@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="zmq-2.1.10">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/x64/zmq-2.1.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
