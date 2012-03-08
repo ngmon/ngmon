@@ -1,4 +1,4 @@
-package cz.example.run;
+package cz.muni.fi.xtovarn.heimdall.run;
 
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.entity.Payload;
@@ -32,8 +32,8 @@ public class Run {
 		event.setTime(new Date(System.currentTimeMillis()));
 		event.setType("org.linux.cron.Started");
 		Payload payload =	new Payload();
-		payload.put("value", 4648);
-		payload.put("value2", "aax4x46aeEF");
+		payload.add("value", 4648);
+		payload.add("value2", "aax4x46aeEF");
 		event.setPayload(payload);
 
 		mapper.writeValue(new File("sth.json"), mapper.readValue(mapper.writeValueAsBytes(event), Event.class));

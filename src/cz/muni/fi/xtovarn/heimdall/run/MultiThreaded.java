@@ -1,18 +1,16 @@
-package cz.muni.fi.xtovarn.heimdall;
+package cz.muni.fi.xtovarn.heimdall.run;
 
 import com.sleepycat.bind.EntryBinding;
 import com.sleepycat.bind.tuple.LongBinding;
 import com.sleepycat.db.*;
-import cz.muni.fi.xtovarn.heimdall.binding.BasicEventTupleBinding;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.store.EventStoreBDB;
 
 import java.io.FileNotFoundException;
-import java.util.Date;
 
 
 public class MultiThreaded {
-	static EventStoreBDB store;
+	/*static EventStoreBDB store;
 
 
 	public static void main(String[] args) throws FileNotFoundException, DatabaseException, InterruptedException {
@@ -44,7 +42,6 @@ public class MultiThreaded {
 		SecondaryDatabase sdb = store.getSecondaryDatabase();
 		DatabaseEntry theKey = new DatabaseEntry();
 		DatabaseEntry theData = new DatabaseEntry();
-		EntryBinding<Event> entryBinding = new BasicEventTupleBinding();
 
 
 		@Override
@@ -62,7 +59,7 @@ public class MultiThreaded {
 				LongBinding.longToEntry(id, theKey);
 
 
-				Event evt1 = new Event(id, new Date(System.currentTimeMillis()), "com.microsoft.wi.ef", "xtovarn logged in");
+				Event evt1 = new Event();
 				entryBinding.objectToEntry(evt1, theData);
 
 				OperationStatus ops = null;
@@ -114,5 +111,5 @@ public class MultiThreaded {
 				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 			}
 		}
-	}
+	}*/
 }

@@ -5,15 +5,17 @@ import com.sleepycat.db.DatabaseEntry;
 import com.sleepycat.db.DatabaseException;
 import com.sleepycat.db.SecondaryDatabase;
 import com.sleepycat.db.SecondaryKeyCreator;
-import cz.muni.fi.xtovarn.heimdall.binding.BasicEventTupleBinding;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import java.io.IOException;
 
 public class EventTypePropertyKeyCreator implements SecondaryKeyCreator {
 
-	private BasicEventTupleBinding eventTupleBinding;
+	private ObjectMapper objectMapper;
 
-	public EventTypePropertyKeyCreator(BasicEventTupleBinding eventTupleBinding) {
-		this.eventTupleBinding = eventTupleBinding;
+	public EventTypePropertyKeyCreator(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
 	}
 
 	@Override
@@ -22,7 +24,14 @@ public class EventTypePropertyKeyCreator implements SecondaryKeyCreator {
 	                                  DatabaseEntry dataEntry,
 	                                  DatabaseEntry resultEntry) throws DatabaseException {
 
-		Event event = eventTupleBinding.entryToObject(dataEntry);
+		Event event = null;
+		try {
+			event = objectMapper.readValue(dataEntry.getData(), Event.class);
+		} catch (IOException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+
+		assert event != null;
 		StringBinding.stringToEntry(event.getType(), resultEntry);
 
 		return true;

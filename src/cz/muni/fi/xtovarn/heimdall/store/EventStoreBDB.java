@@ -1,8 +1,8 @@
 package cz.muni.fi.xtovarn.heimdall.store;
 
 import com.sleepycat.db.*;
-import cz.muni.fi.xtovarn.heimdall.binding.BasicEventTupleBinding;
 import cz.muni.fi.xtovarn.heimdall.keycreator.EventTypePropertyKeyCreator;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,12 +13,17 @@ public class EventStoreBDB {
 	private static SecondaryDatabase secondaryDatabase = null;
 	private static Database sequenceDatabase = null;
 	private static Sequence sequence = null;
+	private static ObjectMapper objectMapper = null;
+
+	public EventStoreBDB(ObjectMapper mapper) {
+		objectMapper = mapper;
+	}
 
 	public void setup() throws FileNotFoundException, DatabaseException {
 		File dbHomeDirectory = new File("./database/evsbdb");
 		String databaseName = "event_store.db";
 
-		EventTypePropertyKeyCreator keyCreator = new EventTypePropertyKeyCreator(new BasicEventTupleBinding());
+		EventTypePropertyKeyCreator keyCreator = new EventTypePropertyKeyCreator(objectMapper);
 
 		EnvironmentConfig environmentConfig = new EnvironmentConfig();
 		environmentConfig.setAllowCreate(true);
@@ -28,15 +33,12 @@ public class EventStoreBDB {
 		DatabaseConfig databaseConfig = new DatabaseConfig();
 		databaseConfig.setAllowCreate(true);
 		databaseConfig.setType(DatabaseType.BTREE);
-		databaseConfig.setTruncate(true);
-
 
 		SecondaryConfig secondaryConfig = new SecondaryConfig();
 		secondaryConfig.setAllowCreate(true);
 		secondaryConfig.setType(DatabaseType.BTREE);
 		secondaryConfig.setSortedDuplicates(true);
 		secondaryConfig.setKeyCreator(keyCreator);
-
 
 		DatabaseConfig sequenceDatabaseConfig = new DatabaseConfig();
 		sequenceDatabaseConfig.setAllowCreate(true);
@@ -46,10 +48,9 @@ public class EventStoreBDB {
 		sequenceConfig.setInitialValue(0);
 		sequenceConfig.setAllowCreate(true);
 
-
 		environment = new Environment(dbHomeDirectory, environmentConfig);
 		database = environment.openDatabase(null, databaseName, null, databaseConfig);
-		secondaryDatabase = environment.openSecondaryDatabase(null, "service_index.db", null, database, secondaryConfig);
+		secondaryDatabase = environment.openSecondaryDatabase(null, "type_index.db", null, database, secondaryConfig);
 		sequenceDatabase = environment.openDatabase(null, "event_id_sequence.db", null, sequenceDatabaseConfig);
 		sequence = sequenceDatabase.openSequence(null, new DatabaseEntry("id".getBytes()), sequenceConfig);
 	}

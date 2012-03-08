@@ -15,12 +15,12 @@ public class Payload {
 	private Map<String, Object> properties = new LinkedHashMap<String, Object>(0);
 
 	@JsonAnySetter
-	public void put(String key, Object value) {
+	public void add(String key, Object value) {
 		properties.put(key, value);
 	}
 
 	@JsonAnyGetter
-	public Map<String, Object> get() {
+	public Map<String, Object> properties() {
 		return properties;
 	}
 
