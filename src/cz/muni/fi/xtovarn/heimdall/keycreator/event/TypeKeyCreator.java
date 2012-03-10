@@ -6,13 +6,11 @@ import com.sleepycat.db.DatabaseException;
 import com.sleepycat.db.SecondaryDatabase;
 import com.sleepycat.db.SecondaryKeyCreator;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import org.codehaus.jackson.map.ObjectMapper;
+import cz.muni.fi.xtovarn.heimdall.util.JSONEventMapper;
 
-public class TypeKeyCreator extends AbstractKeyCreator implements SecondaryKeyCreator {
+import java.io.IOException;
 
-	public TypeKeyCreator(ObjectMapper objectMapper) {
-		super(objectMapper); // TODO Create static ObjectMapper object
-	}
+public class TypeKeyCreator implements SecondaryKeyCreator {
 
 	@Override
 	public boolean createSecondaryKey(SecondaryDatabase secondaryDatabase,
@@ -20,8 +18,15 @@ public class TypeKeyCreator extends AbstractKeyCreator implements SecondaryKeyCr
 	                                  DatabaseEntry dataEntry,
 	                                  DatabaseEntry resultEntry) throws DatabaseException {
 
-		Event event = entryToEvent(dataEntry);
-		StringBinding.stringToEntry(event.getType(), resultEntry);
+		Event event = null;
+		try {
+			event = JSONEventMapper.entryToEvent(dataEntry);
+		} catch (IOException e) {
+			e.printStackTrace();  //TODO To change body of catch statement use File | Settings | File Templates.
+		}
+		if (event != null) {
+			StringBinding.stringToEntry(event.getType(), resultEntry);
+		}
 
 		return true; //TODO null
 	}

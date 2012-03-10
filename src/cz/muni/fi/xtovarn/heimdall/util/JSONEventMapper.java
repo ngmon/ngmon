@@ -9,7 +9,7 @@ import org.codehaus.jackson.smile.SmileFactory;
 
 import java.io.IOException;
 
-public class JSONSimpleMapper {
+public class JSONEventMapper {
 
 	private static final ObjectMapper mapper = new ObjectMapper(new SmileFactory());
 
@@ -25,5 +25,11 @@ public class JSONSimpleMapper {
 		entry.setData(data);
 
 		return entry;
+	}
+
+	public static Event entryToEvent(DatabaseEntry entry) throws IOException {
+		Event event = 	mapper.readValue(entry.getData(), Event.class);
+
+		return event;
 	}
 }

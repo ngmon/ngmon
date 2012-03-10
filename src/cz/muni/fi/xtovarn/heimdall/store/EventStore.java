@@ -4,6 +4,7 @@ import com.sleepycat.bind.tuple.LongBinding;
 import com.sleepycat.db.*;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.keycreator.event.TypeKeyCreator;
+import cz.muni.fi.xtovarn.heimdall.util.JSONEventMapper;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
@@ -18,11 +19,6 @@ public class EventStore {
 	private static SecondaryDatabase eventTypeIndex = null;
 	private static Database sequenceDatabase = null;
 	private static Sequence sequence = null;
-	private static ObjectMapper objectMapper = null;
-
-	public EventStore(ObjectMapper mapper) {
-		objectMapper = mapper;
-	}
 
 	public void setup() throws FileNotFoundException, DatabaseException {
 
@@ -47,7 +43,7 @@ public class EventStore {
 		eventTypeSecondaryConfig.setAllowCreate(true);
 		eventTypeSecondaryConfig.setType(DatabaseType.BTREE);
 		eventTypeSecondaryConfig.setSortedDuplicates(true);
-		TypeKeyCreator typeKeyCreator = new TypeKeyCreator(objectMapper); // Event.type TypeKeyCreator
+		TypeKeyCreator typeKeyCreator = new TypeKeyCreator(); // Event.type TypeKeyCreator
 		eventTypeSecondaryConfig.setKeyCreator(typeKeyCreator);
 		eventTypeIndex = environment.openSecondaryDatabase(null, "event_type_index.db", null, eventStore, eventTypeSecondaryConfig);
 
@@ -66,7 +62,7 @@ public class EventStore {
 
 	public OperationStatus put(Event event) throws DatabaseException, IOException {
 		DatabaseEntry key = new DatabaseEntry();
-		DatabaseEntry data = new DatabaseEntry();
+
 
 		/* Populate key */
 		Long id = sequence.get(null, 1); // Get unique long key from sequence
@@ -76,8 +72,7 @@ public class EventStore {
 		event.setId(id);
 
 		/* Populate data */
-		byte[] bytes = objectMapper.writeValueAsBytes(event); // Convert JSON to binary data (Smile)
-		data.setData(bytes);
+		DatabaseEntry data = JSONEventMapper.eventToEntry(event);
 
 		return eventStore.put(null, key, data);
 	}
@@ -92,7 +87,7 @@ public class EventStore {
 		OperationStatus retVal = cursor.getFirst(key, data, LockMode.DEFAULT);
 
 		while (retVal == OperationStatus.SUCCESS) {
-			Event event = objectMapper.readValue(data.getData(), Event.class);
+			Event event = JSONEventMapper.entryToEvent(data);
 			list.add(event);
 			retVal = cursor.getNext(key, data, LockMode.DEFAULT);
 		}
@@ -109,7 +104,7 @@ public class EventStore {
 		LongBinding.longToEntry(id, key);
 		eventStore.get(null, key, data, LockMode.DEFAULT);
 
-		Event event = objectMapper.readValue(data.getData(), Event.class);
+		Event event = JSONEventMapper.entryToEvent(data);
 
 		return event;
 	}
