@@ -1,20 +1,12 @@
 package cz.muni.fi.xtovarn.heimdall.run;
 
-import com.sleepycat.bind.EntryBinding;
-import com.sleepycat.bind.tuple.LongBinding;
-import com.sleepycat.db.*;
-import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.store.EventStoreBDB;
-
-import java.io.FileNotFoundException;
-
 
 public class MultiThreaded {
-	/*static EventStoreBDB store;
+	/*static EventStore store;
 
 
 	public static void main(String[] args) throws FileNotFoundException, DatabaseException, InterruptedException {
-		store = new EventStoreBDB();
+		store = new EventStore();
 		store.setup();
 
 		Thread ww1 = new Thread(new WorkerWriter());

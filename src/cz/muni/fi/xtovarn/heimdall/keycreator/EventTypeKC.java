@@ -10,11 +10,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 
-public class EventTypePropertyKeyCreator implements SecondaryKeyCreator {
+public class EventTypeKC implements SecondaryKeyCreator {
 
 	private ObjectMapper objectMapper;
 
-	public EventTypePropertyKeyCreator(ObjectMapper objectMapper) {
+	public EventTypeKC(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
 
@@ -28,7 +28,7 @@ public class EventTypePropertyKeyCreator implements SecondaryKeyCreator {
 		try {
 			event = objectMapper.readValue(dataEntry.getData(), Event.class);
 		} catch (IOException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			e.printStackTrace();  //TODO To change body of catch statement use File | Settings | File Templates.
 		}
 
 		assert event != null;
