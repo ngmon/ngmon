@@ -9,6 +9,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -82,9 +84,24 @@ public class EventStore {
 		return eventStore.put(null, key, data);
 	}
 
-	public List<Event> getAll() {
+	public List<Event> getAllRecords() throws DatabaseException, IOException {
+		Cursor cursor = eventStore.openCursor(null, null);
+		DatabaseEntry key = new DatabaseEntry();
+		DatabaseEntry data = new DatabaseEntry();
+		
+		List<Event> list = new ArrayList<Event>();
+		
+		OperationStatus retVal = cursor.getFirst(key, data, LockMode.DEFAULT);
 
-		return new LinkedList<Event>();
+		while (retVal == OperationStatus.SUCCESS) {
+			Event event = objectMapper.readValue(data.getData(), Event.class);
+			list.add(event);
+			retVal = cursor.getNext(key, data, LockMode.DEFAULT);
+		}
+
+		cursor.close();
+
+		return list;
 	}
 
 	public void close() throws DatabaseException {

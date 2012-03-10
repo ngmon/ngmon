@@ -10,6 +10,8 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.smile.SmileFactory;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class App {
 
@@ -42,6 +44,12 @@ public class App {
 
 		OperationStatus ops = store.put(event);
 		System.out.println(ops.toString());
+		
+		List<Event> list = store.getAllRecords();
+
+		for(Event entry : list){
+			System.out.println(entry.toString());
+		}
 
 		store.close();
 	}
