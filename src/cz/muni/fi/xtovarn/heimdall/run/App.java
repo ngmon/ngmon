@@ -4,6 +4,7 @@ import com.sleepycat.db.*;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.entity.Payload;
 import cz.muni.fi.xtovarn.heimdall.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.util.JSONSimpleMapper;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
@@ -41,6 +42,8 @@ public class App {
 		payload.add("value2", "aax4x46aeEF");
 		event.setPayload(payload);
 
+
+		JSONSimpleMapper.eventToEntry(event);
 
 		OperationStatus ops = store.put(event);
 		System.out.println(ops.toString());
