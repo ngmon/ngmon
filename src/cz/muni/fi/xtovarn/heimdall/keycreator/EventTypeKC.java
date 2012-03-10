@@ -10,12 +10,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 
-public class EventTypeKC implements SecondaryKeyCreator {
-
-	private ObjectMapper objectMapper;
+public class EventTypeKC extends AbstractEventKC implements SecondaryKeyCreator {
 
 	public EventTypeKC(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
+		super(objectMapper);
 	}
 
 	@Override
@@ -24,16 +22,9 @@ public class EventTypeKC implements SecondaryKeyCreator {
 	                                  DatabaseEntry dataEntry,
 	                                  DatabaseEntry resultEntry) throws DatabaseException {
 
-		Event event = null;
-		try {
-			event = objectMapper.readValue(dataEntry.getData(), Event.class);
-		} catch (IOException e) {
-			e.printStackTrace();  //TODO To change body of catch statement use File | Settings | File Templates.
-		}
-
-		assert event != null;
+		Event event = entryToObject(dataEntry);
 		StringBinding.stringToEntry(event.getType(), resultEntry);
 
-		return true;
+		return true; //TODO null
 	}
 }
