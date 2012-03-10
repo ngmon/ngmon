@@ -88,9 +88,9 @@ public class EventStore {
 		Cursor cursor = eventStore.openCursor(null, null);
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry data = new DatabaseEntry();
-		
+
 		List<Event> list = new ArrayList<Event>();
-		
+
 		OperationStatus retVal = cursor.getFirst(key, data, LockMode.DEFAULT);
 
 		while (retVal == OperationStatus.SUCCESS) {
@@ -102,6 +102,18 @@ public class EventStore {
 		cursor.close();
 
 		return list;
+	}
+
+	public Event getEventById(Long id) throws DatabaseException, IOException {
+		DatabaseEntry key = new DatabaseEntry();
+		DatabaseEntry data = new DatabaseEntry();
+
+		LongBinding.longToEntry(id, key);
+		eventStore.get(null, key, data, LockMode.DEFAULT);
+
+		Event event = objectMapper.readValue(data.getData(), Event.class);
+
+		return event;
 	}
 
 	public void close() throws DatabaseException {
