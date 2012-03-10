@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.keycreator;
+package cz.muni.fi.xtovarn.heimdall.keycreator.event;
 
 import com.sleepycat.db.DatabaseEntry;
 import com.sleepycat.db.DatabaseException;
@@ -9,15 +9,15 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 
-public abstract class AbstractEventKC {
+public abstract class AbstractKeyCreator {
 
 	private ObjectMapper objectMapper;
 
-	public AbstractEventKC(ObjectMapper objectMapper) {
+	public AbstractKeyCreator(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
 
-	protected Event entryToObject(DatabaseEntry dataEntry) {
+	protected Event entryToEvent(DatabaseEntry dataEntry) {
 		Event event = null;
 		try {
 			event = objectMapper.readValue(dataEntry.getData(), Event.class);

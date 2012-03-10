@@ -94,7 +94,7 @@ public class MultiThreaded {
 			assert cursor != null;
 			try {
 				while (cursor.getNext(theKey, theData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-					System.out.println("READER" + Thread.currentThread().getId() + "::>" + entryBinding.entryToObject(theData).toString());
+					System.out.println("READER" + Thread.currentThread().getId() + "::>" + entryBinding.entryToEvent(theData).toString());
 					Thread.sleep(300);
 				}
 			} catch (DatabaseException e) {

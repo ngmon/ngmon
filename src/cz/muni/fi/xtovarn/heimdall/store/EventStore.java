@@ -3,15 +3,13 @@ package cz.muni.fi.xtovarn.heimdall.store;
 import com.sleepycat.bind.tuple.LongBinding;
 import com.sleepycat.db.*;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.keycreator.EventTypeKC;
+import cz.muni.fi.xtovarn.heimdall.keycreator.event.TypeKeyCreator;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 public class EventStore {
@@ -49,8 +47,8 @@ public class EventStore {
 		eventTypeSecondaryConfig.setAllowCreate(true);
 		eventTypeSecondaryConfig.setType(DatabaseType.BTREE);
 		eventTypeSecondaryConfig.setSortedDuplicates(true);
-		EventTypeKC keyCreator = new EventTypeKC(objectMapper); // Event.type KeyCreator
-		eventTypeSecondaryConfig.setKeyCreator(keyCreator);
+		TypeKeyCreator typeKeyCreator = new TypeKeyCreator(objectMapper); // Event.type TypeKeyCreator
+		eventTypeSecondaryConfig.setKeyCreator(typeKeyCreator);
 		eventTypeIndex = environment.openSecondaryDatabase(null, "event_type_index.db", null, eventStore, eventTypeSecondaryConfig);
 
 		/* Setup sequence eventStore */
