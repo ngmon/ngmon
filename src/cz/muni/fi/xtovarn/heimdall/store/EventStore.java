@@ -5,7 +5,6 @@ import com.sleepycat.db.*;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.keycreator.event.TypeKeyCreator;
 import cz.muni.fi.xtovarn.heimdall.util.JSONEventMapper;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,7 +61,6 @@ public class EventStore {
 
 	public OperationStatus put(Event event) throws DatabaseException, IOException {
 		DatabaseEntry key = new DatabaseEntry();
-
 
 		/* Populate key */
 		Long id = sequence.get(null, 1); // Get unique long key from sequence

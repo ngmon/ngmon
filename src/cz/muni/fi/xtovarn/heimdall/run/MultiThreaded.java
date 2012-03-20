@@ -1,11 +1,22 @@
 package cz.muni.fi.xtovarn.heimdall.run;
 
 
+import com.sleepycat.db.DatabaseException;
+import com.sleepycat.db.OperationStatus;
+import cz.muni.fi.xtovarn.heimdall.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.entity.Payload;
+import cz.muni.fi.xtovarn.heimdall.store.EventStore;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+
 public class MultiThreaded {
-	/*static EventStore store;
+	static EventStore store;
 
 
-	public static void main(String[] args) throws FileNotFoundException, DatabaseException, InterruptedException {
+	public static void main(String[] args) throws InterruptedException, FileNotFoundException, DatabaseException {
 		store = new EventStore();
 		store.setup();
 
@@ -30,37 +41,37 @@ public class MultiThreaded {
 	}
 
 	static class WorkerWriter implements Runnable {
-		Database db = store.getDatabase();
-		SecondaryDatabase sdb = store.getSecondaryDatabase();
-		DatabaseEntry theKey = new DatabaseEntry();
-		DatabaseEntry theData = new DatabaseEntry();
-
 
 		@Override
 		public void run() {
 			int a = 5;
 			while (a > 1) {
+				Event event = new Event();
 
-				Long id = null;
-				try {
-					id = store.getSequence().get(null, 1);
-				} catch (DatabaseException e) {
-					e.printStackTrace();
-				}
-
-				LongBinding.longToEntry(id, theKey);
-
-
-				Event evt1 = new Event();
-				entryBinding.objectToEntry(evt1, theData);
+				event.setApplication("Cron");
+				event.setHostname("domain.localhost.cz");
+				event.setPriority(5);
+				event.setProcess("proc_cron NAme");
+				event.setProcessId("id005");
+				event.setPriority(4);
+				event.setSeverity(5);
+				event.setTime(new Date(System.currentTimeMillis()));
+				event.setType("org.linux.cron.Started");
+				Payload payload = new Payload();
+				payload.add("value", 4648);
+				payload.add("value2", "aax4x46aeEF");
+				event.setPayload(payload);
 
 				OperationStatus ops = null;
 				try {
-					ops = db.put(null, theKey, theData);
+					ops = store.put(event);
 				} catch (DatabaseException e) {
-					e.printStackTrace();
+					e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+				} catch (IOException e) {
+					e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 				}
-				System.out.println("WRITER" + Thread.currentThread().getId() + "::>" + evt1.toString());
+				System.out.println(ops.toString());
+				System.out.println("WRITER" + Thread.currentThread().getId() + "::>" + event.toString());
 
 				a--;
 
@@ -74,34 +85,23 @@ public class MultiThreaded {
 	}
 
 	static class WorkerReader implements Runnable {
-		Database db = store.getDatabase();
-		SecondaryDatabase sdb = store.getSecondaryDatabase();
-		DatabaseEntry theKey = new DatabaseEntry();
-		DatabaseEntry theData = new DatabaseEntry();
-		EntryBinding<Event> entryBinding = new BasicEventTupleBinding();
-
 
 		@Override
 		public void run() {
-			Cursor cursor = null;
-
+			List<Event> list = null;
 			try {
-				cursor = db.openCursor(null, null);
+				list = store.getAllRecords();
 			} catch (DatabaseException e) {
+				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			} catch (IOException e) {
 				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 			}
 
-			assert cursor != null;
-			try {
-				while (cursor.getNext(theKey, theData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-					System.out.println("READER" + Thread.currentThread().getId() + "::>" + entryBinding.entryToEvent(theData).toString());
-					Thread.sleep(300);
-				}
-			} catch (DatabaseException e) {
-				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-			} catch (InterruptedException e) {
-				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			for (Event entry : list) {
+				System.out.println("READER" + Thread.currentThread().getId() + "::>" + entry.toString());
 			}
+
+
 		}
-	}*/
+	}
 }
