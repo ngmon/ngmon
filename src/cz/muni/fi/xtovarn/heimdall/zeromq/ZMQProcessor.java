@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ZeroMQ Forwarder Device implementation.
+ * ZeroMQ Processor Device implementation.
  *
- * @author Alois Belaska <alois.belaska@gmail.com>
+ * @author Daniel Tovarňák, Alois Belaska <alois.belaska@gmail.com>
  */
 public class ZMQProcessor implements Runnable {
 
@@ -26,6 +26,7 @@ public class ZMQProcessor implements Runnable {
 	 * @param context	a 0MQ context previously created.
 	 * @param inSocket  input socket
 	 * @param outSocket output socket
+	 * @param processor MessageProcessor instance
 	 */
 	public ZMQProcessor(Context context, Socket inSocket, Socket outSocket, MessageProcessor processor) {
 		this.inSocket = inSocket;
@@ -38,12 +39,12 @@ public class ZMQProcessor implements Runnable {
 	}
 
 	/**
-	 * Forwarding messages.
+	 * Processing messages.
 	 */
 	@Override
 	public void run() {
 		while (!Thread.currentThread().isInterrupted()) {
-			List<byte[]> message =  new ArrayList<byte[]>(1);
+			List<byte[]> message = new ArrayList<byte[]>(1);
 			boolean rcv_more = true;
 
 			try {
@@ -53,24 +54,27 @@ public class ZMQProcessor implements Runnable {
 				}
 
 				/* Recieve whole multi-part message */
-				while(rcv_more) {
+				while (rcv_more) {
 					message.add(inSocket.recv(0));
 					rcv_more = inSocket.hasReceiveMore();
 				}
 
 				if (!message.isEmpty()) {
 					List<byte[]> outputMessage = processor.process(message);
+					boolean snd_more = false;
 
 					/* Send whole multi-part message */
 					for (int i = 0; i < outputMessage.size(); i++) {
-						snd_more = (outputMessage.size() -i) != 1; // Do we have the last part of the message?
+						snd_more = (outputMessage.size() - i) != 1; // Do we have the last part of the message?
 						byte[] messagePart = outputMessage.get(i);
-						outSocket.send(messagePart, rcv_more ? ZMQ.SNDMORE : 0);
+						outSocket.send(messagePart, snd_more ? ZMQ.SNDMORE : 0); // TODO non-blocking send
 					}
 				}
 			} catch (ZMQException e) {
-				/* context destroyed, exit */
-				if (ZMQ.Error.ETERM.getCode() == e.getErrorCode()) {
+				if (ZMQ.Error.ENOTSUP.getCode() == e.getErrorCode()) {
+					System.err.println(e.getMessage() + ", ERROR_CODE:" + e.getErrorCode());
+					break;
+				} else if (ZMQ.Error.ETERM.getCode() == e.getErrorCode()) { // context destroyed, exit
 					break;
 				}
 				throw e;
