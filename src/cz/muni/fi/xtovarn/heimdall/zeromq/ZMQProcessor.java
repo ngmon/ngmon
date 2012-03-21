@@ -39,25 +39,37 @@ public class ZMQProcessor implements Runnable {
 	 */
 	@Override
 	public void run() {
-		byte[] msg = null;
-		boolean more = true;
-
 		while (!Thread.currentThread().isInterrupted()) {
+			byte[][] message = null;
+			boolean more = true;
+			int part = 0;
+
 			try {
-				// wait while there are requests to process
+
+				/* wait while there are requests to process */
 				if (poller.poll(250000) < 1) {
 					continue;
 				}
 
-				msg = inSocket.recv(0);
-				more = inSocket.hasReceiveMore();
+				/* Recieve whole multi-part message */
+				while (inSocket.hasReceiveMore()) {
+					message[part] = inSocket.recv(0);
+					part++;
+				}
 
-				if (msg != null) {
+				if (message[0] != null) {
+					byte[][] outputMessage = processor.process(message);
 
-					outSocket.send(processor.process(msg)[0], more ? ZMQ.SNDMORE : 0);
+					/* Send whole multi-part message */
+					for (int i = 0; i < outputMessage.length; i++) {
+						more = (outputMessage.length-i) != 1; // Do we have the last part of the message?
+						byte[] messagePart = outputMessage[i];
+						outSocket.send(messagePart, more ? ZMQ.SNDMORE : 0);
+					}
 				}
 			} catch (ZMQException e) {
-				// context destroyed, exit
+
+				/* context destroyed, exit */
 				if (ZMQ.Error.ETERM.getCode() == e.getErrorCode()) {
 					break;
 				}
