@@ -4,6 +4,8 @@ import com.sleepycat.db.*;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.entity.Payload;
 import cz.muni.fi.xtovarn.heimdall.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.zeromq.JSONProcessorImpl;
+import cz.muni.fi.xtovarn.heimdall.zeromq.ZMQProcessor;
 import cz.muni.fi.xtovarn.heimdall.zeromq.ZMQSimpleJSONParser;
 import org.zeromq.ZMQ;
 
@@ -22,7 +24,7 @@ public class App {
 
 		ZMQ.Socket outer = context.socket(ZMQ.PUSH);
 
-		ZMQSimpleJSONParser parser = new ZMQSimpleJSONParser(context, reciver, outer);
+		ZMQProcessor parser = new ZMQProcessor(context, reciver, outer, new JSONProcessorImpl());
 
 		parser.run();
 

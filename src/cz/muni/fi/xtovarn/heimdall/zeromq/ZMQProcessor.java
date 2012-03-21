@@ -5,6 +5,9 @@ import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * ZeroMQ Forwarder Device implementation.
  *
@@ -40,35 +43,32 @@ public class ZMQProcessor implements Runnable {
 	@Override
 	public void run() {
 		while (!Thread.currentThread().isInterrupted()) {
-			byte[][] message = null;
-			boolean more = true;
-			int part = 0;
+			List<byte[]> message =  new ArrayList<byte[]>(1);
+			boolean rcv_more = true;
 
 			try {
-
 				/* wait while there are requests to process */
 				if (poller.poll(250000) < 1) {
 					continue;
 				}
 
 				/* Recieve whole multi-part message */
-				while (inSocket.hasReceiveMore()) {
-					message[part] = inSocket.recv(0);
-					part++;
+				while(rcv_more) {
+					message.add(inSocket.recv(0));
+					rcv_more = inSocket.hasReceiveMore();
 				}
 
-				if (message[0] != null) {
-					byte[][] outputMessage = processor.process(message);
+				if (!message.isEmpty()) {
+					List<byte[]> outputMessage = processor.process(message);
 
 					/* Send whole multi-part message */
-					for (int i = 0; i < outputMessage.length; i++) {
-						more = (outputMessage.length-i) != 1; // Do we have the last part of the message?
-						byte[] messagePart = outputMessage[i];
-						outSocket.send(messagePart, more ? ZMQ.SNDMORE : 0);
+					for (int i = 0; i < outputMessage.size(); i++) {
+						snd_more = (outputMessage.size() -i) != 1; // Do we have the last part of the message?
+						byte[] messagePart = outputMessage.get(i);
+						outSocket.send(messagePart, rcv_more ? ZMQ.SNDMORE : 0);
 					}
 				}
 			} catch (ZMQException e) {
-
 				/* context destroyed, exit */
 				if (ZMQ.Error.ETERM.getCode() == e.getErrorCode()) {
 					break;

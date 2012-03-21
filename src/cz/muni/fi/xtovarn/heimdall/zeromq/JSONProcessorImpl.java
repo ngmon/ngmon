@@ -7,21 +7,23 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JSONProcessorImpl implements MessageProcessor {
 	@Override
-	public byte[][] process(byte[][] message) {
-		byte outputMessage[][] = null;
+	public List<byte[]> process(List<byte[]> message) {
+		List<byte[]> outputMessage = new ArrayList<byte[]>();
 
-		if (message.length > 1) {
+		if (message.size() > 1) {
 			System.err.println("Wrong format!!");
 		}
 
-		String json = (new String(message[0])).trim();
+		String json = (new String(message.get(0))).trim();
 		Event event = null;
 		try {
 			event = JSONStringParser.stringToEvent(json);
-			outputMessage[0] = JSONEventMapper.eventToEntry(event).getData();
+			outputMessage.add(JSONEventMapper.eventToEntry(event).getData());
 		} catch (JsonParseException e) {
 			System.err.println(e.getMessage());
 		} catch (JsonMappingException e) {
@@ -29,6 +31,8 @@ public class JSONProcessorImpl implements MessageProcessor {
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
+
+		System.out.println(event.toString());
 
 		return outputMessage;
 	}
