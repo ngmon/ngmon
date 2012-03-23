@@ -67,7 +67,7 @@ public class ZMQProcessor implements Runnable {
 					for (int i = 0; i < outputMessage.size(); i++) {
 						snd_more = (outputMessage.size() - i) != 1; // Do we have the last part of the message?
 						byte[] messagePart = outputMessage.get(i);
-						outSocket.send(messagePart, snd_more ? ZMQ.SNDMORE : 0); // TODO non-blocking send
+						outSocket.send(messagePart, snd_more ? ZMQ.SNDMORE : ZMQ.NOBLOCK); // TODO non-blocking send?
 					}
 				}
 			} catch (ZMQException e) {
