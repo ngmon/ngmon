@@ -1,6 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.run;
 
 import com.sleepycat.db.*;
+import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.processor.Enrich;
 import cz.muni.fi.xtovarn.heimdall.processor.Print;
 import cz.muni.fi.xtovarn.heimdall.processor.Store;
@@ -11,6 +12,8 @@ import cz.muni.fi.xtovarn.heimdall.zeromq.ZMQEventProcessor;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class App {
 
@@ -23,9 +26,9 @@ public class App {
 		reciver.bind("tcp://*:359");
 		ZMQ.Socket outer = context.socket(ZMQ.PUSH);
 
-		Enrich action = new Enrich(new Store(new Print(), eventStore));
+		BlockingQueue<Event> queue1 = new ArrayBlockingQueue<Event>(10);
 
-		ZMQEventProcessor parser = new ZMQEventProcessor(context, reciver, outer, action);
+		ZMQEventProcessor parser = new ZMQEventProcessor(context, reciver, queue1);
 
 		parser.run();
 

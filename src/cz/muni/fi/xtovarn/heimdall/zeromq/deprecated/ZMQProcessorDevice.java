@@ -13,6 +13,7 @@ import java.util.List;
  *
  * @author Daniel Tovarňák, Alois Belaska <alois.belaska@gmail.com>
  */
+@Deprecated
 public class ZMQProcessorDevice implements Runnable {
 
 	private final ZMQ.Poller poller;

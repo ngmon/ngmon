@@ -1,8 +1,8 @@
-package cz.muni.fi.xtovarn.heimdall.zeromq.deprecated;
+package cz.muni.fi.xtovarn.heimdall.zeromq;
 
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.util.JSONEventMapper;
 import cz.muni.fi.xtovarn.heimdall.util.JSONStringParser;
+import cz.muni.fi.xtovarn.heimdall.zeromq.deprecated.ZMQMessageProcessor;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.zeromq.ZMQ;
@@ -12,12 +12,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Deprecated
-public class JSONMessageProcessor implements ZMQMessageProcessor {
-	@Override
-	public List<byte[]> process(List<byte[]> message) throws ZMQException{
-		List<byte[]> outputMessage = new ArrayList<byte[]>();
+public class JSONProcessor {
 
+	public Event process(List<byte[]> message) throws ZMQException{
 		if (message.size() > 1) {
 			throw new ZMQException("The message has more parts than expected", (int) ZMQ.Error.ENOTSUP.getCode()); // TODO choose correct error CODE
 		}
@@ -26,7 +23,6 @@ public class JSONMessageProcessor implements ZMQMessageProcessor {
 		Event event = null;
 		try {
 			event = JSONStringParser.stringToEvent(json);
-			outputMessage.add(JSONEventMapper.eventAsBytes(event));
 		} catch (JsonParseException e) {
 			System.err.println(e.getMessage());
 		} catch (JsonMappingException e) {
@@ -35,7 +31,7 @@ public class JSONMessageProcessor implements ZMQMessageProcessor {
 			System.err.println(e.getMessage());
 		}
 
-		return outputMessage;
+		return event;
 	}
 
 }
