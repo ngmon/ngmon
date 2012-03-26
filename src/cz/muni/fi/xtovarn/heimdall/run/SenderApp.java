@@ -32,7 +32,7 @@ public class SenderApp {
 
 			System.out.println("Sending >>" + json);
 
-			Thread.sleep(4000);
+			Thread.sleep(10);
 		}
 
 		//  We never get here but clean up anyhow

@@ -19,7 +19,6 @@ public class ZMQProcessorDevice implements Runnable {
 	private final ZMQ.Poller poller;
 	private final ZMQ.Socket inSocket;
 	private final ZMQ.Socket outSocket;
-	private final ZMQMessageProcessor messageProcessor;
 
 	/**
 	 * Class constructor.
@@ -27,16 +26,14 @@ public class ZMQProcessorDevice implements Runnable {
 	 * @param context   a 0MQ context previously created.
 	 * @param inSocket  input socket
 	 * @param outSocket output socket
-	 * @param messageProcessor ZMQMessageProcessor instance
 	 */
-	public ZMQProcessorDevice(Context context, Socket inSocket, Socket outSocket, ZMQMessageProcessor messageProcessor) {
+	public ZMQProcessorDevice(Context context, Socket inSocket, Socket outSocket) {
 		this.inSocket = inSocket;
 		this.outSocket = outSocket;
 
 		this.poller = context.poller(1);
 		this.poller.register(inSocket, ZMQ.Poller.POLLIN);
 
-		this.messageProcessor = messageProcessor;
 	}
 
 	/**
@@ -62,7 +59,7 @@ public class ZMQProcessorDevice implements Runnable {
 
 				/* Send whole multi-part message */
 				if (!message.isEmpty()) {
-					List<byte[]> outputMessage = messageProcessor.process(message); // processing logic
+					List<byte[]> outputMessage = message; // processing logic
 					boolean snd_more;
 
 					/* Iterate over message parts */

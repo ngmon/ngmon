@@ -47,6 +47,10 @@ public class App {
 		ww3.start();
 		ww1.start();
 
+		while (!Thread.currentThread().isInterrupted()) {
+			queue4.take();
+		}
+
 		ww1.join();
 		ww2.join();
 		ww3.join();
