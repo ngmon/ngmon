@@ -1,15 +1,10 @@
-package cz.muni.fi.xtovarn.heimdall.zeromq;
+package cz.muni.fi.xtovarn.heimdall.zeromq.depr;
 
-import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.processor.AbstractAction;
-import cz.muni.fi.xtovarn.heimdall.util.JSONEventMapper;
-import cz.muni.fi.xtovarn.heimdall.util.JSONStringParser;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +13,12 @@ import java.util.List;
  *
  * @author Daniel Tovarňák, Alois Belaska <alois.belaska@gmail.com>
  */
-public class ZMQEventProcessor implements Runnable {
+public class ZMQProcessorDevice implements Runnable {
 
 	private final ZMQ.Poller poller;
-	private final Socket inSocket;
-	private final Socket outSocket;
-	private final AbstractAction actionChain;
+	private final ZMQ.Socket inSocket;
+	private final ZMQ.Socket outSocket;
+	private final ZMQMessageProcessor messageProcessor;
 
 	/**
 	 * Class constructor.
@@ -31,16 +26,16 @@ public class ZMQEventProcessor implements Runnable {
 	 * @param context   a 0MQ context previously created.
 	 * @param inSocket  input socket
 	 * @param outSocket output socket
-	 * @param actionChain ZMQMessageProcessor instance
+	 * @param messageProcessor ZMQMessageProcessor instance
 	 */
-	public ZMQEventProcessor(Context context, Socket inSocket, Socket outSocket, AbstractAction actionChain) {
+	public ZMQProcessorDevice(Context context, Socket inSocket, Socket outSocket, ZMQMessageProcessor messageProcessor) {
 		this.inSocket = inSocket;
 		this.outSocket = outSocket;
 
 		this.poller = context.poller(1);
 		this.poller.register(inSocket, ZMQ.Poller.POLLIN);
 
-		this.actionChain = actionChain;
+		this.messageProcessor = messageProcessor;
 	}
 
 	/**
@@ -66,22 +61,8 @@ public class ZMQEventProcessor implements Runnable {
 
 				/* Send whole multi-part message */
 				if (!message.isEmpty()) {
-					List<byte[]> outputMessage = new ArrayList<byte[]>();
+					List<byte[]> outputMessage = messageProcessor.process(message); // processing logic
 					boolean snd_more;
-
-
-					/* process message */
-					Event event = null;
-					try {
-
-						event = JSONStringParser.stringToEvent(new String(message.get(0)).trim());
-						actionChain.process(event);
-						outputMessage.add(JSONEventMapper.eventAsBytes(event));
-
-					} catch (IOException e) {
-						System.err.println(e.getMessage());
-					}
-
 
 					/* Iterate over message parts */
 					for (int i = 0; i < outputMessage.size(); i++) {

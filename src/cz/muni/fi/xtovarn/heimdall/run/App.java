@@ -6,8 +6,6 @@ import cz.muni.fi.xtovarn.heimdall.processor.Print;
 import cz.muni.fi.xtovarn.heimdall.processor.Store;
 import cz.muni.fi.xtovarn.heimdall.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.zeromq.ZMQEventProcessor;
-import cz.muni.fi.xtovarn.heimdall.zeromq.deprecated.JSONMessageProcessor;
-import cz.muni.fi.xtovarn.heimdall.zeromq.deprecated.ZMQProcessorDevice;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
