@@ -6,6 +6,7 @@ import com.sleepycat.db.OperationStatus;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.entity.Payload;
 import cz.muni.fi.xtovarn.heimdall.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.store.EventStoreFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,7 +18,7 @@ public class MultiThreaded {
 
 
 	public static void main(String[] args) throws InterruptedException, FileNotFoundException, DatabaseException {
-		store = new EventStore();
+		store = EventStoreFactory.getInstance();
 
 		Thread ww1 = new Thread(new WorkerWriter());
 		Thread ww2 = new Thread(new WorkerWriter());

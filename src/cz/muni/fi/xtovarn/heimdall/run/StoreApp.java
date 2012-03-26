@@ -5,6 +5,7 @@ import com.sleepycat.db.OperationStatus;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.entity.Payload;
 import cz.muni.fi.xtovarn.heimdall.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.store.EventStoreFactory;
 
 import java.io.IOException;
 import java.util.Date;
@@ -13,7 +14,7 @@ import java.util.List;
 public class StoreApp {
 
 	public static void main(String[] args) throws IOException, DatabaseException {
-		EventStore store = new EventStore();
+		EventStore store = EventStoreFactory.getInstance();
 
 		Event event = new Event();
 

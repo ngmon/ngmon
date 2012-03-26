@@ -19,7 +19,7 @@ public class EventStore {
 	private static Database sequenceDatabase = null;
 	private static Sequence sequence = null;
 
-	public EventStore() throws FileNotFoundException, DatabaseException {
+	protected EventStore() throws FileNotFoundException, DatabaseException {
 		setup();
 	}
 
