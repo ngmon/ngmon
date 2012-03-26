@@ -1,9 +1,9 @@
 package cz.muni.fi.xtovarn.heimdall.run;
 
 import com.sleepycat.db.*;
-import cz.muni.fi.xtovarn.heimdall.processor.Enrich;
-import cz.muni.fi.xtovarn.heimdall.processor.Print;
-import cz.muni.fi.xtovarn.heimdall.processor.Store;
+import cz.muni.fi.xtovarn.heimdall.proc.Enrich;
+import cz.muni.fi.xtovarn.heimdall.proc.Print;
+import cz.muni.fi.xtovarn.heimdall.proc.Store;
 import cz.muni.fi.xtovarn.heimdall.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.zeromq.ZMQEventProcessor;
 import org.zeromq.ZMQ;

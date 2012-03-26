@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.processor;
+package cz.muni.fi.xtovarn.heimdall.proc;
 
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 
