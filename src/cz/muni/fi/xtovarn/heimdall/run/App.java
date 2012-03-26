@@ -27,10 +27,10 @@ public class App {
 		ZMQ.Socket reciver = context.socket(ZMQ.PULL);
 		reciver.bind("tcp://*:359");
 
-		BlockingQueue<List<byte[]>> queue1 = new ArrayBlockingQueue<List<byte[]>>(10);		
-		BlockingQueue<Event> queue2 = new ArrayBlockingQueue<Event>(10);
-		BlockingQueue<Event> queue3 = new ArrayBlockingQueue<Event>(10);
-		BlockingQueue<Event> queue4 = new ArrayBlockingQueue<Event>(20);
+		BlockingQueue<List<byte[]>> queue1 = new ArrayBlockingQueue<List<byte[]>>(1);
+		BlockingQueue<Event> queue2 = new ArrayBlockingQueue<Event>(1);
+		BlockingQueue<Event> queue3 = new ArrayBlockingQueue<Event>(1);
+		BlockingQueue<Event> queue4 = new ArrayBlockingQueue<Event>(1);
 
 		ZMQBasicReciever parser = new ZMQBasicReciever(reciver, queue1, context);
 		Stage<List<byte[]>, Event> stage1 = new ParseJSONStage(queue1, queue2);
@@ -49,6 +49,7 @@ public class App {
 
 		while (!Thread.currentThread().isInterrupted()) {
 			queue4.take();
+			System.err.println("[" + queue1.size() + "¦" + queue2.size() + "¦" + queue3.size() + "¦" + queue4.size() + "]");
 		}
 
 		ww1.join();

@@ -5,6 +5,7 @@ import com.sleepycat.db.OperationStatus;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.entity.Payload;
 import cz.muni.fi.xtovarn.heimdall.store.EventStore;
+import org.codehaus.jackson.map.util.ISO8601Utils;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
@@ -20,19 +21,23 @@ public class SenderApp {
 		//  Socket facing clients
 		ZMQ.Socket sender = context.socket(ZMQ.PUSH);
 		sender.connect("tcp://localhost:359");
-
+		
+		int n = 65000;
+		
 		while (!Thread.currentThread().isInterrupted()) {
-			
-			String json = "{\"Event\":{\"id\":123564,\"occurrenceTime\":\"2012-03-20T13:54:22.039+0000\",\"hostname\":\"domain.localhost.cz\",\"type\":\"org.linux.cron.Started\",\"application\":\"Cron\",\"process\":\"proc_cron NAme\",\"processId\":\"id005\",\"severity\":5,\"priority\":4,\"Payload\":{\"schema\":null,\"schemaVersion\":null,\"value\":4648,\"value2\":\"aax4x46aeEF\"}}}";
+
+			String json = "{\"Event\":{\"occurrenceTime\":\"" + ISO8601Utils.format(new Date(System.currentTimeMillis()), true) + "\",\"hostname\":\"domain.localhost.cz\",\"type\":\"org.linux.cron.Started\",\"application\":\"Cron\",\"process\":\"proc_cron NAme\",\"processId\":\"id005\",\"severity\":5,\"priority\":4,\"Payload\":{\"schema\":null,\"schemaVersion\":null,\"value\":4648,\"value2\":\"aax4x46aeEF\"}}}";
 			
 /*			sender.send(json.getBytes(), ZMQ.SNDMORE);
 			sender.send(json.getBytes(), ZMQ.SNDMORE);
 			sender.send(json.getBytes(), ZMQ.SNDMORE);*/
 			sender.send(json.getBytes(), 0);
 
-			System.out.println("Sending >>" + json);
-
-			Thread.sleep(10);
+//			System.out.println("Sending >>" + json);
+//
+			Thread.sleep(1);
+			n--;
+			if (n < 1) Thread.currentThread().interrupt();
 		}
 
 		//  We never get here but clean up anyhow
