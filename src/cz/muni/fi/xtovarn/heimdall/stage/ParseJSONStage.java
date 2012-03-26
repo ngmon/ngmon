@@ -18,8 +18,6 @@ public class ParseJSONStage extends AbstractStage<List<byte[]>, Event> implement
 	@Override
 	public Event work(List<byte[]> workItem) throws IOException {
 
-		System.out.println(this.toString() + " bytes recieved");
-
 		if (workItem.size() > 1) {
 			throw new IOException("The message has more parts than expected");
 		}
