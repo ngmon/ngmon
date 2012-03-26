@@ -1,25 +1,30 @@
-package cz.muni.fi.xtovarn.heimdall.zeromq;
+package cz.muni.fi.xtovarn.heimdall.stage;
 
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.util.JSONStringParser;
-import cz.muni.fi.xtovarn.heimdall.zeromq.deprecated.ZMQMessageProcessor;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
-public class JSONProcessor {
+public class ParseJSONStage extends AbstractStage<List<byte[]>, Event> implements Stage<List<byte[]>, Event> {
 
-	public Event process(List<byte[]> message) throws ZMQException{
-		if (message.size() > 1) {
-			throw new ZMQException("The message has more parts than expected", (int) ZMQ.Error.ENOTSUP.getCode()); // TODO choose correct error CODE
+	public ParseJSONStage(BlockingQueue<List<byte[]>> inWorkQueue, BlockingQueue<Event> outWorkQueue) {
+		super(inWorkQueue, outWorkQueue);
+	}
+
+	@Override
+	public Event work(List<byte[]> workItem) throws IOException {
+
+		if (workItem.size() > 1) {
+			throw new IOException("The message has more parts than expected");
 		}
 
-		String json = (new String(message.get(0))).trim();
+		String json = (new String(workItem.get(0))).trim();
 		Event event = null;
 		try {
 			event = JSONStringParser.stringToEvent(json);
@@ -33,5 +38,4 @@ public class JSONProcessor {
 
 		return event;
 	}
-
 }
