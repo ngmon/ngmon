@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.zeromq.depr;
+package cz.muni.fi.xtovarn.heimdall.zeromq.deprecated;
 
 import org.zeromq.ZMQException;
 

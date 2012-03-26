@@ -1,7 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.zeromq;
 
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.proc.AbstractAction;
+import cz.muni.fi.xtovarn.heimdall.processor.AbstractAction;
 import cz.muni.fi.xtovarn.heimdall.util.JSONEventMapper;
 import cz.muni.fi.xtovarn.heimdall.util.JSONStringParser;
 import org.zeromq.ZMQ;
