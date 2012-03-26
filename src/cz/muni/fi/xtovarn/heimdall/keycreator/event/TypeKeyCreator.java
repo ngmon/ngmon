@@ -20,7 +20,7 @@ public class TypeKeyCreator implements SecondaryKeyCreator {
 
 		Event event = null;
 		try {
-			event = JSONEventMapper.entryToEvent(dataEntry);
+			event = JSONEventMapper.bytesToEvent(dataEntry.getData());
 		} catch (IOException e) {
 			e.printStackTrace();  //TODO To change body of catch statement use File | Settings | File Templates.
 		}

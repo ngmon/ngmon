@@ -18,7 +18,6 @@ public class MultiThreaded {
 
 	public static void main(String[] args) throws InterruptedException, FileNotFoundException, DatabaseException {
 		store = new EventStore();
-		store.setup();
 
 		Thread ww1 = new Thread(new WorkerWriter());
 		Thread ww2 = new Thread(new WorkerWriter());
@@ -55,7 +54,7 @@ public class MultiThreaded {
 				event.setProcessId("id005");
 				event.setPriority(4);
 				event.setSeverity(5);
-				event.setTime(new Date(System.currentTimeMillis()));
+				event.setOccurrenceTime(new Date(System.currentTimeMillis()));
 				event.setType("org.linux.cron.Started");
 				Payload payload = new Payload();
 				payload.add("value", 4648);

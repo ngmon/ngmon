@@ -19,7 +19,11 @@ public class EventStore {
 	private static Database sequenceDatabase = null;
 	private static Sequence sequence = null;
 
-	public void setup() throws FileNotFoundException, DatabaseException {
+	public EventStore() throws FileNotFoundException, DatabaseException {
+		setup();
+	}
+
+	private void setup() throws FileNotFoundException, DatabaseException {
 
 		/* Setup environment root path */
 		File homeDirectory = new File("./database/evsbdb");
@@ -70,7 +74,7 @@ public class EventStore {
 		event.setId(id);
 
 		/* Populate data */
-		DatabaseEntry data = JSONEventMapper.eventToEntry(event);
+		DatabaseEntry data = new DatabaseEntry(JSONEventMapper.eventAsBytes(event));
 
 		return eventStore.put(null, key, data);
 	}
@@ -85,7 +89,7 @@ public class EventStore {
 		OperationStatus retVal = cursor.getFirst(key, data, LockMode.DEFAULT);
 
 		while (retVal == OperationStatus.SUCCESS) {
-			Event event = JSONEventMapper.entryToEvent(data);
+			Event event = JSONEventMapper.bytesToEvent(data.getData());
 			list.add(event);
 			retVal = cursor.getNext(key, data, LockMode.DEFAULT);
 		}
@@ -102,7 +106,7 @@ public class EventStore {
 		LongBinding.longToEntry(id, key);
 		eventStore.get(null, key, data, LockMode.DEFAULT);
 
-		Event event = JSONEventMapper.entryToEvent(data);
+		Event event = JSONEventMapper.bytesToEvent(data.getData());
 
 		return event;
 	}

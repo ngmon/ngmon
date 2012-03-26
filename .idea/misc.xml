@@ -25,6 +25,19 @@
             </SvnBranchConfiguration>
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/.idea">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchUrls">
+                <list>
+                  <option value="https://svn.fi.muni.cz/fi/xtovarn_heimdalld/heimdalld/branches" />
+                  <option value="https://svn.fi.muni.cz/fi/xtovarn_heimdalld/heimdalld/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://svn.fi.muni.cz/fi/xtovarn_heimdalld/heimdalld/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
       </map>
     </option>
     <option name="mySupportsUserInfoFilter" value="true" />

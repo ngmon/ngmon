@@ -1,17 +1,16 @@
 package cz.muni.fi.xtovarn.heimdall.entity;
 
-import cz.muni.fi.xtovarn.heimdall.entity.Payload;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonRootName;
 
-import java.io.Serializable;
 import java.util.Date;
 
 @JsonRootName("Event")
 public class Event {
 	
 	private long id;
-	private Date time;
+	private Date occurrenceTime;
+	private Date detectionTime;
 	private String hostname;
 	private String type;
 	private String application;
@@ -33,12 +32,20 @@ public class Event {
 		this.id = id;
 	}
 
-	public Date getTime() {
-		return time;
+	public Date getOccurrenceTime() {
+		return occurrenceTime;
 	}
 
-	public void setTime(Date time) {
-		this.time = time;
+	public void setOccurrenceTime(Date occurrenceTime) {
+		this.occurrenceTime = occurrenceTime;
+	}
+
+	public Date getDetectionTime() {
+		return detectionTime;
+	}
+
+	public void setDetectionTime(Date detectionTime) {
+		this.detectionTime = detectionTime;
 	}
 
 	public String getHostname() {
@@ -107,9 +114,10 @@ public class Event {
 
 	@Override
 	public String toString() {
-		return "Event{" +
+		return "[Event@" + this.hashCode() + "] {" +
 				"id=" + id +
-				", time=" + time +
+				", occurrenceTime=" + occurrenceTime +
+				", detectionTime=" + detectionTime +
 				", hostname='" + hostname + '\'' +
 				", type='" + type + '\'' +
 				", application='" + application + '\'' +
@@ -120,4 +128,6 @@ public class Event {
 				", payload=" + payload +
 				'}';
 	}
+
+
 }

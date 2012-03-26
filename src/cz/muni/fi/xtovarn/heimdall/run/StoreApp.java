@@ -14,7 +14,6 @@ public class StoreApp {
 
 	public static void main(String[] args) throws IOException, DatabaseException {
 		EventStore store = new EventStore();
-		store.setup();
 
 		Event event = new Event();
 
@@ -25,7 +24,7 @@ public class StoreApp {
 		event.setProcessId("id005");
 		event.setPriority(4);
 		event.setSeverity(5);
-		event.setTime(new Date(System.currentTimeMillis()));
+		event.setOccurrenceTime(new Date(System.currentTimeMillis()));
 		event.setType("org.linux.cron.Started");
 		Payload payload = new Payload();
 		payload.add("value", 4648);

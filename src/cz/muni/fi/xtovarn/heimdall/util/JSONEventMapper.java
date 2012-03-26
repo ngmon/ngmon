@@ -2,7 +2,6 @@ package cz.muni.fi.xtovarn.heimdall.util;
 
 import com.sleepycat.db.DatabaseEntry;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
@@ -20,17 +19,13 @@ public class JSONEventMapper {
 		mapper.configure(DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
 	}
 
-	public static DatabaseEntry eventToEntry(Event event) throws IOException {
-		DatabaseEntry entry = new DatabaseEntry();
-		byte[] data = mapper.writeValueAsBytes(event);
-		entry.setData(data);
+	public static byte[] eventAsBytes(Event event) throws IOException {
 
-		return entry;
+		return mapper.writeValueAsBytes(event);
 	}
 
-	public static Event entryToEvent(DatabaseEntry entry) throws IOException {
-		Event event = 	mapper.readValue(entry.getData(), Event.class);
+	public static Event bytesToEvent(byte[] data) throws IOException {
 
-		return event;
+		return mapper.readValue(data, Event.class);
 	}
 }
