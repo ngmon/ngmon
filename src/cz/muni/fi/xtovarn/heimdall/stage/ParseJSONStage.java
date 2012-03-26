@@ -4,8 +4,6 @@ import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.util.JSONStringParser;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQException;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +17,8 @@ public class ParseJSONStage extends AbstractStage<List<byte[]>, Event> implement
 
 	@Override
 	public Event work(List<byte[]> workItem) throws IOException {
+
+		System.out.println(this.toString() + " bytes recieved");
 
 		if (workItem.size() > 1) {
 			throw new IOException("The message has more parts than expected");

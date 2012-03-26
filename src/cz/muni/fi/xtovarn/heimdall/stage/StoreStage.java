@@ -26,7 +26,9 @@ public class StoreStage extends AbstractStage<Event, Event> implements Stage<Eve
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
-		
+
+		System.out.println("STORED: " + workItem.toString());
+
 		return workItem;
 	}
 
