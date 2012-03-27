@@ -47,7 +47,7 @@ public class ZMQBasicReciever implements Runnable {
 			boolean rcv_more = true;
 
 			try {
-				/* Wait while there are requests to processEvent */
+				/* Wait while there are requests to process */
 				if (poller.poll(250000) < 1) {
 					continue;
 				}
