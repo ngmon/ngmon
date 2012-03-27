@@ -16,7 +16,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public class ZMQBasicReciever implements Runnable {
 
-	private final ZMQ.Poller poller;
 	private final Socket inSocket;
 	private final BlockingQueue<List<byte[]>> outWorkQueue;
 
@@ -24,15 +23,10 @@ public class ZMQBasicReciever implements Runnable {
 	 * Class constructor.
 	 *
 	 * @param outWorkQueue out work Queue
-	 * @param context   a 0MQ context previously created.
 	 * @param inSocket  input socket
 	 */
-	public ZMQBasicReciever(Socket inSocket, BlockingQueue<List<byte[]>> outWorkQueue, Context context) {
+	public ZMQBasicReciever(Socket inSocket, BlockingQueue<List<byte[]>> outWorkQueue) {
 		this.inSocket = inSocket;
-
-		this.poller = context.poller(1);
-		this.poller.register(inSocket, ZMQ.Poller.POLLIN);
-
 		this.outWorkQueue = outWorkQueue;
 	}
 
@@ -47,14 +41,9 @@ public class ZMQBasicReciever implements Runnable {
 			boolean rcv_more = true;
 
 			try {
-				/* Wait while there are requests to process */
-				if (poller.poll(250000) < 1) {
-					continue;
-				}
-
 				/* Recieve whole multi-part message */
 				while (rcv_more) {
-					message.add(inSocket.recv(0));
+					message.add(inSocket.recv(0)); // BLOCKING recieve
 					rcv_more = inSocket.hasReceiveMore();
 				}
 
