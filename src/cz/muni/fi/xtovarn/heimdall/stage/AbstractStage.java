@@ -22,7 +22,6 @@ public abstract class AbstractStage<T_in,T_out> implements Runnable {
 
 		while (!Thread.currentThread().isInterrupted()) {
 			try {
-
 				incomingWork = inWorkQueue.take();
 				outcomingWork = work(incomingWork);
 				outWorkQueue.put(outcomingWork);
@@ -35,7 +34,6 @@ public abstract class AbstractStage<T_in,T_out> implements Runnable {
 			} catch (IOException e) {
 
 				e.printStackTrace();  // TODO Exception
-
 			}
 		}
 	}

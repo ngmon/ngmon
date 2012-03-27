@@ -8,6 +8,7 @@ import cz.muni.fi.xtovarn.heimdall.stage.Stage;
 import cz.muni.fi.xtovarn.heimdall.stage.StoreStage;
 import cz.muni.fi.xtovarn.heimdall.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.store.EventStoreFactory;
+import cz.muni.fi.xtovarn.heimdall.zeromq.ZMQBasicSender;
 import cz.muni.fi.xtovarn.heimdall.zeromq.ZMQContextFactory;
 import cz.muni.fi.xtovarn.heimdall.zeromq.ZMQBasicReciever;
 import org.zeromq.ZMQ;
@@ -20,6 +21,7 @@ import java.util.concurrent.BlockingQueue;
 public class App {
 
 	private static final String RCV_ADDRESS = "tcp://*:359";
+	private static final String SND_ADDRESS = "tcp://*:360";
 
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
 		System.out.println("Heimdall is starting...");
@@ -28,8 +30,11 @@ public class App {
 		final ZMQ.Context context = ZMQContextFactory.getInstance();
 
 		// Socket facing clients
-		final ZMQ.Socket reciever = context.socket(ZMQ.PULL);
+		ZMQ.Socket reciever = context.socket(ZMQ.PULL);
 		reciever.bind(RCV_ADDRESS);
+		
+		ZMQ.Socket sender = context.socket(ZMQ.PULL);
+		sender.bind(SND_ADDRESS);
 
 		BlockingQueue<List<byte[]>> queue1 = new ArrayBlockingQueue<List<byte[]>>(2);
 		BlockingQueue<Event> queue2 = new ArrayBlockingQueue<Event>(2);
@@ -40,11 +45,13 @@ public class App {
 		Stage<List<byte[]>, Event> stage1 = new ParseJSONStage(queue1, queue2);
 		Stage<Event, Event> stage2 = new SanitizeStage(queue2, queue3);
 		Stage<Event, Event> stage3 = new StoreStage(queue3, queue4, eventStore);
+		ZMQBasicSender sender_stage = new ZMQBasicSender(queue4, sender);
 
 		final Thread ww1 = new Thread(parser);
 		final Thread ww2 = new Thread(stage1);
 		final Thread ww3 = new Thread(stage2);
 		final Thread ww4 = new Thread(stage3);
+		final Thread ww5 = new Thread(sender_stage);
 
 
 		/* Inner class, handles shutdowns by Ctrl+C */
@@ -52,7 +59,10 @@ public class App {
 
 			@Override
 			public void run() {
-				context.term();
+				ww1.interrupt();
+				ww5.interrupt();
+
+				context.term(); // Interrupt ww1
 				ww2.interrupt();
 				ww3.interrupt();
 				ww4.interrupt();
@@ -70,14 +80,11 @@ public class App {
 		ww4.start();
 		ww2.start();
 		ww3.start();
+		ww5.start();
 		ww1.start();
 
-
-		/*while (!Thread.currentThread().isInterrupted()) {
-			queue4.take();
-		}*/
-
 		ww1.join();
+		ww5.join();
 		ww2.join();
 		ww3.join();
 		ww4.join();
