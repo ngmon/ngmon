@@ -18,7 +18,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class App {
-	
+
 	private static final String RCV_ADDRESS = "tcp://*:359";
 
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
@@ -31,27 +31,25 @@ public class App {
 		ZMQ.Socket reciever = context.socket(ZMQ.PULL);
 		reciever.bind(RCV_ADDRESS);
 
-		BlockingQueue<List<byte[]>> queue1 = new ArrayBlockingQueue<List<byte[]>>(100);
-		BlockingQueue<Event> queue2 = new ArrayBlockingQueue<Event>(100);
-		BlockingQueue<Event> queue3 = new ArrayBlockingQueue<Event>(100);
-		BlockingQueue<Event> queue4 = new ArrayBlockingQueue<Event>(100);
+		BlockingQueue<List<byte[]>> queue1 = new ArrayBlockingQueue<List<byte[]>>(2);
+		BlockingQueue<Event> queue2 = new ArrayBlockingQueue<Event>(2);
+		BlockingQueue<Event> queue3 = new ArrayBlockingQueue<Event>(2);
+		BlockingQueue<Event> queue4 = new ArrayBlockingQueue<Event>(2);
 
 		ZMQBasicReciever parser = new ZMQBasicReciever(reciever, queue1);
 		Stage<List<byte[]>, Event> stage1 = new ParseJSONStage(queue1, queue2);
 		Stage<Event, Event> stage2 = new SanitizeStage(queue2, queue3);
 		Stage<Event, Event> stage3 = new StoreStage(queue3, queue4, eventStore);
 
-		Thread ww1 = new Thread(parser);
-		Thread ww2 = new Thread(stage1);
-		Thread ww3 = new Thread(stage2);
-		Thread ww4 = new Thread(stage3);
+		final Thread ww1 = new Thread(parser);
+		final Thread ww2 = new Thread(stage1);
+		final Thread ww3 = new Thread(stage2);
+		final Thread ww4 = new Thread(stage3);
 
 		ww4.start();
 		ww2.start();
 		ww3.start();
 		ww1.start();
-
-		System.out.println("");
 
 		while (!Thread.currentThread().isInterrupted()) {
 			queue4.take();
@@ -61,6 +59,10 @@ public class App {
 		ww2.join();
 		ww3.join();
 		ww4.join();
+
+		// TODO How to safely reach here?
+
+		System.out.println("Shutting down...");
 
 		reciever.close();
 		context.term();

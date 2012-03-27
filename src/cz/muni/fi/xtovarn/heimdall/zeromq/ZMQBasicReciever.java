@@ -34,7 +34,6 @@ public class ZMQBasicReciever implements Runnable {
 	 */
 	@Override
 	public void run() {
-		System.out.println(String.format("%-78s", this.getClass().getSimpleName()).replace(" ",".") + "STARTED");
 
 		while (!Thread.currentThread().isInterrupted()) {
 			List<byte[]> message = new ArrayList<byte[]>(1);
