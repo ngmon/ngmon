@@ -1,7 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall.zeromq;
 
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 
@@ -35,6 +34,7 @@ public class ZMQBasicReciever implements Runnable {
 	 */
 	@Override
 	public void run() {
+		System.out.println(String.format("%-78s", this.getClass().getSimpleName()).replace(" ",".") + "STARTED");
 
 		while (!Thread.currentThread().isInterrupted()) {
 			List<byte[]> message = new ArrayList<byte[]>(1);

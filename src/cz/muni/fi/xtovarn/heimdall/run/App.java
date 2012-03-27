@@ -18,21 +18,25 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class App {
+	
+	private static final String RCV_ADDRESS = "tcp://*:359";
 
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
+		System.out.println("Heimdall is starting...");
+
 		EventStore eventStore = EventStoreFactory.getInstance();
 		ZMQ.Context context = ZMQContextFactory.getInstance();
 
 		// Socket facing clients
-		ZMQ.Socket reciver = context.socket(ZMQ.PULL);
-		reciver.bind("tcp://*:359");
+		ZMQ.Socket reciever = context.socket(ZMQ.PULL);
+		reciever.bind(RCV_ADDRESS);
 
-		BlockingQueue<List<byte[]>> queue1 = new ArrayBlockingQueue<List<byte[]>>(1);
-		BlockingQueue<Event> queue2 = new ArrayBlockingQueue<Event>(1);
-		BlockingQueue<Event> queue3 = new ArrayBlockingQueue<Event>(1);
-		BlockingQueue<Event> queue4 = new ArrayBlockingQueue<Event>(1);
+		BlockingQueue<List<byte[]>> queue1 = new ArrayBlockingQueue<List<byte[]>>(100);
+		BlockingQueue<Event> queue2 = new ArrayBlockingQueue<Event>(100);
+		BlockingQueue<Event> queue3 = new ArrayBlockingQueue<Event>(100);
+		BlockingQueue<Event> queue4 = new ArrayBlockingQueue<Event>(100);
 
-		ZMQBasicReciever parser = new ZMQBasicReciever(reciver, queue1, context);
+		ZMQBasicReciever parser = new ZMQBasicReciever(reciever, queue1);
 		Stage<List<byte[]>, Event> stage1 = new ParseJSONStage(queue1, queue2);
 		Stage<Event, Event> stage2 = new SanitizeStage(queue2, queue3);
 		Stage<Event, Event> stage3 = new StoreStage(queue3, queue4, eventStore);
@@ -47,9 +51,10 @@ public class App {
 		ww3.start();
 		ww1.start();
 
+		System.out.println("");
+
 		while (!Thread.currentThread().isInterrupted()) {
 			queue4.take();
-			System.err.println("[" + queue1.size() + "¦" + queue2.size() + "¦" + queue3.size() + "¦" + queue4.size() + "]");
 		}
 
 		ww1.join();
@@ -57,7 +62,7 @@ public class App {
 		ww3.join();
 		ww4.join();
 
-		reciver.close();
+		reciever.close();
 		context.term();
 
 		eventStore.close();

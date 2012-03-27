@@ -1,16 +1,11 @@
 package cz.muni.fi.xtovarn.heimdall.run;
 
 import com.sleepycat.db.DatabaseException;
-import com.sleepycat.db.OperationStatus;
-import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.entity.Payload;
-import cz.muni.fi.xtovarn.heimdall.store.EventStore;
 import org.codehaus.jackson.map.util.ISO8601Utils;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 public class SenderApp {
 
@@ -22,7 +17,7 @@ public class SenderApp {
 		ZMQ.Socket sender = context.socket(ZMQ.PUSH);
 		sender.connect("tcp://localhost:359");
 		
-		int n = 65000;
+		int n = 10000;
 		
 		while (!Thread.currentThread().isInterrupted()) {
 

@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Class-Path: zmq-2.1.10.jar db-5.3.15.jar jackson-core-asl-1.9.5.jar ja
+ ckson-mapper-asl-1.9.5.jar jackson-smile-1.9.5.jar
+Main-Class: cz.muni.fi.xtovarn.heimdall.run.App
+

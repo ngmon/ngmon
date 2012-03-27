@@ -15,6 +15,8 @@ public abstract class AbstractStage<T_in,T_out> implements Runnable {
 
 	@Override
 	public void run() {
+		System.out.println(String.format("%-78s", this.getClass().getSimpleName()).replace(" ",".") + "STARTED");
+
 		T_in incomingWork;
 		T_out outcomingWork;
 
