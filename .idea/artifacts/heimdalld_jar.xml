@@ -1,0 +1,20 @@
+<component name="ArtifactManager">
+  <artifact name="heimdalld:jar">
+    <output-path>$PROJECT_DIR$/bin</output-path>
+    <root id="root">
+      <element id="archive" name="heimdalld.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="heimdalld" />
+      </element>
+      <element id="library" level="project" name="zmq-2.1.10" />
+      <element id="library" level="project" name="db-5.3.15" />
+      <element id="library" level="project" name="jackson-asl-1.9.5" />
+      <element id="file-copy" path="$PROJECT_DIR$/jzmq.dll" />
+      <element id="file-copy" path="$PROJECT_DIR$/libdb53.dll" />
+      <element id="file-copy" path="$PROJECT_DIR$/libdb_java53.dll" />
+      <element id="file-copy" path="$PROJECT_DIR$/libzmq.dll" />
+    </root>
+  </artifact>
+</component>
