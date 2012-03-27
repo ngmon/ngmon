@@ -4,7 +4,7 @@ package cz.muni.fi.xtovarn.heimdall.stage;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
-public abstract class AbstractStage<T_in, T_out> implements Runnable {
+public abstract class AbstractStage<T_in,T_out> implements Runnable {
 	private final BlockingQueue<T_in> inWorkQueue;
 	private final BlockingQueue<T_out> outWorkQueue;
 
@@ -15,6 +15,7 @@ public abstract class AbstractStage<T_in, T_out> implements Runnable {
 
 	@Override
 	public void run() {
+		System.out.println(String.format("%-78s", this.getClass().getSimpleName()).replace(" ",".") + "STARTED");
 
 		T_in incomingWork;
 		T_out outcomingWork;
@@ -26,10 +27,15 @@ public abstract class AbstractStage<T_in, T_out> implements Runnable {
 				outcomingWork = work(incomingWork);
 				outWorkQueue.put(outcomingWork);
 
-			} catch (InterruptedException e) {
-				e.printStackTrace();  // TODO Interupted
+			} catch (InterruptedException e) { // Thread has been interrupted
+
+				System.err.println(String.format("%-78s", this.getClass().getSimpleName()).replace(" ",".") + "STOPPED");
+				break;
+
 			} catch (IOException e) {
+
 				e.printStackTrace();  // TODO Exception
+
 			}
 		}
 	}

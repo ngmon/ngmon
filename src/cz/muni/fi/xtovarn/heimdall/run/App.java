@@ -25,10 +25,10 @@ public class App {
 		System.out.println("Heimdall is starting...");
 
 		EventStore eventStore = EventStoreFactory.getInstance();
-		ZMQ.Context context = ZMQContextFactory.getInstance();
+		final ZMQ.Context context = ZMQContextFactory.getInstance();
 
 		// Socket facing clients
-		ZMQ.Socket reciever = context.socket(ZMQ.PULL);
+		final ZMQ.Socket reciever = context.socket(ZMQ.PULL);
 		reciever.bind(RCV_ADDRESS);
 
 		BlockingQueue<List<byte[]>> queue1 = new ArrayBlockingQueue<List<byte[]>>(2);
@@ -46,26 +46,45 @@ public class App {
 		final Thread ww3 = new Thread(stage2);
 		final Thread ww4 = new Thread(stage3);
 
+
+		/* Inner class, handles shutdowns by Ctrl+C */
+		class ShutdownHandler implements Runnable {
+
+			@Override
+			public void run() {
+				context.term();
+				ww2.interrupt();
+				ww3.interrupt();
+				ww4.interrupt();
+
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler()));
+
 		ww4.start();
 		ww2.start();
 		ww3.start();
 		ww1.start();
 
-		while (!Thread.currentThread().isInterrupted()) {
+
+		/*while (!Thread.currentThread().isInterrupted()) {
 			queue4.take();
-		}
+		}*/
 
 		ww1.join();
 		ww2.join();
 		ww3.join();
 		ww4.join();
 
-		// TODO How to safely reach here?
+		Thread.sleep(10);
 
 		System.out.println("Shutting down...");
-
-		reciever.close();
-		context.term();
 
 		eventStore.close();
 	}

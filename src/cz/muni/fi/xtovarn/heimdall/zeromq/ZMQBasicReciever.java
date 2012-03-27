@@ -22,7 +22,7 @@ public class ZMQBasicReciever implements Runnable {
 	 * Class constructor.
 	 *
 	 * @param outWorkQueue out work Queue
-	 * @param inSocket  input socket
+	 * @param inSocket     input socket
 	 */
 	public ZMQBasicReciever(Socket inSocket, BlockingQueue<List<byte[]>> outWorkQueue) {
 		this.inSocket = inSocket;
@@ -34,8 +34,10 @@ public class ZMQBasicReciever implements Runnable {
 	 */
 	@Override
 	public void run() {
+		System.out.println(String.format("%-78s", this.getClass().getSimpleName()).replace(" ", ".") + "STARTED");
 
 		while (!Thread.currentThread().isInterrupted()) {
+
 			List<byte[]> message = new ArrayList<byte[]>(1);
 			boolean rcv_more = true;
 
@@ -52,10 +54,13 @@ public class ZMQBasicReciever implements Runnable {
 				}
 
 			} catch (ZMQException e) {
+
 				if (ZMQ.Error.ETERM.getCode() == e.getErrorCode()) { // context destroyed, exit
+					inSocket.close();
+					System.err.println(String.format("%-78s", this.getClass().getSimpleName()).replace(" ", ".") + "STOPPED");
 					break;
 				}
-				throw e;
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();  // TODO interrupted
 			}
