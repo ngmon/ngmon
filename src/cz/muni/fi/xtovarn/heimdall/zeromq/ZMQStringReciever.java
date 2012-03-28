@@ -4,8 +4,6 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMQException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -13,18 +11,12 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author Daniel Tovarňák, Alois Belaska <alois.belaska@gmail.com>
  */
-public class ZMQBasicReciever implements Runnable {
+public class ZMQStringReciever implements Runnable {
 
 	private final Socket inSocket;
-	private final BlockingQueue<List<byte[]>> outWorkQueue;
+	private final BlockingQueue<String> outWorkQueue;
 
-	/**
-	 * Class constructor.
-	 *
-	 * @param outWorkQueue out work Queue
-	 * @param inSocket     input socket
-	 */
-	public ZMQBasicReciever(Socket inSocket, BlockingQueue<List<byte[]>> outWorkQueue) {
+	public ZMQStringReciever(Socket inSocket, BlockingQueue<String> outWorkQueue) {
 		this.inSocket = inSocket;
 		this.outWorkQueue = outWorkQueue;
 	}
@@ -34,36 +26,38 @@ public class ZMQBasicReciever implements Runnable {
 	 */
 	@Override
 	public void run() {
+
 		System.out.println(String.format("%-78s", this.getClass().getSimpleName()).replace(" ", ".") + "STARTED");
 
 		while (!Thread.currentThread().isInterrupted()) {
-
-			List<byte[]> message = new ArrayList<byte[]>(1);
-			boolean rcv_more = true;
+			byte[] message;
 
 			try {
-				/* Recieve whole multi-part message */
-				while (rcv_more) {
-					message.add(inSocket.recv(0)); // BLOCKING recieve
-					rcv_more = inSocket.hasReceiveMore();
-				}
+					message = inSocket.recv(0); // BLOCKING recieve
 
 				/* Push event into queue */
-				if (!message.isEmpty()) {
-					outWorkQueue.put(message); // add message to outcoming work queue
+				if (message.length != 0) {
+					outWorkQueue.put(work(message)); // add string to outcoming work queue
 				}
 
 			} catch (ZMQException e) {
-
 				if (ZMQ.Error.ETERM.getCode() == e.getErrorCode()) { // context destroyed, exit
+					System.err.println(this.getClass().getSimpleName() + ": ZMQException logged");
 					inSocket.close();
-					System.err.println(String.format("%-78s", this.getClass().getSimpleName()).replace(" ", ".") + "STOPPED");
 					break;
 				}
 
 			} catch (InterruptedException e) {
-				e.printStackTrace();  // TODO interrupted
+				System.err.println(this.getClass().getSimpleName() + ": InterruptedException logged");
+				break;
 			}
 		}
+
+		System.out.println(String.format("%-78s", this.getClass().getSimpleName()).replace(" ", ".") + "STOPPED");
+	}
+
+	public String work(byte[] message) {
+
+		return new String(message).trim();
 	}
 }
