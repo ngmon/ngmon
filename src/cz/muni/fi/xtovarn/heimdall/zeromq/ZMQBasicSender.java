@@ -50,7 +50,7 @@ public class ZMQBasicSender implements Runnable {
 					snd_more = (outputMessage.size() - i) != 1; // Do we have the last part of the message?
 					byte[] messagePart = outputMessage.get(i);
 					boolean sent = outSocket.send(messagePart, snd_more ? ZMQ.SNDMORE : 0); // BLOCKING Send
-					System.out.println("SENDING[" + sent + "]: " + Arrays.toString(messagePart));
+					System.out.println("SENDING[" + sent + "]: {" + messagePart.length + "} " + Arrays.toString(messagePart));
 				}
 
 			} catch (ZMQException e) {
