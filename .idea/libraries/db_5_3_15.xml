@@ -4,7 +4,7 @@
       <root url="jar://$PROJECT_DIR$/lib/x64/db-5.3.15.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="file://C:/opt/db-5.3.15/javadoc" />
+      <root url="http://docs.oracle.com/cd/E17076_02/html/java/" />
     </JAVADOC>
     <SOURCES />
   </library>
