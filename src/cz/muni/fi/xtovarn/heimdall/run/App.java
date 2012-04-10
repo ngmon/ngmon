@@ -2,6 +2,8 @@ package cz.muni.fi.xtovarn.heimdall.run;
 
 import com.sleepycat.db.*;
 import cz.muni.fi.xtovarn.heimdall.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.netty.UserQueues;
+import cz.muni.fi.xtovarn.heimdall.stage.NettyStage;
 import cz.muni.fi.xtovarn.heimdall.stage.Stage;
 import cz.muni.fi.xtovarn.heimdall.stage.StoreStage;
 import cz.muni.fi.xtovarn.heimdall.store.EventStore;
@@ -18,7 +20,6 @@ import java.util.concurrent.BlockingQueue;
 public class App {
 
 	private static final String RCV_ADDRESS = "tcp://*:359";
-	private static final String SND_ADDRESS = "tcp://*:360";
 
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
 		System.out.println("Heimdall is starting...");
@@ -29,28 +30,25 @@ public class App {
 		// Socket facing clients
 		final ZMQ.Socket reciever = context.socket(ZMQ.PULL);
 		reciever.bind(RCV_ADDRESS);
-		
-		final ZMQ.Socket sender = context.socket(ZMQ.PUB);
-		sender.bind(SND_ADDRESS);
+
 
 		BlockingQueue<String> queue1 = new ArrayBlockingQueue<String>(10);
-		BlockingQueue<Event> queue2 = new ArrayBlockingQueue<Event>(1);
+		BlockingQueue<Event> queue2 = UserQueues.queue("xdanos");
 
 		final ZMQStringReciever rcvrStage = new ZMQStringReciever(reciever, queue1);
 		final Stage<String, Event> storeStage = new StoreStage(queue1, queue2, eventStore);
-		final ZMQBasicSender senderStage = new ZMQBasicSender(queue2, sender);
+		final NettyStage senderStage = new NettyStage();
 
 		final Thread rcvrStage_thread = new Thread(rcvrStage);
 		final Thread storeStage_thread = new Thread(storeStage);
 		final Thread senderStage_thread = new Thread(senderStage);
 
-				/* Inner class, handles shutdowns by Ctrl+C */
+		/* Inner class, handles shutdowns by Ctrl+C */
 		class ShutdownHandler implements Runnable {
 
 			@Override
 			public void run() {
 				storeStage_thread.interrupt();
-
 				rcvrStage_thread.interrupt();
 				senderStage_thread.interrupt();
 
