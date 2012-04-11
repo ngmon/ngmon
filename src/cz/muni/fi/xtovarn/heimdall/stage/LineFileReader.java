@@ -18,16 +18,19 @@ public class LineFileReader implements Runnable {
 			read("events.json");
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 
-	private void read(String filename) throws IOException {
+	private void read(String filename) throws IOException, InterruptedException {
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 
 		String s;
 
 		while ((s = in.readLine()) != null) {
 			processWithPipeline(s);
+			Thread.sleep(3000);
 		}
 
 		in.close();

@@ -1,7 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline;
 
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.util.JSONStringParser;
+import cz.muni.fi.xtovarn.heimdall.json.JSONStringParser;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 

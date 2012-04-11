@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.stage;
+package cz.muni.fi.xtovarn.heimdall.netty;
 
 import cz.muni.fi.xtovarn.heimdall.netty.MainHandler;
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -12,7 +12,7 @@ import org.jboss.netty.handler.codec.string.StringEncoder;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-public class NettyStage implements Runnable {
+public class NettyServer implements Runnable {
 	@Override
 	public void run() {
 		ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());

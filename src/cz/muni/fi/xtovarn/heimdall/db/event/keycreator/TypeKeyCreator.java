@@ -6,7 +6,7 @@ import com.sleepycat.db.DatabaseException;
 import com.sleepycat.db.SecondaryDatabase;
 import com.sleepycat.db.SecondaryKeyCreator;
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.util.JSONEventMapper;
+import cz.muni.fi.xtovarn.heimdall.json.JSONEventMapper;
 
 import java.io.IOException;
 

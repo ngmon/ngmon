@@ -3,10 +3,8 @@ package cz.muni.fi.xtovarn.heimdall.run;
 import com.sleepycat.db.DatabaseException;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreFactory;
-import cz.muni.fi.xtovarn.heimdall.pipeline.ParseJSON;
-import cz.muni.fi.xtovarn.heimdall.pipeline.Pipeline;
-import cz.muni.fi.xtovarn.heimdall.pipeline.SetDetectionTime;
-import cz.muni.fi.xtovarn.heimdall.pipeline.Store;
+import cz.muni.fi.xtovarn.heimdall.netty.NettyServer;
+import cz.muni.fi.xtovarn.heimdall.pipeline.*;
 import cz.muni.fi.xtovarn.heimdall.stage.LineFileReader;
 
 import java.io.IOException;
@@ -21,12 +19,14 @@ public class App {
 		EventStore eventStore = EventStoreFactory.getInstance();
 
 		ExecutorService es = Executors.newSingleThreadExecutor();
-		Pipeline pipeline = new Pipeline(new ParseJSON(), new SetDetectionTime(), new Store(eventStore));
+		Pipeline pipeline = new Pipeline(new ParseJSON(), new SetDetectionTime(), new Store(eventStore), new DetermineRecipient());
 
 		LineFileReader lfr = new LineFileReader(pipeline);
 		es.execute(lfr);
-
 		es.shutdown();
+
+		Executors.newCachedThreadPool().execute(new NettyServer());
+
 		es.awaitTermination(5, TimeUnit.MINUTES);
 
 		System.out.println("Shutting down...");

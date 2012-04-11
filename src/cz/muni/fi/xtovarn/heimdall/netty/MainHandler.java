@@ -7,18 +7,17 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 
 public class MainHandler extends SimpleChannelHandler {
 
-	private PerClientSendStage stage;
+	private static ConnectionPool pool = ConnectionPools.getPool();
 
 	@Override
 	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
 		e.getChannel().write("Connected to HeimdallD server!");
-		stage = new PerClientSendStage(UserQueues.queue("xdanos"), e.getChannel());
-		stage.start();
+		pool.add(new Connection("xdanos", e.getChannel()));
 	}
 
 	@Override
 	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
 		System.out.println("Channel disconnected...");
-		stage.stop();
+		pool.remove("xdanos");
 	}
 }

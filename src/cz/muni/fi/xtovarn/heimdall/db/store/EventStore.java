@@ -4,7 +4,7 @@ import com.sleepycat.bind.tuple.LongBinding;
 import com.sleepycat.db.*;
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.db.event.keycreator.TypeKeyCreator;
-import cz.muni.fi.xtovarn.heimdall.util.JSONEventMapper;
+import cz.muni.fi.xtovarn.heimdall.json.JSONEventMapper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
