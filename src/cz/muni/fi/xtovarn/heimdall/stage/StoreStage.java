@@ -2,8 +2,8 @@ package cz.muni.fi.xtovarn.heimdall.stage;
 
 
 import com.sleepycat.db.DatabaseException;
-import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.util.JSONStringParser;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;

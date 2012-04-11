@@ -1,11 +1,11 @@
-package cz.muni.fi.xtovarn.heimdall.keycreator.event;
+package cz.muni.fi.xtovarn.heimdall.db.event.keycreator;
 
 import com.sleepycat.bind.tuple.StringBinding;
 import com.sleepycat.db.DatabaseEntry;
 import com.sleepycat.db.DatabaseException;
 import com.sleepycat.db.SecondaryDatabase;
 import com.sleepycat.db.SecondaryKeyCreator;
-import cz.muni.fi.xtovarn.heimdall.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.util.JSONEventMapper;
 
 import java.io.IOException;

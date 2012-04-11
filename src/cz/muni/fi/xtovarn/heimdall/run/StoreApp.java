@@ -1,15 +1,12 @@
 package cz.muni.fi.xtovarn.heimdall.run;
 
 import com.sleepycat.db.DatabaseException;
-import com.sleepycat.db.OperationStatus;
-import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.entity.Payload;
-import cz.muni.fi.xtovarn.heimdall.store.EventStore;
-import cz.muni.fi.xtovarn.heimdall.store.EventStoreFactory;
+import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreFactory;
 import org.codehaus.jackson.map.util.ISO8601Utils;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 

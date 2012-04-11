@@ -30,9 +30,12 @@ public class SenderApp {
 
 //			System.out.println("Sending >>" + json);
 //
-			Thread.sleep(5000);
+			Thread.sleep(5);
+
+			System.out.println(json);
 			n--;
 			if (n < 1) Thread.currentThread().interrupt();
+
 		}
 
 		//  We never get here but clean up anyhow

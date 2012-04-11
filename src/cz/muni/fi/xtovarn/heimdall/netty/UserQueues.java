@@ -1,6 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall.netty;
 
-import cz.muni.fi.xtovarn.heimdall.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
 
 import java.util.HashMap;
 import java.util.Map;

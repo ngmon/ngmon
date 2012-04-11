@@ -1,6 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall.stage;
 
-import cz.muni.fi.xtovarn.heimdall.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
 import static cz.muni.fi.xtovarn.heimdall.stage.PerClientSendStage.StageStatus.*;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;

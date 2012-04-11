@@ -1,9 +1,9 @@
-package cz.muni.fi.xtovarn.heimdall.store;
+package cz.muni.fi.xtovarn.heimdall.db.store;
 
 import com.sleepycat.bind.tuple.LongBinding;
 import com.sleepycat.db.*;
-import cz.muni.fi.xtovarn.heimdall.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.keycreator.event.TypeKeyCreator;
+import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.db.event.keycreator.TypeKeyCreator;
 import cz.muni.fi.xtovarn.heimdall.util.JSONEventMapper;
 
 import java.io.File;

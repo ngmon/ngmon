@@ -1,14 +1,9 @@
 package cz.muni.fi.xtovarn.heimdall.netty;
 
-import cz.muni.fi.xtovarn.heimdall.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.stage.PerClientSendStage;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ChildChannelStateEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
-
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Executors;
 
 public class MainHandler extends SimpleChannelHandler {
 

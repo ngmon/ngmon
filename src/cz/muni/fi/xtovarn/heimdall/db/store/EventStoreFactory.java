@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.store;
+package cz.muni.fi.xtovarn.heimdall.db.store;
 
 import com.sleepycat.db.DatabaseException;
 

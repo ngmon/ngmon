@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.entity;
+package cz.muni.fi.xtovarn.heimdall.db.entity;
 
 import org.codehaus.jackson.annotate.JsonAnyGetter;
 import org.codehaus.jackson.annotate.JsonAnySetter;
