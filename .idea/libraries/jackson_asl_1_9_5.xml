@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="jackson-asl-1.9.5">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/x64/jackson-core-asl-1.9.5.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/x64/jackson-mapper-asl-1.9.5.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/x64/jackson-smile-1.9.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-core-asl-1.9.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-mapper-asl-1.9.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-smile-1.9.5.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="http://jackson.codehaus.org/1.9.4/javadoc" />
