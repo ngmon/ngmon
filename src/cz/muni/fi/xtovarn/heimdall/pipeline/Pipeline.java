@@ -1,5 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline;
 
+import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.Handler;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
