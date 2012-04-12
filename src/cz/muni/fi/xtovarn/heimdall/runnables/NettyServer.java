@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.netty;
+package cz.muni.fi.xtovarn.heimdall.runnables;
 
 import cz.muni.fi.xtovarn.heimdall.netty.MainHandler;
 import org.jboss.netty.bootstrap.ServerBootstrap;

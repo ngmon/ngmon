@@ -3,9 +3,9 @@ package cz.muni.fi.xtovarn.heimdall.run;
 import com.sleepycat.db.DatabaseException;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreFactory;
-import cz.muni.fi.xtovarn.heimdall.netty.NettyServer;
+import cz.muni.fi.xtovarn.heimdall.runnables.NettyServer;
 import cz.muni.fi.xtovarn.heimdall.pipeline.*;
-import cz.muni.fi.xtovarn.heimdall.stage.LineFileReader;
+import cz.muni.fi.xtovarn.heimdall.runnables.SocketServer;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -21,7 +21,7 @@ public class App {
 		ExecutorService es = Executors.newSingleThreadExecutor();
 		Pipeline pipeline = new Pipeline(new ParseJSON(), new SetDetectionTime(), new Store(eventStore), new DetermineRecipient());
 
-		LineFileReader lfr = new LineFileReader(pipeline);
+		SocketServer lfr = new SocketServer(pipeline);
 		es.execute(lfr);
 		es.shutdown();
 

@@ -1,14 +1,14 @@
-package cz.muni.fi.xtovarn.heimdall.stage;
+package cz.muni.fi.xtovarn.heimdall.runnables;
 
 import cz.muni.fi.xtovarn.heimdall.pipeline.Pipeline;
 
 import java.io.*;
 
-public class LineFileReader implements Runnable {
+public class SocketServer implements Runnable {
 
 	private final Pipeline pipeline;
 
-	public LineFileReader(Pipeline pipeline) {
+	public SocketServer(Pipeline pipeline) {
 		this.pipeline = pipeline;
 	}
 
