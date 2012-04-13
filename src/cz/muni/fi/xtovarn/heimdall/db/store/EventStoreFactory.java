@@ -8,7 +8,7 @@ public class EventStoreFactory {
 
 	private static EventStore instance = null;
 
-	public static EventStore getInstance() throws FileNotFoundException, DatabaseException {
+	public static EventStore getSingleInstance() throws FileNotFoundException, DatabaseException {
 		if (instance == null) {
 			instance = new EventStore();
 		}

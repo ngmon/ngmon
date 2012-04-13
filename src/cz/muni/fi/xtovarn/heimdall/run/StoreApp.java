@@ -13,14 +13,12 @@ import java.util.TimeZone;
 public class StoreApp {
 
 	public static void main(String[] args) throws IOException, DatabaseException {
-		EventStore store = EventStoreFactory.getInstance();
+		EventStore store = EventStoreFactory.getSingleInstance();
 
 		List<Event> list = store.getAllRecords();
 
 		for (Event entry : list) {
-			System.out.println("id: " + entry.getId() +
-					" | detection: " + ISO8601Utils.format(entry.getDetectionTime(), true, TimeZone.getDefault()) +
-					" | occurence: " + ISO8601Utils.format(entry.getOccurrenceTime(), true, TimeZone.getDefault()));
+			System.out.println(entry.toString());
 		}
 
 		store.close();

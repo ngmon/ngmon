@@ -2,23 +2,21 @@ package cz.muni.fi.xtovarn.heimdall.pipeline;
 
 import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.Handler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+public class Pipeline implements Runnable {
 
-public class Pipeline {
+	private final HandlerSequence sequence;
+	private Object o;
 
-	private final List<Handler> handlers;
+	public Pipeline(Object o, HandlerSequence sequence) {
 
-	public Pipeline(Handler... handlers) {
-		this.handlers = new ArrayList<Handler>(Arrays.asList(handlers));
+		this.o = o;
+		this.sequence = sequence;
 	}
 
-	public Object execute(Object o) {
-		for (Handler handler : handlers) {
+	@Override
+	public void run() {
+		for (Handler handler : sequence.getHandlers()) {
 			o = handler.handle(o);
 		}
-
-		return o;
 	}
 }
