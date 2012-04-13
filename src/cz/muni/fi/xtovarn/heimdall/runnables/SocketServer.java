@@ -5,37 +5,42 @@ import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreFactory;
 import cz.muni.fi.xtovarn.heimdall.pipeline.HandlerSequence;
 import cz.muni.fi.xtovarn.heimdall.pipeline.Pipeline;
-import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.DetermineRecipient;
 import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.ParseJSON;
 import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.SetDetectionTime;
 import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.Store;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SocketServer implements Runnable {
 
-	private final ExecutorService executor;
+	private final ExecutorService parentExecutor;
+	private final ExecutorService childExecutor;
 	private final EventStore eventStore;
+	private final HandlerSequence sequence;
 
-	public SocketServer(ExecutorService executor) throws FileNotFoundException, DatabaseException {
-		this.executor = executor;
+	public SocketServer(ExecutorService parentExecutor, ExecutorService childExecutor) throws FileNotFoundException, DatabaseException {
+		this.parentExecutor = parentExecutor;
+		this.childExecutor = childExecutor;
 		eventStore = EventStoreFactory.getSingleInstance();
+		sequence = new HandlerSequence(new ParseJSON(), new SetDetectionTime(), new Store(eventStore)/* TODO , new DetermineRecipient()*/);
+	}
+
+	public void start() {
+		parentExecutor.submit(this);
 	}
 
 	@Override
 	public void run() {
 		try {
-			read("events.json");
+			read("events5.json");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			eventStore.close(); // ALAWAYS close EventStore from Thread which created it!
-		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
 	}
@@ -43,18 +48,24 @@ public class SocketServer implements Runnable {
 	private void read(String filename) throws IOException, InterruptedException {
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 
-		String s;
+		String json;
 
-		while ((s = in.readLine()) != null) {
-			processWithPipeline(s);
+		while ((json = in.readLine()) != null) {
+			childExecutor.submit(new Pipeline(json, sequence));
 		}
 
 		in.close();
-		executor.shutdown();
+		this.shutdown();
 	}
 
-	private void processWithPipeline(String json) {
-		HandlerSequence sequence = new HandlerSequence(new ParseJSON(), new SetDetectionTime(), new Store(eventStore)/*, new DetermineRecipient()*/);
-		executor.submit(new Pipeline(json, sequence));
+
+	public void shutdown() {
+		childExecutor.shutdown();
+		try {
+			childExecutor.awaitTermination(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		parentExecutor.shutdown();
 	}
 }
