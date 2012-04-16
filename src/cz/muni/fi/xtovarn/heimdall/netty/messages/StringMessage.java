@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.netty;
+package cz.muni.fi.xtovarn.heimdall.netty.messages;
 
 public class StringMessage extends Message {
 
@@ -15,11 +15,11 @@ public class StringMessage extends Message {
 
 	@Override
 	public int length() {
-		return Message.DIRECTIVE_BYTES + body.length();
+		return DIRECTIVE_BYTES + body.length();
 	}
 
 	@Override
 	public int size() {
-		return Message.LENGTH_BYTES + length();
+		return LENGTH_BYTES + length();
 	}
 }

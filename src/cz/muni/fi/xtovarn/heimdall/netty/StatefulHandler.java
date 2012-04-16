@@ -1,5 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.netty;
 
+import cz.muni.fi.xtovarn.heimdall.netty.messages.Directive;
+import cz.muni.fi.xtovarn.heimdall.netty.messages.StringMessage;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelHandlerContext;

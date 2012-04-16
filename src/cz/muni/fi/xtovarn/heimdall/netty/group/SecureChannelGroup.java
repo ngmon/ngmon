@@ -13,18 +13,23 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package cz.muni.fi.xtovarn.heimdall.netty;
+package cz.muni.fi.xtovarn.heimdall.netty.group;
 
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class SecureChannelGroup extends DefaultChannelGroup {
+public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGroup {
 
 	private ConcurrentMap<String, Integer> usernameToId = new ConcurrentHashMap<String, Integer>();
 	private ConcurrentMap<Integer, String> idToUsername = new ConcurrentHashMap<Integer, String>();
+
+	public SecureChannelGroup() {
+		super();
+	}
 
 	/* Util methods */
 	private int convertToId(String username) {

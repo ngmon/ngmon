@@ -2,9 +2,9 @@ package cz.muni.fi.xtovarn.heimdall.pipeline;
 
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.netty.ChannelGroups;
-import cz.muni.fi.xtovarn.heimdall.netty.Directive;
-import cz.muni.fi.xtovarn.heimdall.netty.SecureChannelGroup;
-import cz.muni.fi.xtovarn.heimdall.netty.StringMessage;
+import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
+import cz.muni.fi.xtovarn.heimdall.netty.messages.Directive;
+import cz.muni.fi.xtovarn.heimdall.netty.messages.StringMessage;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
