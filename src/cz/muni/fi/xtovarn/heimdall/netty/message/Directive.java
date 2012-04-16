@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.netty.messages;
+package cz.muni.fi.xtovarn.heimdall.netty.message;
 
 import java.util.EnumSet;
 import java.util.HashMap;

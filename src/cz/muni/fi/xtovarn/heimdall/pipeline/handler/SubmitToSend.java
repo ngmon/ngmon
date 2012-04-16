@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.pipeline.handlers;
+package cz.muni.fi.xtovarn.heimdall.pipeline.handler;
 
 import cz.muni.fi.xtovarn.heimdall.pipeline.Send;
 import cz.muni.fi.xtovarn.heimdall.pipeline.Subscription;

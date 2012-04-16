@@ -1,8 +1,8 @@
 package cz.muni.fi.xtovarn.heimdall.run;
 
 import com.sleepycat.db.DatabaseException;
-import cz.muni.fi.xtovarn.heimdall.runnables.NettyServer;
-import cz.muni.fi.xtovarn.heimdall.runnables.SocketServer;
+import cz.muni.fi.xtovarn.heimdall.runnable.NettyServer;
+import cz.muni.fi.xtovarn.heimdall.runnable.SocketServer;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;

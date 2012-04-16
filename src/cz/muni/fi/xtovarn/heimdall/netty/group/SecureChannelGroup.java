@@ -24,6 +24,13 @@ import java.util.concurrent.ConcurrentMap;
 
 public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGroup {
 
+	/* SINGLETON */
+	private static final SecureChannelGroup instance = new SecureChannelGroup();
+
+	public static SecureChannelGroup getInstance() {
+		return instance;
+	}
+
 	private ConcurrentMap<String, Integer> usernameToId = new ConcurrentHashMap<String, Integer>();
 	private ConcurrentMap<Integer, String> idToUsername = new ConcurrentHashMap<Integer, String>();
 

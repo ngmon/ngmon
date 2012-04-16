@@ -1,10 +1,9 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline;
 
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.netty.group.ChannelGroups;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
-import cz.muni.fi.xtovarn.heimdall.netty.messages.Directive;
-import cz.muni.fi.xtovarn.heimdall.netty.messages.StringMessage;
+import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
+import cz.muni.fi.xtovarn.heimdall.netty.message.StringMessage;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
@@ -28,7 +27,7 @@ public class Send implements Runnable {
 		buffer.writeByte(message.getDirective().getCode());
 		buffer.writeBytes(message.getBody().getBytes());
 
-		SecureChannelGroup secureChannelGroup = (SecureChannelGroup) ChannelGroups.getSingleInstance();
+		SecureChannelGroup secureChannelGroup = SecureChannelGroup.getInstance();
 
 		if (secureChannelGroup.contains(recipient)) {
 			Channel ch = secureChannelGroup.find(recipient);

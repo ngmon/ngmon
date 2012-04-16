@@ -1,11 +1,11 @@
-package cz.muni.fi.xtovarn.heimdall.runnables;
+package cz.muni.fi.xtovarn.heimdall.runnable;
 
 import com.sleepycat.db.DatabaseException;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreFactory;
 import cz.muni.fi.xtovarn.heimdall.pipeline.HandlerSequence;
 import cz.muni.fi.xtovarn.heimdall.pipeline.Pipeline;
-import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.*;
+import cz.muni.fi.xtovarn.heimdall.pipeline.handler.*;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

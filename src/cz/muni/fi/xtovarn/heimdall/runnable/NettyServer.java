@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.runnables;
+package cz.muni.fi.xtovarn.heimdall.runnable;
 
 import cz.muni.fi.xtovarn.heimdall.netty.LengthDecoder;
 import cz.muni.fi.xtovarn.heimdall.netty.StatefulHandler;
