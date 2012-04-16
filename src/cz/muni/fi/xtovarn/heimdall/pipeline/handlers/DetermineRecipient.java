@@ -1,15 +1,18 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline.handlers;
 
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.netty.ConnectionPools;
-import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.Handler;
+import cz.muni.fi.xtovarn.heimdall.pipeline.Subscription;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class DetermineRecipient implements Handler {
 
 	@Override
 	public Object handle(Object o) {
-		ConnectionPools.getPool().send("xdanos", (Event) o);
+		Set<String> recipients = new HashSet<String>(1);
+		recipients.add("xdanos");
 
-		return null;
+		return new Subscription(recipients, (Event) o);
 	}
 }

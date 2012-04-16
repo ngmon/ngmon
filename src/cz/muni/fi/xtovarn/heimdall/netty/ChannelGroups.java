@@ -1,12 +1,13 @@
 package cz.muni.fi.xtovarn.heimdall.netty;
 
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
-
 public class ChannelGroups {
-	private static final ChannelGroup group = new SecureChannelGroup();
+	private static SecureChannelGroup instance;
 
-	public static ChannelGroup group() {
-		return group;
+	public static SecureChannelGroup getSingleInstance() {
+		if (instance == null) {
+			instance = new SecureChannelGroup();
+		}
+		return instance;
 	}
+
 }

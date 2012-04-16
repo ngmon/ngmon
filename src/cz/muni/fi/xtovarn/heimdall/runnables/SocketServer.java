@@ -5,15 +5,14 @@ import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreFactory;
 import cz.muni.fi.xtovarn.heimdall.pipeline.HandlerSequence;
 import cz.muni.fi.xtovarn.heimdall.pipeline.Pipeline;
-import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.ParseJSON;
-import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.SetDetectionTime;
-import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.Store;
+import cz.muni.fi.xtovarn.heimdall.pipeline.handlers.*;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class SocketServer implements Runnable {
@@ -27,7 +26,13 @@ public class SocketServer implements Runnable {
 		this.parentExecutor = parentExecutor;
 		this.childExecutor = childExecutor;
 		eventStore = EventStoreFactory.getSingleInstance();
-		sequence = new HandlerSequence(new ParseJSON(), new SetDetectionTime(), new Store(eventStore)/* TODO , new DetermineRecipient()*/);
+		sequence = new HandlerSequence(
+				new ParseJSON(),
+				new SetDetectionTime(),
+				new Store(eventStore),
+				new DetermineRecipient(),
+				new SubmitToSend(Executors.newSingleThreadExecutor())
+		);
 	}
 
 	public void start() {
@@ -52,6 +57,7 @@ public class SocketServer implements Runnable {
 
 		while ((json = in.readLine()) != null) {
 			childExecutor.submit(new Pipeline(json, sequence));
+			Thread.sleep(7000);
 		}
 
 		in.close();

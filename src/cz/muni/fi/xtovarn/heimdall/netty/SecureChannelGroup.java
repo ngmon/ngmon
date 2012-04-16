@@ -26,22 +26,20 @@ public class SecureChannelGroup extends DefaultChannelGroup {
 	private ConcurrentMap<String, Integer> usernameToId = new ConcurrentHashMap<String, Integer>();
 	private ConcurrentMap<Integer, String> idToUsername = new ConcurrentHashMap<Integer, String>();
 
-	private int convert(String username) {
+	/* Util methods */
+	private int convertToId(String username) {
 		return usernameToId.get(username);
 	}
-
-	private String convert(int id) {
+	private String convertToUsername(int id) {
 		return idToUsername.get(id);
 	}
-
-	private void remove(Integer id) {
-		usernameToId.remove(convert(id));
+	private void removeById(Integer id) {
+		usernameToId.remove(convertToUsername(id));
 		idToUsername.remove(id);
 	}
-
-	private void remove(String username) {
+	private void removeByUsername(String username) {
 		usernameToId.remove(username);
-		idToUsername.remove(convert(username));
+		idToUsername.remove(convertToId(username));
 	}
 
 	public boolean add(String username, Channel channel) {
@@ -53,6 +51,10 @@ public class SecureChannelGroup extends DefaultChannelGroup {
 		return success;
 	}
 
+	public Channel find(String username) {
+		return super.find(convertToId(username));
+	}
+
 	@Override
 	public boolean remove(Object o) {
 		boolean success = super.remove(o);
@@ -62,11 +64,11 @@ public class SecureChannelGroup extends DefaultChannelGroup {
 		}
 
 		if (o instanceof Integer) {
-			remove((Integer) o);
+			removeById((Integer) o);
 		} else if (o instanceof String) {
-			remove((String) o);
+			removeByUsername((String) o);
 		} else if (o instanceof Channel) {
-			remove(((Channel) o).getId());
+			removeById(((Channel) o).getId());
 		}
 
 		return true;
