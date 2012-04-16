@@ -1,7 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline;
 
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.netty.ChannelGroups;
+import cz.muni.fi.xtovarn.heimdall.netty.group.ChannelGroups;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.messages.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.messages.StringMessage;
@@ -28,13 +28,13 @@ public class Send implements Runnable {
 		buffer.writeByte(message.getDirective().getCode());
 		buffer.writeBytes(message.getBody().getBytes());
 
-		SecureChannelGroup secureChannelGroup = ChannelGroups.getSingleInstance();
+		SecureChannelGroup secureChannelGroup = (SecureChannelGroup) ChannelGroups.getSingleInstance();
 
-		Channel ch = secureChannelGroup.find(recipient);
-		if (ch != null) {
+		if (secureChannelGroup.contains(recipient)) {
+			Channel ch = secureChannelGroup.find(recipient);
 			ch.write(buffer);
 		} else {
-			System.out.println("Written to temp DB: " + buffer.toString());
+			System.out.println("Written to tempDB");
 		}
 	}
 }

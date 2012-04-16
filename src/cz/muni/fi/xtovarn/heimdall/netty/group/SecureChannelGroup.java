@@ -27,10 +27,6 @@ public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGr
 	private ConcurrentMap<String, Integer> usernameToId = new ConcurrentHashMap<String, Integer>();
 	private ConcurrentMap<Integer, String> idToUsername = new ConcurrentHashMap<Integer, String>();
 
-	public SecureChannelGroup() {
-		super();
-	}
-
 	/* Util methods */
 	private int convertToId(String username) {
 		return usernameToId.get(username);
@@ -58,6 +54,14 @@ public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGr
 
 	public Channel find(String username) {
 		return super.find(convertToId(username));
+	}
+
+	public boolean contains(String username) {
+		if (!usernameToId.containsKey(username)) {
+			return false;
+		}
+
+		return super.contains(convertToId(username));
 	}
 
 	@Override
