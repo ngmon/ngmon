@@ -1,6 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.run;
 
 import com.sleepycat.db.DatabaseException;
+import cz.muni.fi.xtovarn.heimdall.runnables.NettyServer;
 import cz.muni.fi.xtovarn.heimdall.runnables.SocketServer;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class App {
 
 		System.out.println("Heimdall is starting...");
 		socketServer.start();
+		Executors.newSingleThreadExecutor().execute(new NettyServer());
 
 		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler()));
 	}
