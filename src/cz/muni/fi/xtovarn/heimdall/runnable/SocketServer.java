@@ -16,9 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class SocketServer implements Runnable, Startable {
+public class SocketServer implements Startable {
 
-	private final ExecutorService parentExecutor = Executors.newCachedThreadPool();
 	private final ExecutorService childExecutor = Executors.newCachedThreadPool();
 	private final HandlerSequence sequence;
 
@@ -31,19 +30,21 @@ public class SocketServer implements Runnable, Startable {
 				new SubmitToDispatcher(dispatcher));
 	}
 
-	public void start() {
-		parentExecutor.submit(this);
-	}
-	public void stop() {
-		shutdown();
-	}
-
 	@Override
-	public void run() {
+	public void start() {
 		try {
 			read("events5.json");
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void stop() {
+		childExecutor.shutdown();
+		try {
+			childExecutor.awaitTermination(5, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -60,17 +61,6 @@ public class SocketServer implements Runnable, Startable {
 		}
 
 		in.close();
-		this.shutdown();
-	}
-
-
-	public void shutdown() {
-		childExecutor.shutdown();
-		try {
-			childExecutor.awaitTermination(5, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		parentExecutor.shutdown();
+		this.stop();
 	}
 }

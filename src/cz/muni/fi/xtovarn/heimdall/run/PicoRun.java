@@ -16,7 +16,6 @@ import org.picocontainer.lifecycle.StartableLifecycleStrategy;
 import org.picocontainer.monitors.LifecycleComponentMonitor;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
 
 public class PicoRun {
 
@@ -32,6 +31,8 @@ public class PicoRun {
 		pico.as(Characteristics.SINGLE).addComponent(SocketServer.class);
 
 		pico.start();
+
+		pico.getComponent(EventStore.class).getAllRecords();
 
 	}
 }

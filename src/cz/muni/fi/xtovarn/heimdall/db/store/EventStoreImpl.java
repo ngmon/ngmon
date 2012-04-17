@@ -11,21 +11,29 @@ import java.util.List;
 
 public class EventStoreImpl implements EventStore {
 
-	private final Database primaryDatabase;
-	private final SecondaryDatabase eventTypeIndex;
-	private final Sequence sequence;
+	private final EventStoreIOLayer ebdb;
 
 	public EventStoreImpl(EventStoreIOLayer ebdb) {
-		primaryDatabase = ebdb.getPrimaryDatabase();
-		eventTypeIndex = ebdb.getEventTypeIndex();
-		sequence = ebdb.getSequence();
+		this.ebdb = ebdb;
+	}
+
+	public Database getPrimaryDatabase() {
+		return ebdb.getPrimaryDatabase();
+	}
+
+	public SecondaryDatabase getEventTypeIndex() {
+		return ebdb.getEventTypeIndex();
+	}
+
+	public Sequence getSequence() {
+		return ebdb.getSequence();
 	}
 
 	public OperationStatus put(Event event) throws DatabaseException, IOException {
 		DatabaseEntry key = new DatabaseEntry();
 
 		/* Populate key */
-		Long id = sequence.get(null, 1); // Get unique long key from sequence
+		Long id = getSequence().get(null, 1); // Get unique long key from sequence
 		LongBinding.longToEntry(id, key); // Bind key to DatabaseEntry
 
 		/* Parse and populate Event fields */
@@ -34,11 +42,11 @@ public class EventStoreImpl implements EventStore {
 		/* Populate data */
 		DatabaseEntry data = new DatabaseEntry(JSONEventMapper.eventAsBytes(event));
 
-		return primaryDatabase.put(null, key, data);
+		return getPrimaryDatabase().put(null, key, data);
 	}
 
 	public List<Event> getAllRecords() throws DatabaseException, IOException {
-		Cursor cursor = primaryDatabase.openCursor(null, null);
+		Cursor cursor = getPrimaryDatabase().openCursor(null, null);
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry data = new DatabaseEntry();
 
@@ -62,7 +70,7 @@ public class EventStoreImpl implements EventStore {
 		DatabaseEntry data = new DatabaseEntry();
 
 		LongBinding.longToEntry(id, key);
-		primaryDatabase.get(null, key, data, LockMode.DEFAULT);
+		getPrimaryDatabase().get(null, key, data, LockMode.DEFAULT);
 
 		return JSONEventMapper.bytesToEvent(data.getData());
 	}

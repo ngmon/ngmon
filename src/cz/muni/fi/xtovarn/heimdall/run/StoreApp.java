@@ -1,12 +1,8 @@
 package cz.muni.fi.xtovarn.heimdall.run;
 
 import com.sleepycat.db.DatabaseException;
-import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreIOLayer;
-import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreFactory;
 
 import java.io.IOException;
-import java.util.List;
 
 public class StoreApp {
 
