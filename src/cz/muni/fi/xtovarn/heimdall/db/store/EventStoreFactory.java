@@ -6,11 +6,11 @@ import java.io.FileNotFoundException;
 
 public class EventStoreFactory {
 
-	private static EventStore instance = null;
+	private static EventStoreIOLayer instance = null;
 
-	public static EventStore getSingleInstance() throws FileNotFoundException, DatabaseException {
+	public static EventStoreIOLayer getSingleInstance() throws FileNotFoundException, DatabaseException {
 		if (instance == null) {
-			instance = new EventStore();
+			instance = new EventStoreIOLayer();
 		}
 		return instance;
 	}

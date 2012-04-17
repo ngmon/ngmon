@@ -1,7 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline.handler;
 
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.pipeline.Subscription;
+import cz.muni.fi.xtovarn.heimdall.dispatcher.Subscription;
 
 import java.util.HashSet;
 import java.util.Set;

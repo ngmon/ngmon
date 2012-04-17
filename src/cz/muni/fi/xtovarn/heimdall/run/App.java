@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 public class App {
 
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
-		Thread.sleep(10000);
+		/*Thread.sleep(10000);
 
 		final SocketServer socketServer = new SocketServer(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(3));
 
@@ -25,7 +25,7 @@ public class App {
 		socketServer.start();
 		Executors.newSingleThreadExecutor().execute(new NettyServer());
 
-		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler()));
+		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler()));*/
 	}
 
 

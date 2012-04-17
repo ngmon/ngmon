@@ -3,7 +3,7 @@ package cz.muni.fi.xtovarn.heimdall.pipeline;
 import cz.muni.fi.xtovarn.heimdall.pipeline.handler.Handler;
 
 public class Pipeline implements Runnable {
-
+	/* TODO Pipeline into factory */
 	private final HandlerSequence sequence;
 	private Object o;
 

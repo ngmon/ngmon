@@ -4,6 +4,7 @@ import com.sleepycat.db.DatabaseException;
 import com.sleepycat.db.OperationStatus;
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreIOLayer;
 
 import java.io.IOException;
 

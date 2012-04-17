@@ -2,10 +2,11 @@ package cz.muni.fi.xtovarn.heimdall.runnable;
 
 import com.sleepycat.db.DatabaseException;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
-import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreFactory;
+import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
 import cz.muni.fi.xtovarn.heimdall.pipeline.HandlerSequence;
 import cz.muni.fi.xtovarn.heimdall.pipeline.Pipeline;
 import cz.muni.fi.xtovarn.heimdall.pipeline.handler.*;
+import org.picocontainer.Startable;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -15,28 +16,26 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class SocketServer implements Runnable {
+public class SocketServer implements Runnable, Startable {
 
-	private final ExecutorService parentExecutor;
-	private final ExecutorService childExecutor;
-	private final EventStore eventStore;
+	private final ExecutorService parentExecutor = Executors.newCachedThreadPool();
+	private final ExecutorService childExecutor = Executors.newCachedThreadPool();
 	private final HandlerSequence sequence;
 
-	public SocketServer(ExecutorService parentExecutor, ExecutorService childExecutor) throws FileNotFoundException, DatabaseException {
-		this.parentExecutor = parentExecutor;
-		this.childExecutor = childExecutor;
-		eventStore = EventStoreFactory.getSingleInstance();
+	public SocketServer(EventStore eventStore, Dispatcher dispatcher) throws FileNotFoundException, DatabaseException {
 		sequence = new HandlerSequence(
 				new ParseJSON(),
 				new SetDetectionTime(),
 				new Store(eventStore),
 				new DetermineRecipient(),
-				new SubmitToSend(Executors.newSingleThreadExecutor())
-		);
+				new SubmitToDispatcher(dispatcher));
 	}
 
 	public void start() {
 		parentExecutor.submit(this);
+	}
+	public void stop() {
+		shutdown();
 	}
 
 	@Override
