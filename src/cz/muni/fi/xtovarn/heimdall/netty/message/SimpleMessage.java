@@ -1,21 +1,21 @@
 package cz.muni.fi.xtovarn.heimdall.netty.message;
 
-public class StringMessage extends Message {
+public class SimpleMessage extends AbstractMessage implements Message {
 
-	private final String body;
+	private final byte[] body;
 
-	public StringMessage(Directive directive, String body) {
+	public SimpleMessage(Directive directive, byte[] body) {
 		super(directive);
 		this.body = body;
 	}
 
-	public String getBody() {
+	public byte[] getBody() {
 		return body;
 	}
 
 	@Override
 	public int length() {
-		return DIRECTIVE_BYTES + body.length();
+		return DIRECTIVE_BYTES + body.length;
 	}
 
 	@Override

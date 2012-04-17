@@ -3,9 +3,8 @@ package cz.muni.fi.xtovarn.heimdall.pipeline;
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
-import cz.muni.fi.xtovarn.heimdall.netty.message.StringMessage;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
+import cz.muni.fi.xtovarn.heimdall.netty.message.Message;
+import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import org.jboss.netty.channel.Channel;
 
 public class Send implements Runnable {
@@ -20,18 +19,13 @@ public class Send implements Runnable {
 
 	@Override
 	public void run() {
-		StringMessage message = new StringMessage(Directive.SEND_JSON, event.toString());
-		ChannelBuffer buffer = ChannelBuffers.buffer(message.size());
-
-		buffer.writeShort(message.length());
-		buffer.writeByte(message.getDirective().getCode());
-		buffer.writeBytes(message.getBody().getBytes());
+		Message message = new SimpleMessage(Directive.SEND_JSON, event.toString().getBytes());
 
 		SecureChannelGroup secureChannelGroup = SecureChannelGroup.getInstance();
 
 		if (secureChannelGroup.contains(recipient)) {
 			Channel ch = secureChannelGroup.find(recipient);
-			ch.write(buffer);
+			ch.write(message);
 		} else {
 			System.out.println("Written to tempDB");
 		}

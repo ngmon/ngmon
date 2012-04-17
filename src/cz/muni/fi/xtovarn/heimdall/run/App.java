@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 public class App {
 
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
+		Thread.sleep(10000);
+
 		final SocketServer socketServer = new SocketServer(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(3));
 
 		class ShutdownHandler implements Runnable {
