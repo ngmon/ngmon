@@ -31,7 +31,7 @@ public class Dispatcher implements Startable {
 
 	private void dispatch(String recipient, Event event) {
 		if (secureChannelGroup.contains(recipient)) {
-			executor.submit(new Dispatch(secureChannelGroup.find(recipient), recipient, event));
+			executor.submit(new Dispatch(secureChannelGroup.find(recipient), event));
 		} else {
 //			System.out.println("Written to tempDB");
 		}

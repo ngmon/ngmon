@@ -85,6 +85,8 @@ public class EventStoreIOLayer implements Startable {
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
+
+		System.out.println("Database Closed!");
 	}
 
 	public Database getPrimaryDatabase() {

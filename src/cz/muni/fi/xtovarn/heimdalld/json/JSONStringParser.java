@@ -22,4 +22,9 @@ public class JSONStringParser {
 
 		return mapper.readValue(jsonString, Event.class);
 	}
+
+	public static String eventToString(Event event) throws IOException {
+
+		return mapper.writeValueAsString(event);
+	}
 }

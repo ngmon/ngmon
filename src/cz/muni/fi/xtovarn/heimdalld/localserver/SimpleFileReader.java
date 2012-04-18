@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdalld.localreader;
+package cz.muni.fi.xtovarn.heimdalld.localserver;
 
 import cz.muni.fi.xtovarn.heimdalld.pipeline.PipelineFactory;
 import org.picocontainer.Startable;

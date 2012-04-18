@@ -6,6 +6,7 @@ import java.util.Map;
 
 public enum Directive {
 	GREET(1),
+	HELLO(2),
 	AUTH_REQUEST(40),
 	AUTH_RESPONSE(41),
 	CHALLENGE(42),

@@ -18,13 +18,34 @@ public class DefaultHandler extends SimpleChannelHandler {
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+		SimpleMessage message = (SimpleMessage) e.getMessage();
 
+		switch (message.getDirective()) {
+			case HELLO:
+
+				int size = secureChannelGroup.size() + 1;
+				secureChannelGroup.add("xdanos@" + size, e.getChannel());
+
+			case GREET:
+				break;
+			case AUTH_REQUEST:
+				break;
+			case AUTH_RESPONSE:
+				break;
+			case CHALLENGE:
+				break;
+			case COMMAND:
+				break;
+			case SEND_JSON:
+				break;
+			case SEND_SMILE:
+				break;
+		}
 	}
 
 	@Override
 	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		e.getChannel().write(new SimpleMessage(Directive.GREET, "greet(param1:100)".getBytes()));
-		secureChannelGroup.add("xdanos", e.getChannel());
+		e.getChannel().write(new SimpleMessage(Directive.GREET, "greet(version:0.0.1)".getBytes()));
 	}
 
 	@Override

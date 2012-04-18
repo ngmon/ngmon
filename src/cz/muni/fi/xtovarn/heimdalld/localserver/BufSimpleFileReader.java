@@ -1,18 +1,18 @@
-package cz.muni.fi.xtovarn.heimdalld.localreader;
+package cz.muni.fi.xtovarn.heimdalld.localserver;
 
 import cz.muni.fi.xtovarn.heimdalld.pipeline.PipelineFactory;
 import org.codehaus.jackson.map.util.ISO8601Utils;
 import org.picocontainer.Startable;
 
+import java.io.IOException;
 import java.util.Date;
-import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class BufSimpleFileReader implements Startable {
 
-	private final ExecutorService childExecutor = Executors.newFixedThreadPool(4);
+	private final ExecutorService childExecutor = Executors.newSingleThreadExecutor();
 	private final PipelineFactory pipelineFactory;
 
 	public BufSimpleFileReader(PipelineFactory pipelineFactory) {
@@ -21,11 +21,9 @@ public class BufSimpleFileReader implements Startable {
 
 	@Override
 	public void start() {
-		Scanner console = new Scanner(System.in);
-		System.out.print("Press enter.");
-		String guess = console.next();
-
-		System.out.println(guess);
+		System.out.println("Press enter to continue...");
+		try {System.in.read();} catch (IOException e){}
+		System.out.println("Reading!");
 
 		int i = 10000;
 		while (i > 1) {

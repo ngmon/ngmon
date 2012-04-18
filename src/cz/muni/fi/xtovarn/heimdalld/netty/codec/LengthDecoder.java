@@ -41,6 +41,7 @@ public class LengthDecoder extends FrameDecoder {
 		}
 
 		// There's enough bytes in the buffer. Pass it to the next handler.
+		System.out.println(buffer.readerIndex());
 		return buffer;
 	}
 }

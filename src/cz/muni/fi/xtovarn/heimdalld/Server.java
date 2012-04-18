@@ -1,10 +1,10 @@
-package cz.muni.fi.xtovarn.heimdalld.run;
+package cz.muni.fi.xtovarn.heimdalld;
 
 import com.sleepycat.db.DatabaseException;
 import cz.muni.fi.xtovarn.heimdalld.db.store.EventStoreIOLayer;
 import cz.muni.fi.xtovarn.heimdalld.db.store.EventStoreImpl;
 import cz.muni.fi.xtovarn.heimdalld.dispatcher.Dispatcher;
-import cz.muni.fi.xtovarn.heimdalld.localreader.BufSimpleFileReader;
+import cz.muni.fi.xtovarn.heimdalld.localserver.BufSimpleFileReader;
 import cz.muni.fi.xtovarn.heimdalld.netty.NettyServer;
 import cz.muni.fi.xtovarn.heimdalld.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdalld.pipeline.DefaultPipelineFactory;
@@ -17,7 +17,7 @@ import org.picocontainer.monitors.LifecycleComponentMonitor;
 
 import java.io.IOException;
 
-public class PicoRun {
+public class Server {
 
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
 

@@ -11,7 +11,7 @@ public class DetermineRecipient implements Handler {
 	@Override
 	public Object handle(Object o) {
 		Set<String> recipients = new HashSet<String>(1);
-		recipients.add("xdanos");
+		recipients.add("xdanos@1");
 
 		return new Subscription(recipients, (Event) o);
 	}

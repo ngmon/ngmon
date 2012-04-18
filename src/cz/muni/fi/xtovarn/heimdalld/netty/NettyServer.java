@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class NettyServer implements Startable {
 
 	private final SecureChannelGroup secureChannelGroup;
-	private final static int SERVER_PORT = 6000;
+	public final static int SERVER_PORT = 6000;
 
 	private ServerBootstrap bootstrap;
 
@@ -24,7 +24,7 @@ public class NettyServer implements Startable {
 
 	@Override
 	public void start() {
-		ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
+		ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newSingleThreadExecutor(), Executors.newSingleThreadExecutor());
 
 		bootstrap = new ServerBootstrap(factory);
 
@@ -44,5 +44,7 @@ public class NettyServer implements Startable {
 			e.printStackTrace();
 		}
 		bootstrap.releaseExternalResources();
+
+		System.out.println("Netty Closed!");
 	}
 }

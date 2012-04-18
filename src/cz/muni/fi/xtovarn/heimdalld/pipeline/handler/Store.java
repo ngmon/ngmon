@@ -21,10 +21,13 @@ public class Store implements Handler {
 			OperationStatus status = store.put((Event) o);
 		} catch (DatabaseException e) {
 			System.err.println(e.getMessage());
+			e.printStackTrace();
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
+			e.printStackTrace();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 		return o;
