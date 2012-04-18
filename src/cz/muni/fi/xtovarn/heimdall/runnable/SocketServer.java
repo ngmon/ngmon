@@ -33,7 +33,7 @@ public class SocketServer implements Startable {
 	@Override
 	public void start() {
 		try {
-			read("events5.json");
+			read("events.json");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

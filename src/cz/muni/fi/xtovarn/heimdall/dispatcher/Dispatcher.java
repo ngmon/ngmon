@@ -1,5 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall.dispatcher;
 
+import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import org.picocontainer.Startable;
 
@@ -20,11 +21,20 @@ public class Dispatcher implements Startable {
 	}
 
 	public boolean submit(Subscription subscription) {
+
 		for (String recipient : subscription.getRecipients()) {
-			executor.submit(new Dispatch(secureChannelGroup, recipient, subscription.getEvent()));
+			dispatch(recipient, subscription.getEvent());
 		}
 
 		return true;
+	}
+
+	private void dispatch(String recipient, Event event) {
+		if (secureChannelGroup.contains(recipient)) {
+			executor.submit(new Dispatch(secureChannelGroup.find(recipient), recipient, event));
+		} else {
+			System.out.println("Written to tempDB");
+		}
 	}
 
 	@Override
