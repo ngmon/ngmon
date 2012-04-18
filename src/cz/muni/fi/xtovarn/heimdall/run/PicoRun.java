@@ -19,7 +19,7 @@ import java.io.IOException;
 
 public class PicoRun {
 
-	public static void main(String[] args) throws IOException, DatabaseException {
+	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
 		MutablePicoContainer parent = new DefaultPicoContainer();
 		MutablePicoContainer pico = new DefaultPicoContainer(new OptInCaching(), new StartableLifecycleStrategy(new LifecycleComponentMonitor()),parent);
 

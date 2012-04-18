@@ -8,6 +8,7 @@ import org.codehaus.jackson.smile.SmileFactory;
 
 import java.io.IOException;
 
+// TODO add to pico
 public class JSONEventMapper {
 
 	private static final ObjectMapper mapper = new ObjectMapper(new SmileFactory());

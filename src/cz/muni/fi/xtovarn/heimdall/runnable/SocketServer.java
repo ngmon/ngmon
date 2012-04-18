@@ -57,7 +57,6 @@ public class SocketServer implements Startable {
 					new Store(eventStore),
 					new DetermineRecipient(),
 					new SubmitToDispatcher(dispatcher))));
-			Thread.sleep(7000);
 		}
 
 		in.close();
