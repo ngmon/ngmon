@@ -6,6 +6,7 @@ import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreImpl;
 import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
 import cz.muni.fi.xtovarn.heimdall.netty.ServerPipelineFactory;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
+import cz.muni.fi.xtovarn.heimdall.pipeline.DefaultPipelineFactory;
 import cz.muni.fi.xtovarn.heimdall.runnable.NettyServer;
 import cz.muni.fi.xtovarn.heimdall.runnable.SocketServer;
 import org.picocontainer.Characteristics;
@@ -20,6 +21,7 @@ import java.io.IOException;
 public class PicoRun {
 
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
+
 		MutablePicoContainer parent = new DefaultPicoContainer();
 		MutablePicoContainer pico = new DefaultPicoContainer(new OptInCaching(), new StartableLifecycleStrategy(new LifecycleComponentMonitor()),parent);
 
@@ -30,6 +32,7 @@ public class PicoRun {
 		pico.as(Characteristics.SINGLE).addComponent(SocketServer.class);
 		pico.addComponent(EventStoreImpl.class);
 		pico.addComponent(ServerPipelineFactory.class);
+		pico.addComponent(DefaultPipelineFactory.class);
 
 		pico.start();
 	}

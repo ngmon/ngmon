@@ -1,10 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall.runnable;
 
-import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
-import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
-import cz.muni.fi.xtovarn.heimdall.pipeline.HandlerSequence;
-import cz.muni.fi.xtovarn.heimdall.pipeline.Pipeline;
-import cz.muni.fi.xtovarn.heimdall.pipeline.handler.*;
+import cz.muni.fi.xtovarn.heimdall.pipeline.PipelineFactory;
 import org.picocontainer.Startable;
 
 import java.io.BufferedReader;
@@ -17,12 +13,10 @@ import java.util.concurrent.TimeUnit;
 public class SocketServer implements Startable {
 
 	private final ExecutorService childExecutor = Executors.newCachedThreadPool();
-	private final EventStore eventStore;
-	private final Dispatcher dispatcher;
+	private final PipelineFactory pipelineFactory;
 
-	public SocketServer(EventStore eventStore, Dispatcher dispatcher) {
-		this.eventStore = eventStore;
-		this.dispatcher = dispatcher;
+	public SocketServer(PipelineFactory pipelineFactory) {
+		this.pipelineFactory = pipelineFactory;
 	}
 
 	@Override
@@ -51,12 +45,7 @@ public class SocketServer implements Startable {
 		String json;
 
 		while ((json = in.readLine()) != null) {
-			childExecutor.submit(new Pipeline(json, new HandlerSequence(
-					new ParseJSON(),
-					new SetDetectionTime(),
-					new Store(eventStore),
-					new DetermineRecipient(),
-					new SubmitToDispatcher(dispatcher))));
+			childExecutor.submit(pipelineFactory.getPipeline(json));
 		}
 
 		in.close();
