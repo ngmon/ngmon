@@ -1,6 +1,7 @@
 package cz.muni.fi.xtovarn.heimdalld.localserver;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.local.DefaultLocalServerChannelFactory;
 import org.jboss.netty.channel.local.LocalAddress;
@@ -9,7 +10,11 @@ import org.picocontainer.Startable;
 public class LocalServer implements Startable {
 
 	private ServerBootstrap bootstrap;
+	private final Resender resender;
 
+	public LocalServer(Resender resender) {
+		this.resender = resender;
+	}
 
 	@Override
 	public void start() {
@@ -19,7 +24,7 @@ public class LocalServer implements Startable {
 
 		bootstrap.setPipelineFactory(new LocalServerPipelineFactory(resender));
 
-		bootstrap.bind(new LocalAddress("/dev/eventlog")); // fake address
+		Channel channel = bootstrap.bind(new LocalAddress(1)); // fake address
 	}
 
 	@Override
