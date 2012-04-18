@@ -29,7 +29,7 @@ public class EventStoreImpl implements EventStore {
 		return ebdb.getSequence();
 	}
 
-	public OperationStatus put(Event event) throws DatabaseException, IOException {
+	public synchronized OperationStatus put(Event event) throws DatabaseException, IOException {
 		DatabaseEntry key = new DatabaseEntry();
 
 		/* Populate key */

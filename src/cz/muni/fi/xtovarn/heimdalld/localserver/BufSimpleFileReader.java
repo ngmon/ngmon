@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BufSimpleFileReader implements Startable {
 
-	private final ExecutorService childExecutor = Executors.newSingleThreadExecutor();
+	private final ExecutorService childExecutor = Executors.newFixedThreadPool(10);
 	private final PipelineFactory pipelineFactory;
 
 	public BufSimpleFileReader(PipelineFactory pipelineFactory) {
@@ -25,7 +25,7 @@ public class BufSimpleFileReader implements Startable {
 		try {System.in.read();} catch (IOException e){}
 		System.out.println("Reading!");
 
-		int i = 10000;
+		int i = 1000;
 		while (i > 1) {
 			i--;
 			String json = "{\"Event\":{\"occurrenceTime\":\"" + ISO8601Utils.format(new Date(System.currentTimeMillis()), true) + "\",\"hostname\":\"domain.localhost.cz\",\"type\":\"org.linux.cron.Started\",\"application\":\"Cron\",\"process\":\"proc_cron NAme\",\"processId\":\"id005\",\"severity\":5,\"priority\":4,\"Payload\":{\"schema\":null,\"schemaVersion\":null,\"value\":4648,\"value2\":\"aax4x46aeEF\"}}}";

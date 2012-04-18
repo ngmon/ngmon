@@ -15,8 +15,6 @@ public class MessageEncoder extends OneToOneEncoder {
 
 		ChannelBuffer buffer = ChannelBuffers.buffer(message.size());
 
-		System.out.println(message.size() + "." + message.length());
-
 		buffer.writeShort(message.length());
 		buffer.writeByte(message.getDirective().getCode());
 		buffer.writeBytes(message.getBody());

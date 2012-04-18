@@ -17,8 +17,6 @@ public class ClientHandler extends SimpleChannelHandler {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
 		String body = new String(message.getBody());
 
-		System.out.println(message.size() + "." + message.length());
-
 		switch (message.getDirective()) {
 			case GREET:
 				e.getChannel().write(new SimpleMessage(Directive.HELLO, ("hello(" + body + ")").getBytes()));
@@ -35,11 +33,11 @@ public class ClientHandler extends SimpleChannelHandler {
 			case SEND_SMILE:
 				Event event = JSONEventMapper.bytesToEvent(message.getBody());
 				System.out.println(JSONStringParser.eventToString(event));
-//				long arrival = System.currentTimeMillis();
-//				long occurence = event.getOccurrenceTime().getTime();
-//				long detection = event.getDetectionTime().getTime();
-//
-//				System.out.println("[" + (detection - occurence) + "]" + "[" + (arrival - detection) + "]");
+				long arrival = System.currentTimeMillis();
+				long occurence = event.getOccurrenceTime().getTime();
+				long detection = event.getDetectionTime().getTime();
+
+				System.out.println("[" + (detection - occurence) + "]" + "[" + (arrival - detection) + "]");
 			case SEND_JSON:
 				break;
 		}
