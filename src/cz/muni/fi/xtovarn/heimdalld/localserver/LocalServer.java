@@ -17,9 +17,9 @@ public class LocalServer implements Startable {
 
 		bootstrap = new ServerBootstrap(factory);
 
-		bootstrap.setPipelineFactory(new LocalServerPipelineFactory());
+		bootstrap.setPipelineFactory(new LocalServerPipelineFactory(resender));
 
-		bootstrap.bind(new LocalAddress("/dev/eventlog"));
+		bootstrap.bind(new LocalAddress("/dev/eventlog")); // fake address
 	}
 
 	@Override
