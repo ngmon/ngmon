@@ -1,6 +1,6 @@
-package cz.muni.fi.xtovarn.heimdall.runnable;
+package cz.muni.fi.xtovarn.heimdall.netty;
 
-import cz.muni.fi.xtovarn.heimdall.netty.ServerPipelineFactory;
+import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -8,23 +8,27 @@ import org.picocontainer.Startable;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class NettyServer implements Startable {
 
-	private final ServerPipelineFactory serverPipelineFactory;
+	private final SecureChannelGroup secureChannelGroup;
 	private final static int SERVER_PORT = 6000;
 
-	public NettyServer(ServerPipelineFactory serverPipelineFactory) {
-		this.serverPipelineFactory = serverPipelineFactory;
+	private ServerBootstrap bootstrap;
+
+	public NettyServer(SecureChannelGroup secureChannelGroup) {
+		this.secureChannelGroup = secureChannelGroup;
 	}
+
 
 	@Override
 	public void start() {
 		ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
 
-		ServerBootstrap bootstrap = new ServerBootstrap(factory);
+		bootstrap = new ServerBootstrap(factory);
 
-		bootstrap.setPipelineFactory(serverPipelineFactory);
+		bootstrap.setPipelineFactory(new ServerPipelineFactory(secureChannelGroup));
 
 		bootstrap.setOption("child.tcpNoDelay", true);
 		bootstrap.setOption("child.keepAlive", true);
@@ -34,6 +38,11 @@ public class NettyServer implements Startable {
 
 	@Override
 	public void stop() {
-		System.out.println("how to stop?");
+		try {
+			secureChannelGroup.close().await(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		bootstrap.releaseExternalResources();
 	}
 }

@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.netty;
+package cz.muni.fi.xtovarn.heimdall.netty.handler;
 
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;

@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.netty;
+package cz.muni.fi.xtovarn.heimdall.netty.codec;
 
 import cz.muni.fi.xtovarn.heimdall.netty.message.Message;
 import org.jboss.netty.buffer.ChannelBuffer;

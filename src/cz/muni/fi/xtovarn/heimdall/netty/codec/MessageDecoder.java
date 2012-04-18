@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.netty;
+package cz.muni.fi.xtovarn.heimdall.netty.codec;
 
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;

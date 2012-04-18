@@ -33,7 +33,7 @@ public class Dispatcher implements Startable {
 		if (secureChannelGroup.contains(recipient)) {
 			executor.submit(new Dispatch(secureChannelGroup.find(recipient), recipient, event));
 		} else {
-			System.out.println("Written to tempDB");
+//			System.out.println("Written to tempDB");
 		}
 	}
 

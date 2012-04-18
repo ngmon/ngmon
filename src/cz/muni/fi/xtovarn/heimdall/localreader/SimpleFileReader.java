@@ -1,28 +1,27 @@
-package cz.muni.fi.xtovarn.heimdall.runnable;
+package cz.muni.fi.xtovarn.heimdall.localreader;
 
 import cz.muni.fi.xtovarn.heimdall.pipeline.PipelineFactory;
 import org.picocontainer.Startable;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class SocketServer implements Startable {
+public class SimpleFileReader implements Startable {
 
 	private final ExecutorService childExecutor = Executors.newCachedThreadPool();
 	private final PipelineFactory pipelineFactory;
 
-	public SocketServer(PipelineFactory pipelineFactory) {
+	public SimpleFileReader(PipelineFactory pipelineFactory) {
 		this.pipelineFactory = pipelineFactory;
 	}
 
 	@Override
 	public void start() {
 		try {
-			read("events.json");
+			read("events5.json");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -40,7 +39,7 @@ public class SocketServer implements Startable {
 	}
 
 	private void read(String filename) throws IOException, InterruptedException {
-		BufferedReader in = new BufferedReader(new FileReader(filename));
+		BufferedReader in = new BufferedReader(new java.io.FileReader(filename));
 
 		String json;
 

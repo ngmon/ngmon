@@ -1,18 +1,15 @@
 package cz.muni.fi.xtovarn.heimdall.run;
 
 import com.sleepycat.db.DatabaseException;
-import cz.muni.fi.xtovarn.heimdall.runnable.NettyServer;
-import cz.muni.fi.xtovarn.heimdall.runnable.SocketServer;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
 
 public class App {
 
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
 		/*Thread.sleep(10000);
 
-		final SocketServer socketServer = new SocketServer(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(3));
+		final SimpleFileReader socketServer = new SimpleFileReader(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(3));
 
 		class ShutdownHandler implements Runnable {
 			@Override
