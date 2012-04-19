@@ -22,6 +22,8 @@ public class ServerPipelineFactory implements ChannelPipelineFactory {
 	public ChannelPipeline getPipeline() throws Exception {
 		ChannelPipeline pipeline = pipeline();
 
+//		TODO Use ZLIB Compression
+
 		pipeline.addLast("framer", new LengthDecoder());
 
 		pipeline.addLast("decoder", new MessageDecoder());
