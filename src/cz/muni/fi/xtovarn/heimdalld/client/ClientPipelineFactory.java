@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdalld_client;
+package cz.muni.fi.xtovarn.heimdalld.client;
 
 import cz.muni.fi.xtovarn.heimdalld.netty.codec.LengthDecoder;
 import cz.muni.fi.xtovarn.heimdalld.netty.codec.MessageDecoder;

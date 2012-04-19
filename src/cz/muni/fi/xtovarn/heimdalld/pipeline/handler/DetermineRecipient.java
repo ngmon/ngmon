@@ -12,6 +12,8 @@ public class DetermineRecipient implements Handler {
 	public Object handle(Object o) {
 		Set<String> recipients = new HashSet<String>(1);
 		recipients.add("xdanos@1");
+		recipients.add("xdanos@2");
+		recipients.add("xdanos@3");
 
 		return new Subscription(recipients, (Event) o);
 	}

@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdalld_client;
+package cz.muni.fi.xtovarn.heimdalld.client;
 
 import cz.muni.fi.xtovarn.heimdalld.db.entity.Event;
 import cz.muni.fi.xtovarn.heimdalld.json.JSONEventMapper;

@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdalld_client;
+package cz.muni.fi.xtovarn.heimdalld.client;
 
 import cz.muni.fi.xtovarn.heimdalld.netty.NettyServer;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -9,7 +9,7 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-public class Client {
+public class RemoteClient {
 
 	private static ClientBootstrap bootstrap;
 
