@@ -52,7 +52,8 @@ int main(int argc, char *argv[])
 	for (i = 0; i < loops; i++) {
 		
 		echoString = event_string();
-		echoStringLen = strlen(echoString);          /* Determine input length */    
+		echoStringLen = strlen(echoString);          /* Determine input length */
+		
 		if (send(sock, echoString, echoStringLen, 0) != echoStringLen) error("send() sent a different number of bytes than expected"); /* Send the string to the server */
 		
 		avg += my_sleep(sleep_time);
@@ -81,7 +82,7 @@ char* iso_time() {
 
 	gettimeofday(&tv, NULL); 
 	now_t=tv.tv_sec;
-	millis = tv.tv_usec/1000;
+	millis = tv.tv_usec;
 	now = *localtime(&now_t);
 	
 	asprintf(&timestring, "%4d-%02d-%02dT%02d:%02d:%02d.%03d+0200", now.tm_year+1900, now.tm_mon+1, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec, millis);
@@ -92,7 +93,7 @@ char* iso_time() {
 char* event_string() {
 	char *event_json;   
 	
-	asprintf(&event_json,"%s\"%s\"%s", "{\"Event\":{\"occurrenceTime\":", iso_time(), ",\"hostname\":\"domain.localhost.cz\",\"type\":\"org.linux.cron.Started\",\"application\":\"Cron\",\"process\":\"proc_cron NAme\",\"processId\":\"id005\",\"severity\":5,\"priority\":4,\"Payload\":{\"schema\":null,\"schemaVersion\":null,\"value\":4648,\"value2\":\"aax4x46aeEF\"}}}");
+	asprintf(&event_json,"{\"Event\":{\"occurrenceTime\":\"%s\",\"hostname\":\"domain.localhost.cz\",\"type\":\"org.linux.cron.Started\",\"application\":\"Cron\",\"process\":\"proc_cron NAme\",\"processId\":\"id005\",\"severity\":5,\"priority\":4,\"Payload\":{\"schema\":null,\"schemaVersion\":null,\"value\":4648,\"value2\":\"aax4x46aeEF\"}}}\n", iso_time());
 	
 	return event_json;
 }
