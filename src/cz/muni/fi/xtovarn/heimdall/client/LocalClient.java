@@ -16,7 +16,7 @@ public class LocalClient {
 
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-		int i = 5000;
+		int i = 1;
 		while (i > 0) {
 			Thread.sleep(1000);
 			i--;
