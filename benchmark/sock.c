@@ -82,10 +82,10 @@ char* iso_time() {
 
 	gettimeofday(&tv, NULL); 
 	now_t=tv.tv_sec;
-	millis = tv.tv_usec;
+	millis = tv.tv_usec/1000;
 	now = *localtime(&now_t);
 	
-	asprintf(&timestring, "%4d-%02d-%02dT%02d:%02d:%02d.%02d+0200", now.tm_year+1900, now.tm_mon+1, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec, millis);
+	asprintf(&timestring, "%4d-%02d-%02dT%02d:%02d:%02d.%03d+0200", now.tm_year+1900, now.tm_mon+1, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec, millis);
 	
 	return timestring;
 }
