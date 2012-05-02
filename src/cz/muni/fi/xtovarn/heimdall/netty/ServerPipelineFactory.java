@@ -7,6 +7,8 @@ import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.handler.DefaultHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
+import org.jboss.netty.handler.codec.compression.ZlibDecoder;
+import org.jboss.netty.handler.codec.compression.ZlibEncoder;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
@@ -22,7 +24,8 @@ public class ServerPipelineFactory implements ChannelPipelineFactory {
 	public ChannelPipeline getPipeline() throws Exception {
 		ChannelPipeline pipeline = pipeline();
 
-//		TODO Use ZLIB Compression
+		pipeline.addLast("decompress", new ZlibDecoder());
+		pipeline.addLast("compress", new ZlibEncoder());
 
 		pipeline.addLast("framer", new LengthDecoder());
 
