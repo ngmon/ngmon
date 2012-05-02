@@ -56,13 +56,14 @@ public class EventStoreIOLayer implements Startable {
 			sequence = sequenceDatabase.openSequence(null, new DatabaseEntry("id".getBytes()), sequenceConfig);
 
 		} catch (FileNotFoundException e) {
-            System.err.println("FileNotFoundException: " + e.getCause());
+			System.err.println("FileNotFoundException: " + e.getCause());
 			e.printStackTrace();
 		} catch (DatabaseException e) {
-            System.err.println("DatabaseException: " + e.getCause());
+			System.err.println("DatabaseException: " + e.getCause());
 			e.printStackTrace();
 		}
 	}
+
 	public void stop() {
 		try {
 			if (sequence != null) {
