@@ -2,7 +2,6 @@ package cz.muni.fi.xtovarn.heimdall.dispatcher;
 
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.json.JSONEventMapper;
-import cz.muni.fi.xtovarn.heimdall.json.JSONStringParser;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Message;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
@@ -25,10 +24,7 @@ public class Dispatch implements Runnable {
 	public void run() {
 		Message message = null;
 		try {
-			message = new SimpleMessage(Directive.SEND_JSON, JSONStringParser.eventToString(event).getBytes());
-
-			System.out.println("json length:" + JSONStringParser.eventToString(event).getBytes().length);
-
+			message = new SimpleMessage(Directive.SEND_SMILE, JSONEventMapper.eventAsBytes(event));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
