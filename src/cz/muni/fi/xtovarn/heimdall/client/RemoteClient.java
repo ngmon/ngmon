@@ -23,6 +23,6 @@ public class RemoteClient {
 		bootstrap.setOption("child.tcpNoDelay", true);
 		bootstrap.setOption("child.keepAlive", true);
 
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(NettyServer.SERVER_PORT));
+		ChannelFuture future = bootstrap.connect(new InetSocketAddress(6000));
 	}
 }
