@@ -20,13 +20,13 @@ public class Store implements Handler {
 		try {
 			OperationStatus status = store.put((Event) o);
 		} catch (DatabaseException e) {
-			System.err.println(e.getMessage());
+			System.err.println("DatabaseException " + e.getMessage());
 			e.printStackTrace();
 		} catch (IOException e) {
-			System.err.println(e.getMessage());
+            System.err.println("IOException " + e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+            System.err.println("Exception " + e.getMessage());
 			e.printStackTrace();
 		}
 
