@@ -37,7 +37,7 @@ public class ClientHandler extends SimpleChannelHandler {
 				long occurence = event.getOccurrenceTime().getTime();
 				long detection = event.getDetectionTime().getTime();
 
-				System.out.println((detection - occurence) + ";" + (arrival - detection));
+//				System.out.println((detection - occurence) + ";" + (arrival - detection));
 			case SEND_JSON:
 				break;
 		}
