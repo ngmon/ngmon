@@ -12,9 +12,6 @@ public class MessageDecoder extends OneToOneDecoder {
 	protected Object decode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
 
 		ChannelBuffer buffer = (ChannelBuffer) msg;
-
-		System.out.println(buffer.readableBytes() + 2);
-
 		short unsignedByte = ((ChannelBuffer) msg).readUnsignedByte();
 
 		Directive directive = Directive.get(unsignedByte);

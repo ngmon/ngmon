@@ -24,8 +24,8 @@ public class ServerPipelineFactory implements ChannelPipelineFactory {
 	public ChannelPipeline getPipeline() throws Exception {
 		ChannelPipeline pipeline = pipeline();
 
-//		pipeline.addLast("decompress", new ZlibDecoder());
-//		pipeline.addLast("compress", new ZlibEncoder());
+		pipeline.addLast("decompress", new ZlibDecoder());
+		pipeline.addLast("compress", new ZlibEncoder());
 
 		pipeline.addLast("framer", new LengthDecoder());
 
