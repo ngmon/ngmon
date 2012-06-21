@@ -6,7 +6,11 @@
       <root url="jar://$PROJECT_DIR$/lib/jackson-annotations-2.0.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jackson-dataformat-smile-2.0.2.jar!/" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="http://fasterxml.github.com/jackson-core/javadoc/2.0.0/" />
+      <root url="http://fasterxml.github.com/jackson-annotations/javadoc/2.0.0/" />
+      <root url="http://fasterxml.github.com/jackson-databind/javadoc/2.0.0/" />
+    </JAVADOC>
     <SOURCES />
   </library>
 </component>
