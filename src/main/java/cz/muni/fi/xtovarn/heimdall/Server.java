@@ -34,8 +34,6 @@ public class Server {
 		pico.addComponent(EventStoreImpl.class);
 		pico.addComponent(DefaultPipelineFactory.class);
 
-		System.out.println(":sahs" +System.getProperty("java.library.path"));
-
 		System.out.println("Heimdall is starting...");
 		pico.start();
 

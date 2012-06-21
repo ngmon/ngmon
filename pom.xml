@@ -20,21 +20,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<resources>
-			<resource>
-				<filtering>false</filtering>
-				<directory>${basedir}/lib/native</directory>
-				<targetPath>${project.build.directory}/native</targetPath>
-				<includes>
-					<include>libdb-5.3.so</include>
-					<include>libdb53.dll</include>
-					<include>libdb_java-5.3.so</include>
-					<include>libdb_java53.dll</include>
-					<include>libjunixsocket-linux-1.5-amd64.so</include>
-					<include>libjunixsocket-linux-1.5-i386.so</include>
-				</includes>
-			</resource>
-		</resources>
 	</build>
 
 	<dependencies>
