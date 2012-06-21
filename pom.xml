@@ -2,86 +2,99 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>groupId</groupId>
-    <artifactId>heimdall</artifactId>
-    <version>0.1-SNAPSHOT</version>
+	<groupId>cz.muni.fi.xtovarn</groupId>
+	<artifactId>heimdall</artifactId>
+	<version>0.1-SNAPSHOT</version>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<configuration>
+					<executable>java</executable>
+					<mainClass>cz.muni.fi.xtovarn.heimdall.Server</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<filtering>false</filtering>
+				<directory>${basedir}/lib/native</directory>
+				<includes>
+					<include>libdb-5.3.so</include>
+					<include>libdb53.dll</include>
+					<include>libdb_java-5.3.so</include>
+					<include>libdb_java53.dll</include>
+					<include>libjunixsocket-linux-1.5-amd64.so</include>
+					<include>libjunixsocket-linux-1.5-i386.so</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <configuration>
-                    <executable>java</executable>
-                    <mainClass>cz.muni.fi.xtovarn.heimdall.Server</mainClass>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+	<dependencies>
+		<dependency>
+			<artifactId>picocontainer</artifactId>
+			<groupId>org.picocontainer</groupId>
+			<version>2.14.1</version>
+		</dependency>
 
-    <dependencies>
-        <dependency>
-            <artifactId>picocontainer</artifactId>
-            <groupId>org.picocontainer</groupId>
-            <version>2.14.1</version>
-        </dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.0.2</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.0.2</version>
-        </dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.0.2</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.0.2</version>
-        </dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.0.2</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.0.2</version>
-        </dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-smile</artifactId>
+			<version>2.0.2</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-smile</artifactId>
-            <version>2.0.2</version>
-        </dependency>
+		<dependency>
+			<groupId>com.sleepycat</groupId>
+			<artifactId>db</artifactId>
+			<version>5.3.15</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.sleepycat</groupId>
-            <artifactId>db</artifactId>
-            <version>5.3.15</version>
-        </dependency>
+		<dependency>
+			<groupId>org.jboss.netty</groupId>
+			<artifactId>netty</artifactId>
+			<version>3.2.7.Final</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<repository>
+			<id>local-project-libraries</id>
+			<name>Local project libraries</name>
+			<url>file://${project.basedir}/lib/mvn-local-repo</url>
+			<layout>default</layout>
+		</repository>
 
-        <dependency>
-            <groupId>org.jboss.netty</groupId>
-            <artifactId>netty</artifactId>
-            <version>3.2.7.Final</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
-    <repositories>
-        <repository>
-            <id>local-project-libraries</id>
-            <name>Local project libraries</name>
-            <url>file://${project.basedir}/lib</url>
-            <layout>default</layout>
-        </repository>
-
-        <repository>
-            <id>repository.jboss.org</id>
-            <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+		<repository>
+			<id>repository.jboss.org</id>
+			<url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 </project>
