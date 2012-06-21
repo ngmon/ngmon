@@ -1,10 +1,8 @@
 package cz.muni.fi.xtovarn.heimdall.json;
 
+import com.fasterxml.jackson.databind.*;
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.smile.SmileFactory;
+import  com.fasterxml.jackson.dataformat.smile.SmileFactory;
 
 import java.io.IOException;
 
@@ -14,9 +12,9 @@ public class JSONEventMapper {
 	private static final ObjectMapper mapper = new ObjectMapper(new SmileFactory());
 
 	static {
-		mapper.configure(SerializationConfig.Feature.WRAP_ROOT_VALUE, true);
-		mapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
-		mapper.configure(DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+		mapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
 	}
 
 	public static byte[] eventAsBytes(Event event) throws IOException {

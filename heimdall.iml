@@ -10,9 +10,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="db-5.3.15" level="project" />
-    <orderEntry type="library" name="jackson-asl-1.9.5" level="project" />
     <orderEntry type="library" name="netty-3.2.7.Final" level="project" />
     <orderEntry type="library" name="picocontainer-2.14.1" level="project" />
+    <orderEntry type="library" name="jackson-2.0.2" level="project" />
   </component>
 </module>
 

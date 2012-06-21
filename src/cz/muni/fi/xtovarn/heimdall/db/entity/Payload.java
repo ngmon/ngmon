@@ -1,7 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.db.entity;
 
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
