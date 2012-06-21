@@ -8,6 +8,7 @@
     </JAVADOC>
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/com/sleepycat/db/5.3.15/db-5.3.15-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mvn-local-repo/com/sleepycat/db/5.3.15/db-5.3.15-sources.jar!/src" />
     </SOURCES>
   </library>
 </component>
