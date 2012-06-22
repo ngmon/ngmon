@@ -41,6 +41,10 @@ public class Payload {
 		this.schemaVersion = schemaVersion;
 	}
 
+	public Object getValue(String name) {
+		return properties.get(name);
+	}
+
 	@Override
 	public String toString() {
 		return "Payload{" +

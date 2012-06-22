@@ -25,6 +25,16 @@ public class Server {
 		MutablePicoContainer parent = new DefaultPicoContainer();
 		final MutablePicoContainer pico = new DefaultPicoContainer(new OptInCaching(), new StartableLifecycleStrategy(new LifecycleComponentMonitor()),parent);
 
+		class ShutdownHandler implements Runnable {
+			@Override
+			public void run() {
+				System.out.println("Shutting down...");
+				pico.stop();
+			}
+		}
+
+		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler()));
+
 		pico.as(Characteristics.SINGLE).addComponent(EventStoreIOLayer.class);
 		pico.as(Characteristics.SINGLE).addComponent(Dispatcher.class);
 		pico.as(Characteristics.SINGLE).addComponent(SecureChannelGroup.class);
@@ -36,14 +46,5 @@ public class Server {
 
 		System.out.println("Heimdall is starting...");
 		pico.start();
-
-		class ShutdownHandler implements Runnable {
-			@Override
-			public void run() {
-				pico.stop();
-			}
-		}
-
-		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler()));
 	}
 }
