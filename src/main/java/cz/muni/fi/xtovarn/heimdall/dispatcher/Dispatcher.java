@@ -39,6 +39,8 @@ public class Dispatcher implements Startable {
 
 	@Override
 	public void stop() {
+		System.out.println("Closing " + this.getClass() + "...");
+
 		executor.shutdown();
 	}
 }

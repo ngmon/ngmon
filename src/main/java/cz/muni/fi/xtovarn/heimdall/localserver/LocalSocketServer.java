@@ -43,10 +43,14 @@ public class LocalSocketServer implements Startable {
 
 	@Override
 	public void stop() {
+		System.out.println("Closing " + this.getClass() + "...");
+
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
+
+		System.out.println(this.getClass() + " closed.");
 	}
 }

@@ -20,18 +20,10 @@ import java.io.IOException;
 
 public class Server {
 
+	private static final MutablePicoContainer parent = new DefaultPicoContainer();
+	private static final MutablePicoContainer pico = new DefaultPicoContainer(new OptInCaching(), new StartableLifecycleStrategy(new LifecycleComponentMonitor()), parent);
+
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
-
-		MutablePicoContainer parent = new DefaultPicoContainer();
-		final MutablePicoContainer pico = new DefaultPicoContainer(new OptInCaching(), new StartableLifecycleStrategy(new LifecycleComponentMonitor()),parent);
-
-		class ShutdownHandler implements Runnable {
-			@Override
-			public void run() {
-				System.out.println("Shutting down...");
-				pico.stop();
-			}
-		}
 
 		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler()));
 
@@ -46,5 +38,13 @@ public class Server {
 
 		System.out.println("Heimdall is starting...");
 		pico.start();
+	}
+
+	static class ShutdownHandler implements Runnable {
+		@Override
+		public void run() {
+			System.out.println("Shutting down...");
+			pico.stop();
+		}
 	}
 }

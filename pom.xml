@@ -23,6 +23,12 @@
 	</build>
 
 	<dependencies>
+        <dependency>
+            <artifactId>guice</artifactId>
+            <groupId>com.google.inject</groupId>
+            <version>3.0</version>
+        </dependency>
+
 		<dependency>
 			<artifactId>picocontainer</artifactId>
 			<groupId>org.picocontainer</groupId>

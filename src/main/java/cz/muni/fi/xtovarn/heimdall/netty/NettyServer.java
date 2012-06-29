@@ -38,6 +38,8 @@ public class NettyServer implements Startable {
 
 	@Override
 	public void stop() {
+		System.out.println("Closing " + this.getClass() + "...");
+
 		try {
 			secureChannelGroup.close().await(5, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {

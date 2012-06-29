@@ -65,6 +65,8 @@ public class EventStoreIOLayer implements Startable {
 	}
 
 	public void stop() {
+		System.out.println("Closing " + this.getClass() + "...");
+
 		try {
 			if (sequence != null) {
 				sequence.close();
@@ -89,7 +91,6 @@ public class EventStoreIOLayer implements Startable {
 			e.printStackTrace();
 		}
 
-		System.out.println("Database Closed!");
 	}
 
 	public Database getPrimaryDatabase() {

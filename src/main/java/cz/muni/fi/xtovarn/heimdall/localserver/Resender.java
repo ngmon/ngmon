@@ -26,6 +26,8 @@ public class Resender implements Startable {
 	}
 
 	public void stop() {
+		System.out.println("Closing " + this.getClass() + "...");
+
 		childExecutor.shutdown();
 		try {
 			childExecutor.awaitTermination(5, TimeUnit.SECONDS);
