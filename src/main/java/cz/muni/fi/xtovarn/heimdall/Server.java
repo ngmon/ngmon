@@ -44,7 +44,7 @@ public class Server {
 		@Override
 		public void run() {
 			System.out.println("Shutting down...");
-			pico.stop();
+			//pico.stop();
 		}
 	}
 }
