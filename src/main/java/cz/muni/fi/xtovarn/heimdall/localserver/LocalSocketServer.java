@@ -9,9 +9,9 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class LocalSocketServer implements Startable {
+public class LocalSocketServer implements Startable, Runnable {
 
-	private final ExecutorService service = Executors.newCachedThreadPool();
+	private final ExecutorService service = Executors.newFixedThreadPool(2);
 	private final Resender resender;
 	private ServerSocket serverSocket;
 
@@ -54,5 +54,10 @@ public class LocalSocketServer implements Startable {
 		}
 
 		System.out.println(this.getClass() + " closed!");
+	}
+
+	@Override
+	public void run() {
+		start();
 	}
 }

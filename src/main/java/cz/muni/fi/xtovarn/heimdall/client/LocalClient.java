@@ -16,9 +16,9 @@ public class LocalClient {
 
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-		int i = 2000;
+		int i = 10000;
 		while (i > 0) {
-			Thread.sleep(100);
+			Thread.sleep(1);
 			i--;
 			String json = "{\"Event\":{\"occurrenceTime\":\"" + ISO8601Utils.format(new Date(System.currentTimeMillis()), true) + "\",\"hostname\":\"domain.localhost.cz\",\"type\":\"org.linux.cron.Started\",\"application\":\"Cron\",\"process\":\"cron\",\"processId\":\"4219\",\"severity\":5,\"priority\":4,\"Payload\":{\"schema\":\"http://www.linux.org/schema/monitoring/cron/3.1/events.xsd\",\"schemaVersion\":\"3.1\",\"value\":4648,\"value2\":\"Fax4x46aeEF%aax4x%46aeEF\"}}}";
 			out.write(json);
