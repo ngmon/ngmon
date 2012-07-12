@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Resender implements Startable {
 
-	private final ExecutorService childExecutor = Executors.newFixedThreadPool(2);
+	private final ExecutorService childExecutor = Executors.newFixedThreadPool(10);
 	private final PipelineFactory pipelineFactory;
 
 	@Inject
