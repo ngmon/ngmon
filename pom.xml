@@ -17,6 +17,7 @@
                 <configuration>
                     <executable>java</executable>
                     <mainClass>cz.muni.fi.xtovarn.heimdall.Server</mainClass>
+                    <commandlineArgs>-agentlib:hprof=cpu=samples</commandlineArgs>
                 </configuration>
             </plugin>
 
