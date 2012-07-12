@@ -1,24 +1,39 @@
 package cz.muni.fi.xtovarn.heimdall;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.sleepycat.db.DatabaseException;
+import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreIOLayer;
-import cz.muni.fi.xtovarn.heimdall.guice.HeimdallModule;
+import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreImpl;
+import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
 import cz.muni.fi.xtovarn.heimdall.localserver.LocalSocketServer;
+import cz.muni.fi.xtovarn.heimdall.localserver.Resender;
 import cz.muni.fi.xtovarn.heimdall.netty.NettyServer;
+import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
+import cz.muni.fi.xtovarn.heimdall.pipeline.DefaultPipelineFactory;
+import cz.muni.fi.xtovarn.heimdall.pipeline.PipelineFactory;
 
 import java.io.IOException;
 
 public class Server {
 
-	private static Injector injector;
+	private static EventStoreIOLayer eventStoreIOLayer;
+	private static NettyServer nettyServer;
+	private static LocalSocketServer localSocketServer;
+
 
 	public static void main(String[] args) throws IOException, DatabaseException, InterruptedException {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler()));
 
-		injector = Guice.createInjector(new HeimdallModule());
+		eventStoreIOLayer = new EventStoreIOLayer();
+		SecureChannelGroup scg = new SecureChannelGroup();
+		nettyServer = new NettyServer(scg);
+		Dispatcher dispatcher = new Dispatcher(scg);
+		EventStore eventStore = new EventStoreImpl(eventStoreIOLayer);
+		PipelineFactory ppln = new DefaultPipelineFactory(eventStore, dispatcher);
+		Resender resender = new Resender(ppln);
+		localSocketServer = new LocalSocketServer(resender);
+
 		start();
 	}
 
@@ -32,14 +47,14 @@ public class Server {
 
 	static void start() {
 		System.out.println("Heimdall is starting...");
-		injector.getInstance(EventStoreIOLayer.class).start();
-		injector.getInstance(NettyServer.class).start();
-		injector.getInstance(LocalSocketServer.class).start();
+		eventStoreIOLayer.start();
+		nettyServer.start();
+		localSocketServer.start();
 	}
 
 	static void stop() {
-		injector.getInstance(LocalSocketServer.class).stop();
-		injector.getInstance(NettyServer.class).stop();
-		injector.getInstance(EventStoreIOLayer.class).stop();
+		eventStoreIOLayer.stop();
+		nettyServer.stop();
+		localSocketServer.stop();
 	}
 }

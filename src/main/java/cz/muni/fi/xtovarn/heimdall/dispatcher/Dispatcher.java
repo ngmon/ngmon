@@ -1,6 +1,5 @@
 package cz.muni.fi.xtovarn.heimdall.dispatcher;
 
-import com.google.inject.Inject;
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.guice.Startable;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
@@ -12,7 +11,7 @@ public class Dispatcher implements Startable {
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 	private final SecureChannelGroup secureChannelGroup;
 
-	@Inject
+//	@Inject
 	public Dispatcher(SecureChannelGroup secureChannelGroup) {
 		this.secureChannelGroup = secureChannelGroup;
 	}

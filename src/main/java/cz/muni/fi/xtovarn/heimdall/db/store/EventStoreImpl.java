@@ -1,6 +1,5 @@
 package cz.muni.fi.xtovarn.heimdall.db.store;
 
-import com.google.inject.Inject;
 import com.sleepycat.bind.tuple.LongBinding;
 import com.sleepycat.db.*;
 import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
@@ -14,7 +13,7 @@ public class EventStoreImpl implements EventStore {
 
 	private final EventStoreIOLayer ebdb;
 
-	@Inject
+//	@Inject
 	public EventStoreImpl(EventStoreIOLayer ebdb) {
 		this.ebdb = ebdb;
 	}

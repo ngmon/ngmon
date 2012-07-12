@@ -1,6 +1,5 @@
 package cz.muni.fi.xtovarn.heimdall.localserver;
 
-import com.google.inject.Inject;
 import cz.muni.fi.xtovarn.heimdall.guice.Startable;
 
 import java.io.IOException;
@@ -15,7 +14,7 @@ public class LocalSocketServer implements Startable, Runnable {
 	private final Resender resender;
 	private ServerSocket serverSocket;
 
-	@Inject
+//	@Inject
 	public LocalSocketServer(Resender resender) {
 		this.resender = resender;
 	}

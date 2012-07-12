@@ -1,6 +1,5 @@
 package cz.muni.fi.xtovarn.heimdall.localserver;
 
-import com.google.inject.Inject;
 import cz.muni.fi.xtovarn.heimdall.guice.Startable;
 import cz.muni.fi.xtovarn.heimdall.pipeline.PipelineFactory;
 
@@ -13,7 +12,7 @@ public class Resender implements Startable {
 	private final ExecutorService childExecutor = Executors.newFixedThreadPool(10);
 	private final PipelineFactory pipelineFactory;
 
-	@Inject
+//	@Inject
 	public Resender(PipelineFactory pipelineFactory) {
 		this.pipelineFactory = pipelineFactory;
 	}
