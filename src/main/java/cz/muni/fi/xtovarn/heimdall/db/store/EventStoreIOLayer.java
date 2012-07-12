@@ -2,7 +2,7 @@ package cz.muni.fi.xtovarn.heimdall.db.store;
 
 import com.sleepycat.db.*;
 import cz.muni.fi.xtovarn.heimdall.db.event.keycreator.TypeKeyCreator;
-import org.picocontainer.Startable;
+import cz.muni.fi.xtovarn.heimdall.guice.Startable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,6 +16,7 @@ public class EventStoreIOLayer implements Startable {
 
 	private static final String BASE_DIRECTORY = "./database/events";
 
+	@Override
 	public void start() {
 		try {
 			/* Setup environment root path */
@@ -91,6 +92,7 @@ public class EventStoreIOLayer implements Startable {
 			e.printStackTrace();
 		}
 
+		System.out.println(this.getClass() + " closed!");
 	}
 
 	public Database getPrimaryDatabase() {

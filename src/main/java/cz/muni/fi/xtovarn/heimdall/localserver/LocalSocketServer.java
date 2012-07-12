@@ -1,6 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.localserver;
 
-import org.picocontainer.Startable;
+import com.google.inject.Inject;
+import cz.muni.fi.xtovarn.heimdall.guice.Startable;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -14,6 +15,7 @@ public class LocalSocketServer implements Startable {
 	private final Resender resender;
 	private ServerSocket serverSocket;
 
+	@Inject
 	public LocalSocketServer(Resender resender) {
 		this.resender = resender;
 	}
@@ -51,6 +53,6 @@ public class LocalSocketServer implements Startable {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
 
-		System.out.println(this.getClass() + " closed.");
+		System.out.println(this.getClass() + " closed!");
 	}
 }

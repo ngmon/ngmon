@@ -1,10 +1,11 @@
 package cz.muni.fi.xtovarn.heimdall.netty;
 
+import com.google.inject.Inject;
+import cz.muni.fi.xtovarn.heimdall.guice.Startable;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.picocontainer.Startable;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
@@ -17,6 +18,7 @@ public class NettyServer implements Startable {
 
 	private ServerBootstrap bootstrap;
 
+	@Inject
 	public NettyServer(SecureChannelGroup secureChannelGroup) {
 		this.secureChannelGroup = secureChannelGroup;
 	}
@@ -47,6 +49,6 @@ public class NettyServer implements Startable {
 		}
 		bootstrap.releaseExternalResources();
 
-		System.out.println("Netty Closed!");
+		System.out.println(this.getClass() + " closed!");
 	}
 }
