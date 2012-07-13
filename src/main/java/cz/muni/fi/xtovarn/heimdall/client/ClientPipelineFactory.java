@@ -15,10 +15,10 @@ public class ClientPipelineFactory implements ChannelPipelineFactory {
 	public ChannelPipeline getPipeline() throws Exception {
 		ChannelPipeline pipeline = pipeline();
 
-		pipeline.addLast("sniffer", new Sniffer());
-
-		pipeline.addLast("decompress", new ZlibDecoder());
-		pipeline.addLast("compress", new ZlibEncoder());
+//		pipeline.addLast("sniffer", new Sniffer());
+//
+//		pipeline.addLast("decompress", new ZlibDecoder());
+//		pipeline.addLast("compress", new ZlibEncoder());
 
 		pipeline.addLast("framer", new LengthDecoder());
 
