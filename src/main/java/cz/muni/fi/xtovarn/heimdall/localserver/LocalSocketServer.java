@@ -1,6 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.localserver;
 
-import cz.muni.fi.xtovarn.heimdall.guice.Startable;
+import cz.muni.fi.xtovarn.heimdall.pipeline.PipelineFactory;
+import cz.muni.fi.xtovarn.heimdall.pipeline.Startable;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,28 +9,25 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class LocalSocketServer implements Startable, Runnable {
+public class LocalSocketServer implements Startable {
 
-	private final ExecutorService service = Executors.newCachedThreadPool();
-	private final Resender resender;
+	private final ExecutorService service = Executors.newFixedThreadPool(10);
+	private final PipelineFactory pipelineFactory;
 	private ServerSocket serverSocket;
 
 //	@Inject
-	public LocalSocketServer(Resender resender) {
-		this.resender = resender;
+	public LocalSocketServer(PipelineFactory pipelineFactory) {
+		this.pipelineFactory = pipelineFactory;
 	}
 
 	@Override
 	public void start() {
-		boolean bRunning = false;
-
 		try {
 			serverSocket = new ServerSocket(5000);
-			bRunning = true;
 
 			while (true) {
 				Socket socket = serverSocket.accept();
-				service.submit(new PushToResender(socket, resender));
+				service.submit(new LocalConnectionHandler(socket, pipelineFactory));
 			}
 		} catch (IOException e) {
 			if (serverSocket != null && serverSocket.isClosed())
@@ -38,7 +36,6 @@ public class LocalSocketServer implements Startable, Runnable {
 				e.printStackTrace();
 		} finally {
 			serverSocket = null;
-			bRunning = false;
 		}
 	}
 
@@ -49,14 +46,9 @@ public class LocalSocketServer implements Startable, Runnable {
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			e.printStackTrace();
 		}
 
 		System.out.println(this.getClass() + " closed!");
-	}
-
-	@Override
-	public void run() {
-		start();
 	}
 }

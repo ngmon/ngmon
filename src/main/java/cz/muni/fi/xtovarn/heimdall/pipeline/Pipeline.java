@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Pipeline implements Runnable {
 
-	private List<Handler> handlers = new ArrayList<Handler>(1);
+	private List<Handler> handlers = new ArrayList<Handler>(5);
 	private Object o;
 
 	public Pipeline(Object o) {

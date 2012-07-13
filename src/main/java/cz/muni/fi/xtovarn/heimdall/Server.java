@@ -6,7 +6,6 @@ import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreIOLayer;
 import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreImpl;
 import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
 import cz.muni.fi.xtovarn.heimdall.localserver.LocalSocketServer;
-import cz.muni.fi.xtovarn.heimdall.localserver.Resender;
 import cz.muni.fi.xtovarn.heimdall.netty.NettyServer;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.pipeline.DefaultPipelineFactory;
@@ -30,9 +29,8 @@ public class Server {
 		nettyServer = new NettyServer(scg);
 		Dispatcher dispatcher = new Dispatcher(scg);
 		EventStore eventStore = new EventStoreImpl(eventStoreIOLayer);
-		PipelineFactory ppln = new DefaultPipelineFactory(eventStore, dispatcher);
-		Resender resender = new Resender(ppln);
-		localSocketServer = new LocalSocketServer(resender);
+		PipelineFactory pipelineFactory = new DefaultPipelineFactory(eventStore, dispatcher);
+		localSocketServer = new LocalSocketServer(pipelineFactory);
 
 		start();
 	}

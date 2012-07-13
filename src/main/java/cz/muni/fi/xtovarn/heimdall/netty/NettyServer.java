@@ -1,7 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.netty;
 
-import cz.muni.fi.xtovarn.heimdall.guice.Startable;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
+import cz.muni.fi.xtovarn.heimdall.pipeline.Startable;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;

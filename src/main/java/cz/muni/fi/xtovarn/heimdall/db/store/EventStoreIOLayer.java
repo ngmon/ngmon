@@ -2,7 +2,7 @@ package cz.muni.fi.xtovarn.heimdall.db.store;
 
 import com.sleepycat.db.*;
 import cz.muni.fi.xtovarn.heimdall.db.event.keycreator.TypeKeyCreator;
-import cz.muni.fi.xtovarn.heimdall.guice.Startable;
+import cz.muni.fi.xtovarn.heimdall.pipeline.Startable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
