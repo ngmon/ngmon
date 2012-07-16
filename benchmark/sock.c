@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
     if ((argc < 3) || (argc > 3))    	/* Test for correct number of arguments */
     {
-       fprintf(stderr, "Usage: %s <loops> <sleep_time>\n",
+       fprintf(stderr, "Usage: %s <loops> <sleep_time_milis>\n",
                argv[0]);
        exit(1);
     }
@@ -110,12 +110,12 @@ struct timespec diff(struct timespec start, struct timespec end) {
 	return temp;
 }
 
-int my_sleep(int nanos) {
+int my_sleep(int milis) {
 	struct timespec t_req, t_rem, start, stop, difference;
-	int real_sleep;	
+	int real_sleep;
 	
-	t_req.tv_sec = 0;
-	t_req.tv_nsec = nanos;
+	t_req.tv_sec = (milis * 1000000) / 1000000000;
+	t_req.tv_nsec = (milis * 1000000) % 1000000000;
 	
 	clock_gettime(CLOCK_REALTIME, &start);
 		
@@ -127,7 +127,7 @@ int my_sleep(int nanos) {
 	
 	difference = diff(start, stop);
 	
-	real_sleep = difference.tv_nsec;
+	real_sleep = (difference.tv_sec * 1000) + (difference.tv_nsec / 1000000);
 	
 	return real_sleep;
 }
