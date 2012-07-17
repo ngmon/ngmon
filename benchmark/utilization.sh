@@ -16,13 +16,13 @@ sleep 5
 ./sock 100 10 # warm up
 
 for i in $(eval echo "{1..$1}"); do
-	./sock 1000 500 &
+	./sock 1000 1000 &
 	killpids[i]=$!
 done
 
-sleep 10
+sleep 5
 
-./getusage $PID 60 > usage[$1].log
+./getusage $PID 35 > usage[$1].log
 
 for p in "${killpids[@]}"; do
 	kill -SIGTERM $p
