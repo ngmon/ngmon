@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 public class LocalSocketServer implements Startable {
 
-	private final ExecutorService service = Executors.newFixedThreadPool(10);
+	private final ExecutorService service = Executors.newFixedThreadPool(50);
 	private final PipelineFactory pipelineFactory;
 	private ServerSocket serverSocket;
 
@@ -23,7 +23,7 @@ public class LocalSocketServer implements Startable {
 	@Override
 	public void start() {
 		try {
-			serverSocket = new ServerSocket(5000, 70);
+			serverSocket = new ServerSocket(5000, 50);
 
 			while (true) {
 				Socket socket = serverSocket.accept();
