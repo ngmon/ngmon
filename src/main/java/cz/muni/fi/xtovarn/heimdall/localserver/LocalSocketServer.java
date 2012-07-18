@@ -23,7 +23,7 @@ public class LocalSocketServer implements Startable {
 	@Override
 	public void start() {
 		try {
-			serverSocket = new ServerSocket(5000);
+			serverSocket = new ServerSocket(5000, 70);
 
 			while (true) {
 				Socket socket = serverSocket.accept();
