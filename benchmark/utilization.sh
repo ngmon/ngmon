@@ -22,7 +22,7 @@ done
 
 sleep 5
 
-./getusage $PID 35 > usage[$1].log
+./getusage $PID 40 > usage[$1].log
 
 for p in "${killpids[@]}"; do
 	kill -SIGTERM $p
@@ -31,6 +31,3 @@ done
 sleep 1
 
 kill -SIGTERM $PID
-
-sleep 3
-cat usage[$1].log
