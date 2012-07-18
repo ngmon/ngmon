@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 public class LocalSocketServer implements Startable {
 
-	private final ExecutorService service = Executors.newFixedThreadPool(50);
+	private final ExecutorService service = Executors.newCachedThreadPool();
 	private final PipelineFactory pipelineFactory;
 	private ServerSocket serverSocket;
 
