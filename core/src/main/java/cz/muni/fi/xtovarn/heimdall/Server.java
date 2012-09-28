@@ -2,7 +2,7 @@ package cz.muni.fi.xtovarn.heimdall;
 
 import com.sleepycat.db.DatabaseException;
 import cz.muni.fi.xtovarn.heimdall.storage.store.BerkeleyDBEventStoreImpl;
-import cz.muni.fi.xtovarn.heimdall.storage.store.BerkeleyDBIOLayer;
+import cz.muni.fi.xtovarn.heimdall.storage.store.NativeCoreBerkeleyDBIOLayer;
 import cz.muni.fi.xtovarn.heimdall.storage.store.EventStore;
 import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
 import cz.muni.fi.xtovarn.heimdall.localserver.LocalSocketServer;
@@ -15,7 +15,7 @@ import java.io.IOException;
 
 public class Server {
 
-	private static BerkeleyDBIOLayer berkeleyDBIOLayer;
+	private static NativeCoreBerkeleyDBIOLayer berkeleyDBIOLayer;
 	private static NettyServer nettyServer;
 	private static LocalSocketServer localSocketServer;
 
@@ -24,7 +24,7 @@ public class Server {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler()));
 
-		berkeleyDBIOLayer = new BerkeleyDBIOLayer();
+		berkeleyDBIOLayer = new NativeCoreBerkeleyDBIOLayer(environmentConfig, databaseConfig, eventTypeSecondaryConfig, sequenceDatabaseConfig, sequenceConfig);
 		SecureChannelGroup scg = new SecureChannelGroup();
 		nettyServer = new NettyServer(scg);
 		Dispatcher dispatcher = new Dispatcher(scg);

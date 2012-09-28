@@ -1,16 +1,16 @@
 package cz.muni.fi.xtovarn.heimdall.storage.event.keycreator;
 
 import com.sleepycat.bind.tuple.StringBinding;
-import com.sleepycat.db.DatabaseEntry;
-import com.sleepycat.db.DatabaseException;
-import com.sleepycat.db.SecondaryDatabase;
-import com.sleepycat.db.SecondaryKeyCreator;
+import com.sleepycat.je.DatabaseEntry;
+import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.SecondaryDatabase;
+import com.sleepycat.je.SecondaryKeyCreator;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.commons.json.JSONEventMapper;
 
 import java.io.IOException;
 
-public class TypeKeyCreator implements SecondaryKeyCreator {
+public class EventTypeKeyCreator implements SecondaryKeyCreator {
 
 	@Override
 	public boolean createSecondaryKey(SecondaryDatabase secondaryDatabase,

@@ -19,12 +19,16 @@
 
 		<dependency>
 			<groupId>com.sleepycat</groupId>
-			<artifactId>db</artifactId>
+			<artifactId>je</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>cz.muni.fi.xtovarn</groupId>
 			<artifactId>commons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 
 	</dependencies>

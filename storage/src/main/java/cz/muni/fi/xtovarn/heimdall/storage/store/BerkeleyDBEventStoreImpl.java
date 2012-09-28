@@ -1,7 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.storage.store;
 
 import com.sleepycat.bind.tuple.LongBinding;
-import com.sleepycat.db.*;
+import com.sleepycat.je.*;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.commons.json.JSONEventMapper;
 
@@ -11,10 +11,10 @@ import java.util.List;
 
 public class BerkeleyDBEventStoreImpl implements EventStore {
 
-	private final BerkeleyDBIOLayer ebdb;
+	private final JavaEditionBerkeleyDBIOLayer ebdb;
 
 //	@Inject
-	public BerkeleyDBEventStoreImpl(BerkeleyDBIOLayer ebdb) {
+	public BerkeleyDBEventStoreImpl(JavaEditionBerkeleyDBIOLayer ebdb) {
 		this.ebdb = ebdb;
 	}
 
@@ -71,7 +71,11 @@ public class BerkeleyDBEventStoreImpl implements EventStore {
 		DatabaseEntry data = new DatabaseEntry();
 
 		LongBinding.longToEntry(id, key);
-		getPrimaryDatabase().get(null, key, data, LockMode.DEFAULT);
+		OperationStatus operationStatus = getPrimaryDatabase().get(null, key, data, LockMode.DEFAULT);
+
+		if (operationStatus.equals(OperationStatus.NOTFOUND)) {
+			return null;
+		}
 
 		return JSONEventMapper.bytesToEvent(data.getData());
 	}

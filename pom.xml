@@ -81,6 +81,12 @@
 				<scope>compile</scope>
 			</dependency>
 
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.7</version>
+			</dependency>
+
 
 			<!-- Heimdall deps.-->
 
@@ -130,13 +136,6 @@
 	</build>
 
 	<repositories>
-		<repository>
-			<id>local-project-libraries</id>
-			<name>Local project libraries</name>
-			<url>file://${project.basedir}/lib/mvn-local-repo</url>
-			<layout>default</layout>
-		</repository>
-
 		<repository>
 			<id>oracleReleases</id>
 			<name>Oracle Released Java Packages</name>
