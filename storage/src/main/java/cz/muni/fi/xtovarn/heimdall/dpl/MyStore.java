@@ -1,11 +1,11 @@
 package cz.muni.fi.xtovarn.heimdall.dpl;
 
-import com.sleepycat.je.*;
+import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.Environment;
+import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.StoreConfig;
-import com.sleepycat.persist.model.EntityModel;
 import cz.muni.fi.xtovarn.heimdall.commons.Startable;
-import cz.muni.fi.xtovarn.heimdall.storage.event.keycreator.EventTypeKeyCreator;
 
 import java.io.File;
 
@@ -31,6 +31,12 @@ public class MyStore implements Startable {
 
 	}
 
+	public EntityStore initializeAndGetStore() {
+		start();
+
+		return entityStore;
+	}
+
 	@Override
 	public void start() {
 		/* Setup environment root path */
@@ -38,7 +44,7 @@ public class MyStore implements Startable {
 
 		environment = new Environment(baseDirectory, environmentConfig);
 
-		entityStore = new EntityStore(environment,"myStore",storeConfig);
+		entityStore = new EntityStore(environment, "myStore", storeConfig);
 
 	}
 

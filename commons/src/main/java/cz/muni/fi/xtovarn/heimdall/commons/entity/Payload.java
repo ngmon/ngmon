@@ -2,10 +2,12 @@ package cz.muni.fi.xtovarn.heimdall.commons.entity;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.sleepycat.persist.model.Persistent;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Persistent
 public class Payload {
 	private String schema;
 	private String schemaVersion;

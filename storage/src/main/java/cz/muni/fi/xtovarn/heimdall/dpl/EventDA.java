@@ -1,11 +1,8 @@
 package cz.muni.fi.xtovarn.heimdall.dpl;
 
-import com.sleepycat.persist.EntityJoin;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.SecondaryIndex;
-import com.sleepycat.persist.model.Relationship;
-import com.sleepycat.persist.model.SecondaryKey;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 
 import java.util.Date;
@@ -36,5 +33,13 @@ public class EventDA {
 		processIdIndex = store.getSecondaryIndex(primaryIndex, String.class, "processId");
 		severityIndex = store.getSecondaryIndex(primaryIndex, Integer.class, "severity");
 		priorityIndex = store.getSecondaryIndex(primaryIndex, Integer.class, "priority");
+	}
+
+	public void put(Event event) {
+		primaryIndex.put(event);
+	}
+
+	public Event getByHostname(String hostname) {
+		return hostnameIndex.get(hostname);
 	}
 }
