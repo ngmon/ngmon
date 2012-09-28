@@ -2,19 +2,42 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>cz.muni.fi.xtovarn</groupId>
-    <artifactId>commons</artifactId>
-    <version>0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+	<groupId>cz.muni.fi.xtovarn</groupId>
+	<artifactId>commons</artifactId>
+	<version>0.1-SNAPSHOT</version>
 
-    <name>Heimdall - Commons</name>
+	<packaging>jar</packaging>
 
-    <parent>
-        <groupId>cz.muni.fi.xtovarn</groupId>
-        <artifactId>heimdall</artifactId>
-        <version>0.1-SNAPSHOT</version>
-    </parent>
-    
+	<name>Heimdall - Commons</name>
+
+	<parent>
+		<groupId>cz.muni.fi.xtovarn</groupId>
+		<artifactId>heimdall</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-smile</artifactId>
+		</dependency>
+	</dependencies>
+
 </project>

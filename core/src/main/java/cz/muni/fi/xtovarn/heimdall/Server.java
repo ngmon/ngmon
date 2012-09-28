@@ -1,9 +1,9 @@
 package cz.muni.fi.xtovarn.heimdall;
 
 import com.sleepycat.db.DatabaseException;
-import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
-import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreIOLayer;
-import cz.muni.fi.xtovarn.heimdall.db.store.EventStoreImpl;
+import cz.muni.fi.xtovarn.heimdall.storage.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.storage.store.EventStoreIOLayer;
+import cz.muni.fi.xtovarn.heimdall.storage.store.EventStoreImpl;
 import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
 import cz.muni.fi.xtovarn.heimdall.localserver.LocalSocketServer;
 import cz.muni.fi.xtovarn.heimdall.netty.NettyServer;

@@ -1,6 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall.dispatcher;
 
-import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 
 import java.util.Set;
 

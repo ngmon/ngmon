@@ -1,8 +1,8 @@
-package cz.muni.fi.xtovarn.heimdall.db.store;
+package cz.muni.fi.xtovarn.heimdall.storage.store;
 
 import com.sleepycat.db.DatabaseException;
 import com.sleepycat.db.OperationStatus;
-import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 
 import java.io.IOException;
 import java.util.List;

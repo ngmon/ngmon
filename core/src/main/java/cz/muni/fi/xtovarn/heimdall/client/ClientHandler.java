@@ -1,7 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.client;
 
-import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.json.JSONEventMapper;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.json.JSONEventMapper;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import org.jboss.netty.channel.ChannelHandlerContext;

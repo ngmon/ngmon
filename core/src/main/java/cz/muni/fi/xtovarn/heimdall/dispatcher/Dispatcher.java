@@ -1,8 +1,8 @@
 package cz.muni.fi.xtovarn.heimdall.dispatcher;
 
-import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
-import cz.muni.fi.xtovarn.heimdall.pipeline.Startable;
+import cz.muni.fi.xtovarn.heimdall.commons.Startable;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

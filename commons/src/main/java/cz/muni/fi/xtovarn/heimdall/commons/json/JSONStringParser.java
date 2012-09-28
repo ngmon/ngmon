@@ -1,11 +1,10 @@
-package cz.muni.fi.xtovarn.heimdall.json;
+package cz.muni.fi.xtovarn.heimdall.commons.json;
 
 import com.fasterxml.jackson.databind.*;
-import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 
 import java.io.IOException;
 
-// TODO add to pico
 public class JSONStringParser {
 
 	private static final ObjectMapper mapper = new ObjectMapper();

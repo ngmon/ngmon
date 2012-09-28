@@ -1,8 +1,8 @@
-package cz.muni.fi.xtovarn.heimdall.db.store;
+package cz.muni.fi.xtovarn.heimdall.storage.store;
 
 import com.sleepycat.db.*;
-import cz.muni.fi.xtovarn.heimdall.db.event.keycreator.TypeKeyCreator;
-import cz.muni.fi.xtovarn.heimdall.pipeline.Startable;
+import cz.muni.fi.xtovarn.heimdall.storage.event.keycreator.TypeKeyCreator;
+import cz.muni.fi.xtovarn.heimdall.commons.Startable;
 
 import java.io.File;
 import java.io.FileNotFoundException;

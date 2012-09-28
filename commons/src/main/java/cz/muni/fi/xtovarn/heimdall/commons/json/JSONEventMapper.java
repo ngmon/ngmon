@@ -1,7 +1,7 @@
-package cz.muni.fi.xtovarn.heimdall.json;
+package cz.muni.fi.xtovarn.heimdall.commons.json;
 
 import com.fasterxml.jackson.databind.*;
-import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import  com.fasterxml.jackson.dataformat.smile.SmileFactory;
 
 import java.io.IOException;

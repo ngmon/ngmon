@@ -2,8 +2,8 @@ package cz.muni.fi.xtovarn.heimdall.pipeline.handler;
 
 import com.sleepycat.db.DatabaseException;
 import com.sleepycat.db.OperationStatus;
-import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.storage.store.EventStore;
 
 import java.io.IOException;
 

@@ -1,9 +1,9 @@
-package cz.muni.fi.xtovarn.heimdall.db.store;
+package cz.muni.fi.xtovarn.heimdall.storage.store;
 
 import com.sleepycat.bind.tuple.LongBinding;
 import com.sleepycat.db.*;
-import cz.muni.fi.xtovarn.heimdall.db.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.json.JSONEventMapper;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.json.JSONEventMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;

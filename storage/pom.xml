@@ -2,18 +2,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>cz.muni.fi.xtovarn</groupId>
-    <artifactId>storage</artifactId>
-    <version>0.1-SNAPSHOT</version>
+	<groupId>cz.muni.fi.xtovarn</groupId>
+	<artifactId>storage</artifactId>
+	<version>0.1-SNAPSHOT</version>
+	<name>Heimdall - Storage</name>
 
-    <name>Heimdall - Storage</name>
+	<parent>
+		<groupId>cz.muni.fi.xtovarn</groupId>
+		<artifactId>heimdall</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
 
-    <parent>
-        <groupId>cz.muni.fi.xtovarn</groupId>
-        <artifactId>heimdall</artifactId>
-        <version>0.1-SNAPSHOT</version>
-    </parent>
-    
+	<dependencies>
+
+		<dependency>
+			<groupId>com.sleepycat</groupId>
+			<artifactId>db</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>cz.muni.fi.xtovarn</groupId>
+			<artifactId>commons</artifactId>
+		</dependency>
+
+	</dependencies>
+
 </project>

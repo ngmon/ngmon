@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.db.entity;
+package cz.muni.fi.xtovarn.heimdall.commons.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;

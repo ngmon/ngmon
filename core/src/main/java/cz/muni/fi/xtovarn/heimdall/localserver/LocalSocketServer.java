@@ -1,7 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.localserver;
 
 import cz.muni.fi.xtovarn.heimdall.pipeline.PipelineFactory;
-import cz.muni.fi.xtovarn.heimdall.pipeline.Startable;
+import cz.muni.fi.xtovarn.heimdall.commons.Startable;
 
 import java.io.IOException;
 import java.net.ServerSocket;

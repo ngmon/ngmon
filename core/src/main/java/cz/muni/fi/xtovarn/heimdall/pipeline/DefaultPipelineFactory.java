@@ -1,8 +1,8 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline;
 
-import cz.muni.fi.xtovarn.heimdall.db.store.EventStore;
-import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
 import cz.muni.fi.xtovarn.heimdall.pipeline.handler.*;
+import cz.muni.fi.xtovarn.heimdall.storage.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
 
 public class DefaultPipelineFactory implements PipelineFactory {
 
