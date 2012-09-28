@@ -9,7 +9,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Heimdall - FSM</name>
+    <name>Heimdall - Finite State Machine</name>
 
     <parent>
         <groupId>cz.muni.fi.xtovarn</groupId>
