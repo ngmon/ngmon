@@ -7,7 +7,7 @@ import cz.muni.fi.xtovarn.heimdall.commons.Startable;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class EventStoreIOLayer implements Startable {
+public class BerkeleyDBIOLayer implements Startable {
 	private static Environment environment = null;
 	private static Database primaryDatabase = null;
 	private static SecondaryDatabase eventTypeIndex = null;

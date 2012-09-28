@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventStoreImpl implements EventStore {
+public class BerkeleyDBEventStoreImpl implements EventStore {
 
-	private final EventStoreIOLayer ebdb;
+	private final BerkeleyDBIOLayer ebdb;
 
 //	@Inject
-	public EventStoreImpl(EventStoreIOLayer ebdb) {
+	public BerkeleyDBEventStoreImpl(BerkeleyDBIOLayer ebdb) {
 		this.ebdb = ebdb;
 	}
 
