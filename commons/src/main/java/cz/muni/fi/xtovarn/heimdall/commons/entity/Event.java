@@ -2,21 +2,45 @@ package cz.muni.fi.xtovarn.heimdall.commons.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
+import com.sleepycat.persist.model.Entity;
+import com.sleepycat.persist.model.PrimaryKey;
+import com.sleepycat.persist.model.Relationship;
+import com.sleepycat.persist.model.SecondaryKey;
 
 import java.util.Date;
 
+@Entity
 @JsonRootName("Event")
 public class Event {
-	
+
+	@PrimaryKey(sequence = "event_long_sequence")
 	private long id;
+
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	private Date occurrenceTime;
+
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	private Date detectionTime;
+
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	private String hostname;
+
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	private String type;
+
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	private String application;
+
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	private String process;
+
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	private String processId;
+
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	private int severity;
+
+	@SecondaryKey(relate = Relationship.MANY_TO_ONE)
 	private int priority;
 
 	@JsonProperty("Payload")
