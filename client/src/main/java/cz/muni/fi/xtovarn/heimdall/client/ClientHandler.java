@@ -2,12 +2,13 @@ package cz.muni.fi.xtovarn.heimdall.client;
 
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.commons.json.JSONEventMapper;
-import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+
+import static cz.muni.fi.xtovarn.heimdall.netty.message.Directive.*;
 
 public class ClientHandler extends SimpleChannelHandler {
 
@@ -19,7 +20,7 @@ public class ClientHandler extends SimpleChannelHandler {
 		switch (message.getDirective()) {
 			case GREET:
 				System.out.println(message.getDirective() + ": " + body);
-				e.getChannel().write(new SimpleMessage(Directive.HELLO, ("hello(" + body + ")").getBytes()));
+				e.getChannel().write(new SimpleMessage(HELLO, ("hello(" + body + ")").getBytes()));
 			case HELLO:
 				break;
 			case AUTH_REQUEST:

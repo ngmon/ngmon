@@ -5,6 +5,7 @@ import cz.muni.fi.xtovarn.heimdall.netty.codec.MessageDecoder;
 import cz.muni.fi.xtovarn.heimdall.netty.codec.MessageEncoder;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
+import org.jboss.netty.channel.Channels;
 import org.jboss.netty.handler.codec.compression.ZlibDecoder;
 import org.jboss.netty.handler.codec.compression.ZlibEncoder;
 
@@ -13,7 +14,7 @@ import static org.jboss.netty.channel.Channels.pipeline;
 public class ClientPipelineFactory implements ChannelPipelineFactory {
 	@Override
 	public ChannelPipeline getPipeline() throws Exception {
-		ChannelPipeline pipeline = pipeline();
+		ChannelPipeline pipeline = Channels.pipeline();
 
 //		pipeline.addLast("sniffer", new Sniffer());
 //

@@ -23,6 +23,7 @@
 		<module>fsm</module>
 		<module>storage</module>
 		<module>pubsub</module>
+		<module>client</module>
 	</modules>
 
 	<dependencyManagement>
@@ -86,6 +87,12 @@
 			<dependency>
 				<groupId>cz.muni.fi.xtovarn</groupId>
 				<artifactId>storage</artifactId>
+				<version>0.1-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cz.muni.fi.xtovarn</groupId>
+				<artifactId>core</artifactId>
 				<version>0.1-SNAPSHOT</version>
 			</dependency>
 
