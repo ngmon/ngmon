@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.storage.store;
+package cz.muni.fi.xtovarn.heimdall.storage;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.OperationStatus;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface EventStore {
 
-	OperationStatus put(Event event) throws DatabaseException, IOException;
+	Event put(Event event) throws DatabaseException, IOException;
 
 	List<Event> getAllRecords() throws DatabaseException, IOException;
 

@@ -3,7 +3,7 @@ package cz.muni.fi.xtovarn.heimdall;
 import com.sleepycat.db.DatabaseException;
 import cz.muni.fi.xtovarn.heimdall.storage.store.BerkeleyDBEventStoreImpl;
 import cz.muni.fi.xtovarn.heimdall.storage.store.NativeCoreBerkeleyDBIOLayer;
-import cz.muni.fi.xtovarn.heimdall.storage.store.EventStore;
+import cz.muni.fi.xtovarn.heimdall.storage.EventStore;
 import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
 import cz.muni.fi.xtovarn.heimdall.localserver.LocalSocketServer;
 import cz.muni.fi.xtovarn.heimdall.netty.NettyServer;

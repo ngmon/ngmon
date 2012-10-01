@@ -1,29 +1,36 @@
 package cz.muni.fi.xtovarn.heimdall.storage;
 
 import com.fasterxml.jackson.databind.util.ISO8601Utils;
+import com.sleepycat.persist.EntityStore;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.commons.json.JSONStringParser;
-import cz.muni.fi.xtovarn.heimdall.dpl.EventDA;
-import cz.muni.fi.xtovarn.heimdall.dpl.MyStore;
+import cz.muni.fi.xtovarn.heimdall.storage.dpl.DefaultEnvironment;
+import cz.muni.fi.xtovarn.heimdall.storage.dpl.EventDataAccessor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
 public class DPLTest {
 
+	private DefaultEnvironment myEnvironment;
+	private EventDataAccessor eventDataAccessor;
 
-	private MyStore myStore;
-	private EventDA eventDA;
+	private static final String BASE_DIRECTORY = "./database/testdb";
 
 	@Before
 	public void setUp() throws Exception {
-		myStore = new MyStore();
+		myEnvironment = new DefaultEnvironment();
 
-		eventDA = new EventDA(myStore.initializeAndGetStore());
+		EntityStore entityStore = myEnvironment.setup(new File(BASE_DIRECTORY));
+
+		entityStore.truncateClass(Event.class);
+
+		eventDataAccessor = new EventDataAccessor(entityStore);
 	}
 
 	@Test
@@ -32,15 +39,15 @@ public class DPLTest {
 
 		Event expected = JSONStringParser.stringToEvent(json);
 
-		eventDA.put(expected);
+		eventDataAccessor.put(expected);
 
-		Event actual = eventDA.getByHostname("domain.localhost.cz");
+		Event actual = eventDataAccessor.getByHostname("domain.localhost.cz");
 
 		assertEquals(expected, actual);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		myStore.stop();
+		myEnvironment.close();
 	}
 }

@@ -49,7 +49,7 @@ public class Payload {
 
 	@Override
 	public String toString() {
-		return "Payload{" +
+		return "[Payload@" + this.hashCode()  + "] {" +
 				"schema='" + schema + '\'' +
 				", schemaVersion='" + schemaVersion + '\'' +
 				", properties=" + properties +

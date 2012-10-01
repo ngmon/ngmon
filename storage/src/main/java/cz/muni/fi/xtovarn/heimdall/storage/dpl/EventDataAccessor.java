@@ -1,13 +1,16 @@
-package cz.muni.fi.xtovarn.heimdall.dpl;
+package cz.muni.fi.xtovarn.heimdall.storage.dpl;
 
+import com.sleepycat.je.DatabaseException;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.SecondaryIndex;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.storage.EventStore;
 
-import java.util.Date;
+import java.io.IOException;
+import java.util.*;
 
-public class EventDA {
+public class EventDataAccessor implements EventStore {
 
 	PrimaryIndex<Long, Event> primaryIndex;
 
@@ -21,7 +24,7 @@ public class EventDA {
 	SecondaryIndex<Integer, Long, Event> severityIndex;
 	SecondaryIndex<Integer, Long, Event> priorityIndex;
 
-	public EventDA(EntityStore store) {
+	public EventDataAccessor(EntityStore store) {
 		primaryIndex = store.getPrimaryIndex(Long.class, Event.class);
 
 		occurrenceTimeIndex = store.getSecondaryIndex(primaryIndex, Date.class, "occurrenceTime");
@@ -35,11 +38,25 @@ public class EventDA {
 		priorityIndex = store.getSecondaryIndex(primaryIndex, Integer.class, "priority");
 	}
 
-	public void put(Event event) {
-		primaryIndex.put(event);
+	@Override
+	public Event put(Event event) {
+		return primaryIndex.put(event);
+	}
+
+	@Override
+	public List<Event> getAllRecords() throws DatabaseException, IOException {
+
+		return new ArrayList<Event>(primaryIndex.sortedMap().values());
+	}
+
+	@Override
+	public Event getEventById(Long id) throws DatabaseException, IOException {
+
+		return primaryIndex.get(id);
 	}
 
 	public Event getByHostname(String hostname) {
+
 		return hostnameIndex.get(hostname);
 	}
 }

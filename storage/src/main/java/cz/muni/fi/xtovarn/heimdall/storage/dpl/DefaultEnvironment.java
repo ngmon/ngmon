@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.dpl;
+package cz.muni.fi.xtovarn.heimdall.storage.dpl;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
@@ -9,17 +9,15 @@ import cz.muni.fi.xtovarn.heimdall.commons.Startable;
 
 import java.io.File;
 
-public class MyStore implements Startable {
+public class DefaultEnvironment {
 	private static Environment environment = null;
 	private static EntityStore entityStore = null;
-
-	private static final String BASE_DIRECTORY = "./database/events";
 
 	private final EnvironmentConfig environmentConfig;
 	private final StoreConfig storeConfig;
 
 
-	public MyStore() {
+	public DefaultEnvironment() {
 
 		/* Setup environment */
 		environmentConfig = new EnvironmentConfig();
@@ -31,25 +29,17 @@ public class MyStore implements Startable {
 
 	}
 
-	public EntityStore initializeAndGetStore() {
-		start();
-
-		return entityStore;
-	}
-
-	@Override
-	public void start() {
+	public EntityStore setup(File baseDirectory) {
 		/* Setup environment root path */
-		File baseDirectory = new File(BASE_DIRECTORY);
 
 		environment = new Environment(baseDirectory, environmentConfig);
 
 		entityStore = new EntityStore(environment, "myStore", storeConfig);
 
+		return entityStore;
 	}
 
-	@Override
-	public void stop() {
+	public void close() {
 		System.out.println("Closing " + this.getClass() + "...");
 
 		try {
