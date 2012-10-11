@@ -1,15 +1,20 @@
 package cz.muni.fi.xtovarn.heimdall.commons.entity;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.sleepycat.persist.model.Persistent;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Persistent
+@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.WRAPPER_OBJECT)
 public class Payload {
+
+	@JsonTypeId
 	private String schema;
+
+	@JsonIgnore
 	private String schemaVersion;
 
 	public Payload() {

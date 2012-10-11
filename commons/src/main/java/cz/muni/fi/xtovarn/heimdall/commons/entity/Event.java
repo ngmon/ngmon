@@ -1,10 +1,11 @@
 package cz.muni.fi.xtovarn.heimdall.commons.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
+import com.fasterxml.jackson.annotation.*;
 import com.sleepycat.persist.model.*;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @JsonRootName("Event")
@@ -40,10 +41,12 @@ public class Event {
 	@SecondaryKey(name = "priority", relate = Relationship.MANY_TO_ONE)
 	private int priority;
 
-	@JsonProperty("Payload")
-	private Payload payload;
+	@JsonProperty("custom")
+	private List<Payload> payload;
 
-	public Event(){}
+	public Event(){
+		this.payload = new LinkedList<Payload>();
+	}
 
 	public long getId() {
 		return id;
@@ -125,12 +128,12 @@ public class Event {
 		this.priority = priority;
 	}
 
-	public Payload getPayload() {
+	public List<Payload> getPayload() {
 		return payload;
 	}
 
 	public void setPayload(Payload payload) {
-		this.payload = payload;
+		this.payload.add(payload);
 	}
 
 	@Override

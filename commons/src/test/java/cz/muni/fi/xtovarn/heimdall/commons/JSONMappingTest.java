@@ -7,10 +7,8 @@ import cz.muni.fi.xtovarn.heimdall.commons.json.JSONStringParser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import sun.util.resources.TimeZoneNamesBundle;
 
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 
@@ -45,8 +43,8 @@ public class JSONMappingTest {
 			"\"severity\":" + severity + "," +
 			"\"priority\":" + priority + "," +
 			"\"Payload\":{" +
-			"\"schema\":" + "\"" + schema + "\"," +
-			"\"schemaVersion\":" + "\"" + schemaVersion + "\"," +
+//			"\"schema\":" + "\"" + schema + "\"," +
+//			"\"schemaVersion\":" + "\"" + schemaVersion + "\"," +
 			"\"value1\":" + value1 +	"," +
 			"\"value2\":"  + "\"" + value2 + "\"" + "}}}";
 
@@ -67,7 +65,7 @@ public class JSONMappingTest {
 		Payload payload = new Payload();
 
 		payload.setSchema(schema);
-		payload.setSchemaVersion(schemaVersion);
+//		payload.setSchemaVersion(schemaVersion);
 		payload.add("value1", value1);
 		payload.add("value2", value2);
 
@@ -92,8 +90,6 @@ public class JSONMappingTest {
 
 	@Test
 	public void testMappingEventToJson() throws Exception {
-
-
 
 	}
 }
