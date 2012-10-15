@@ -1,7 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline.handler;
 
-import com.sleepycat.db.DatabaseException;
-import com.sleepycat.db.OperationStatus;
+import com.sleepycat.je.DatabaseException;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.storage.EventStore;
 
@@ -18,7 +17,7 @@ public class Store implements Handler {
 	@Override
 	public Object handle(Object o) {
 		try {
-			OperationStatus status = store.put((Event) o);
+			store.put((Event) o);
 		} catch (DatabaseException e) {
 			System.err.println("DatabaseException " + e.getMessage());
 			e.printStackTrace();
