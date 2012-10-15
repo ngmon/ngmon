@@ -1,4 +1,4 @@
-momo
+Project Momo
 ====
 
-Monitoring - squared
+Monitoring - Squared
