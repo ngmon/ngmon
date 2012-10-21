@@ -1,18 +1,29 @@
 package cz.muni.fi.xtovarn.fsm;
 
-public class StringBasedFSM<T1 extends Enum<T1>> extends AbstractFiniteStateMachineWithActions<T1, String> {
-    public StringBasedFSM(T1 startState, T1 endState, Class<T1> statesEnumClass) {
-        super(startState, endState, statesEnumClass);
-    }
+import cz.muni.fi.xtovarn.fsm.action.Action;
 
-    protected synchronized void readSymbol(String symbol, int number) {
-        IntegerAction action = (IntegerAction) super.getNextAction(symbol);
+public class StringBasedFSM extends AbstractFiniteStateMachine<MyStateType, String, IntegerContext> {
 
-        if (action.perform(number)) {
-            action.setSuccess();
-        }
+	public StringBasedFSM() {
+		super(MyStateType.STARTED, new MyStateType[]{MyStateType.ENDED}, MyStateType.class);
 
-        super.readSymbol(symbol);
-    }
+		addTransition(MyStateType.STARTED, "symbol1", MyStateType.RUNNING, new Action<IntegerContext>() {
+			@Override
+			public boolean perform(IntegerContext context) {
+				FSMTestWithAction.actionControl = context.getInteger();
+
+				return true;
+			}
+		});
+
+		addTransition(MyStateType.RUNNING, "symbol2", MyStateType.ENDED, new Action<IntegerContext>() {
+			@Override
+			public boolean perform(IntegerContext context) {
+				FSMTestWithAction.actionControl = context.getInteger();
+
+				return true;
+			}
+		});
+	}
 }
 

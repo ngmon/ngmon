@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.fsm;
+package cz.muni.fi.xtovarn.heimdall.commons.util;
 
 public class Pair<T1, T2> {
     private final T1 first;

@@ -4,44 +4,41 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 // TODO Rewrite test
 public class FSMTestWithAction {
 
-    enum MyStateType {STARTED, RUNNING, ENDED}
 
-    private StringBasedFSM<MyStateType> fsm;
+	private StringBasedFSM fsm;
 
-    public static int actionControl = 0;
+	public static int actionControl = 0;
 
-    @Before
-    public void setUp() throws Exception {
-        fsm = new StringBasedFSM<MyStateType>(MyStateType.STARTED, MyStateType.ENDED, MyStateType.class);
 
-        fsm.addTransition(MyStateType.STARTED, "symbol1", MyStateType.RUNNING, new IntegerAction());
-        fsm.addTransition(MyStateType.RUNNING, "symbol2", MyStateType.ENDED, new IntegerAction());
-    }
+	@Before
+	public void setUp() throws Exception {
+		fsm = new StringBasedFSM();
+	}
 
-    @Test
-    public void testTransition1() throws Exception {
-        fsm.readSymbol("symbol1", 67);
+	@Test
+	public void testTransition1() throws Exception {
+		assertTrue(fsm.readSymbol("symbol1", new IntegerContext(67)));
+		assertEquals("Transition was not performed", MyStateType.RUNNING, fsm.getCurrentState());
+	}
 
-        assertEquals("Transition was not performed", MyStateType.RUNNING, fsm.getCurrentState());
-    }
+	@Test
+	public void testFSMEnded() throws Exception {
+		assertTrue(fsm.readSymbol("symbol1", new IntegerContext(67)));
+		assertTrue(fsm.readSymbol("symbol2", new IntegerContext(67)));
 
-    @Test
-    public void testFSMEnded() throws Exception {
-        fsm.readSymbol("symbol1", 67);
-        fsm.readSymbol("symbol2", 67);
+		assertEquals("Transition was not performed", MyStateType.ENDED, fsm.getCurrentState());
+		assertEquals("FSM is in wrong state, should be ended", true, fsm.isEnded());
+	}
 
-        assertEquals("Transition was not performed", MyStateType.ENDED, fsm.getCurrentState());
-        assertEquals("FSM is in wrong state, should be ended", true, fsm.isEnded());
-    }
+	@Test
+	public void testTransitionAction() throws Exception {
+		assertTrue(fsm.readSymbol("symbol1", new IntegerContext(actionControl)));
 
-    @Test
-    public void testTransitionAction() throws Exception {
-        fsm.readSymbol("symbol1", actionControl);
-
-        assertEquals("Action was not performed", 67, actionControl);
-    }
+		assertEquals("Action was not performed", 67, actionControl);
+	}
 }
