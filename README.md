@@ -1,4 +1,4 @@
-Project Momo
-====
+ngmon
+=====
 
-Monitoring - Squared
+New Generation Monitoring Daemon
