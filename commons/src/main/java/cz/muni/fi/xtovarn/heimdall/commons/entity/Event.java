@@ -39,8 +39,8 @@ public class Event {
 	@SecondaryKey(name = "processId", relate = Relationship.MANY_TO_ONE)
 	private String processId;
 
-	@SecondaryKey(name = "severity", relate = Relationship.MANY_TO_ONE)
-	private int severity;
+	@SecondaryKey(name = "level", relate = Relationship.MANY_TO_ONE)
+	private int level;
 
 	@SecondaryKey(name = "priority", relate = Relationship.MANY_TO_ONE)
 	private int priority;
@@ -116,12 +116,12 @@ public class Event {
 		this.processId = processId;
 	}
 
-	public int getSeverity() {
-		return severity;
+	public int getLevel() {
+		return level;
 	}
 
-	public void setSeverity(int severity) {
-		this.severity = severity;
+	public void setLevel(int level) {
+		this.level = level;
 	}
 
 	public int getPriority() {
@@ -151,7 +151,7 @@ public class Event {
 				", application='" + application + '\'' +
 				", process='" + process + '\'' +
 				", processId='" + processId + '\'' +
-				", severity=" + severity +
+				", level=" + level +
 				", priority=" + priority +
 				", payload=" + payload +
 				'}';

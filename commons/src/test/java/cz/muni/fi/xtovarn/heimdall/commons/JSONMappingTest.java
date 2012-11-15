@@ -22,7 +22,7 @@ public class JSONMappingTest {
 	String application = "Cron";
 	String process = "cron";
 	String processId = "4219";
-	int severity = 5;
+	int level = 5;
 	int priority = 4;
 	String schema = "http://cron.org/1.0/events.jsch";
 	String schemaVersion = "1.0";
@@ -40,7 +40,7 @@ public class JSONMappingTest {
 			"\"application\":" + "\"" + application + "\"," +
 			"\"process\":" + "\"" + process + "\"," +
 			"\"processId\":" + "\"" + processId + "\"," +
-			"\"severity\":" + severity + "," +
+			"\"level\":" + level + "," +
 			"\"priority\":" + priority + "," +
 			"\"Payload\":{" +
 //			"\"schema\":" + "\"" + schema + "\"," +
@@ -59,7 +59,7 @@ public class JSONMappingTest {
 		event.setApplication(application);
 		event.setProcess(process);
 		event.setProcessId(processId);
-		event.setSeverity(severity);
+		event.setLevel(level);
 		event.setPriority(priority);
 
 		Payload payload = new Payload();
