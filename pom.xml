@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>cz.muni.fi.xtovarn</groupId>
-	<artifactId>heimdall</artifactId>
+	<artifactId>ngmon</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Heimdall</name>
+	<name>Ngmon</name>
 
 	<properties>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>

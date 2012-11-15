@@ -10,11 +10,11 @@
 
 	<packaging>jar</packaging>
 
-	<name>Heimdall - Commons</name>
+	<name>Ngmon - Commons</name>
 
 	<parent>
 		<groupId>cz.muni.fi.xtovarn</groupId>
-		<artifactId>heimdall</artifactId>
+		<artifactId>ngmon</artifactId>
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 

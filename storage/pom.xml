@@ -7,11 +7,11 @@
 	<groupId>cz.muni.fi.xtovarn</groupId>
 	<artifactId>storage</artifactId>
 	<version>0.1-SNAPSHOT</version>
-	<name>Heimdall - Storage</name>
+	<name>Ngmon - Storage</name>
 
 	<parent>
 		<groupId>cz.muni.fi.xtovarn</groupId>
-		<artifactId>heimdall</artifactId>
+		<artifactId>ngmon</artifactId>
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
