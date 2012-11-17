@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Directive {
-	GREET(1),
-	HELLO(2),
-	AUTH_REQUEST(40),
-	AUTH_RESPONSE(41),
-	CHALLENGE(42),
-	COMMAND(60),
+	CONNECT(10),
+	CONNECTED(11),
+	SUBSCRIBE(20),
+	UNSUBSCRIBE(21),
+	READY(22),
+	GET(23),
 	SEND_JSON(100),
 	SEND_SMILE(101);
 

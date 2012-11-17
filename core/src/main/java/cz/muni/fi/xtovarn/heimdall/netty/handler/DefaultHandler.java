@@ -21,20 +21,12 @@ public class DefaultHandler extends SimpleChannelHandler {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
 
 		switch (message.getDirective()) {
-			case HELLO:
+			case CONNECT:
 
 				int size = secureChannelGroup.size() + 1;
 				secureChannelGroup.add("xdanos@" + size, e.getChannel());
 
-			case GREET:
-				break;
-			case AUTH_REQUEST:
-				break;
-			case AUTH_RESPONSE:
-				break;
-			case CHALLENGE:
-				break;
-			case COMMAND:
+			case CONNECTED:
 				break;
 			case SEND_JSON:
 				break;
@@ -45,7 +37,7 @@ public class DefaultHandler extends SimpleChannelHandler {
 
 	@Override
 	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		e.getChannel().write(new SimpleMessage(Directive.GREET, "greet(version:0.0.1)".getBytes()));
+		e.getChannel().write(new SimpleMessage(Directive.CONNECTED, "greet(version:0.0.1)".getBytes()));
 	}
 
 	@Override

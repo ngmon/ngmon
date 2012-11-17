@@ -18,18 +18,10 @@ public class ClientHandler extends SimpleChannelHandler {
 		String body = new String(message.getBody());
 
 		switch (message.getDirective()) {
-			case GREET:
+			case CONNECTED:
 				System.out.println(message.getDirective() + ": " + body);
-				e.getChannel().write(new SimpleMessage(HELLO, ("hello(" + body + ")").getBytes()));
-			case HELLO:
-				break;
-			case AUTH_REQUEST:
-				break;
-			case AUTH_RESPONSE:
-				break;
-			case CHALLENGE:
-				break;
-			case COMMAND:
+				e.getChannel().write(new SimpleMessage(CONNECT, ("hello(" + body + ")").getBytes()));
+			case CONNECT:
 				break;
 			case SEND_SMILE:
 				Event event = JSONEventMapper.bytesToEvent(message.getBody());
