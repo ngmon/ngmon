@@ -2,7 +2,7 @@ package cz.muni.fi.xtovarn.heimdall;
 
 import com.sleepycat.je.DatabaseException;
 import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
-import cz.muni.fi.xtovarn.heimdall.localserver.LocalSocketServer;
+import cz.muni.fi.xtovarn.heimdall.collector.SocketCollector;
 import cz.muni.fi.xtovarn.heimdall.netty.NettyServer;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.pipeline.DefaultPipelineFactory;
@@ -18,7 +18,7 @@ public class Server {
 
 	private static DefaultEnvironment defaultEnvironment;
 	private static NettyServer nettyServer;
-	private static LocalSocketServer localSocketServer;
+	private static SocketCollector socketCollector;
 	public static final String DATABASE_PATH = "./database/events";
 
 
@@ -32,7 +32,7 @@ public class Server {
 		Dispatcher dispatcher = new Dispatcher(scg);
 		EventStore eventStore = new EventDataAccessor(defaultEnvironment.setup(new File(DATABASE_PATH)));
 		PipelineFactory pipelineFactory = new DefaultPipelineFactory(eventStore, dispatcher);
-		localSocketServer = new LocalSocketServer(pipelineFactory);
+		socketCollector = new SocketCollector(pipelineFactory);
 
 		start();
 	}
@@ -48,12 +48,12 @@ public class Server {
 	static void start() {
 		System.out.println("Heimdall is starting...");
 		nettyServer.start();
-		localSocketServer.start();
+		socketCollector.start();
 	}
 
 	static void stop() {
 		defaultEnvironment.close();
 		nettyServer.stop();
-		localSocketServer.stop();
+		socketCollector.stop();
 	}
 }

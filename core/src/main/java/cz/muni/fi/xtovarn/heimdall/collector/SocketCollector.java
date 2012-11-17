@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.localserver;
+package cz.muni.fi.xtovarn.heimdall.collector;
 
 import cz.muni.fi.xtovarn.heimdall.pipeline.PipelineFactory;
 import cz.muni.fi.xtovarn.heimdall.commons.Startable;
@@ -9,14 +9,14 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class LocalSocketServer implements Startable {
+public class SocketCollector implements Startable {
 
 	private final ExecutorService service = Executors.newCachedThreadPool();
 	private final PipelineFactory pipelineFactory;
 	private ServerSocket serverSocket;
 
 //	@Inject
-	public LocalSocketServer(PipelineFactory pipelineFactory) {
+	public SocketCollector(PipelineFactory pipelineFactory) {
 		this.pipelineFactory = pipelineFactory;
 	}
 
@@ -27,7 +27,7 @@ public class LocalSocketServer implements Startable {
 
 			while (true) {
 				Socket socket = serverSocket.accept();
-				service.submit(new LocalConnectionHandler(socket, pipelineFactory));
+				service.submit(new SensorConnectionHandler(socket, pipelineFactory));
 			}
 		} catch (IOException e) {
 			if (serverSocket != null && serverSocket.isClosed())

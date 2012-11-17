@@ -24,6 +24,7 @@
 		<module>storage</module>
 		<module>pubsub</module>
 		<module>client</module>
+		<module>sensor</module>
 	</modules>
 
 	<dependencyManagement>

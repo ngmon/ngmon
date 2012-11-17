@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.client;
+package cz.muni.fi.xtovarn.heimdall.sensor;
 
 import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
@@ -8,7 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Date;
 
-public class LocalClient {
+public class Sensor {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 

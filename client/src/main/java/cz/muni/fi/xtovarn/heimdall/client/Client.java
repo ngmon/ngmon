@@ -1,6 +1,5 @@
 package cz.muni.fi.xtovarn.heimdall.client;
 
-import cz.muni.fi.xtovarn.heimdall.netty.NettyServer;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
@@ -9,7 +8,7 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-public class RemoteClient {
+public class Client {
 
 	private static ClientBootstrap bootstrap;
 
