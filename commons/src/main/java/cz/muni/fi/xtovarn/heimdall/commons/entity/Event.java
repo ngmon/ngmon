@@ -1,6 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.commons.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
@@ -8,11 +9,10 @@ import com.sleepycat.persist.model.Relationship;
 import com.sleepycat.persist.model.SecondaryKey;
 
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 @Entity
 @JsonRootName("Event")
+@JsonPropertyOrder({"occurrenceTime", "type", "_"})
 public class Event {
 
 	@PrimaryKey(sequence = "event_long_sequence")
@@ -45,11 +45,11 @@ public class Event {
 	@SecondaryKey(name = "priority", relate = Relationship.MANY_TO_ONE)
 	private int priority;
 
-	@JsonProperty()
-	private List<Payload> payload;
+	@JsonProperty("_")
+	private Payload payload;
 
 	public Event(){
-		this.payload = new LinkedList<Payload>();
+		this.payload = new Payload();
 	}
 
 	public long getId() {
@@ -132,12 +132,12 @@ public class Event {
 		this.priority = priority;
 	}
 
-	public List<Payload> getPayload() {
+	public Payload getPayload() {
 		return payload;
 	}
 
 	public void setPayload(Payload payload) {
-		this.payload.add(payload);
+		this.payload = payload;
 	}
 
 	@Override
@@ -157,4 +157,20 @@ public class Event {
 				'}';
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Event event = (Event) o;
+
+		if (id != event.id) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) (id ^ (id >>> 32));
+	}
 }

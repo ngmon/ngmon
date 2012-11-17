@@ -24,29 +24,28 @@ public class JSONMappingTest {
 	String processId = "4219";
 	int level = 5;
 	int priority = 4;
-	String schema = "http://cron.org/1.0/events.jsch";
-	String schemaVersion = "1.0";
+	String version = "1.0";
 	int value1 = 4648;
 	String value2 = "Fax4x46aeEF%aax4x%46aeEF";
 
 	private Event event;
 
 	private final String expectedJson = "{\"Event\":{" +
-			"\"id\":" + id + "," +
 			"\"occurrenceTime\":" + "\"" + ISO8601Utils.format(occurrenceTime, true, TimeZone.getTimeZone("Z")).replace("Z", "+0000") + "\"," +
+			"\"type\":" + "\"" + type + "\"," +
+			"\"_\":{" +
+			"\"version\":" + "\"" + version + "\"," +
+			"\"value1\":" + value1 +	"," +
+			"\"value2\":"  + "\"" + value2 + "\"" + "}" + "," +
+			"\"id\":" + id + "," +
 			"\"detectionTime\":" + "\"" + ISO8601Utils.format(detectionTime, true,TimeZone.getTimeZone("Z")).replace("Z", "+0000") + "\"," +
 			"\"hostname\":" + "\"" + hostname + "\"," +
-			"\"type\":" + "\"" + type + "\"," +
 			"\"application\":" + "\"" + application + "\"," +
 			"\"process\":" + "\"" + process + "\"," +
 			"\"processId\":" + "\"" + processId + "\"," +
 			"\"level\":" + level + "," +
-			"\"priority\":" + priority + "," +
-			"\"Payload\":{" +
-//			"\"schema\":" + "\"" + schema + "\"," +
-//			"\"schemaVersion\":" + "\"" + schemaVersion + "\"," +
-			"\"value1\":" + value1 +	"," +
-			"\"value2\":"  + "\"" + value2 + "\"" + "}}}";
+			"\"priority\":" + priority +
+			"}}";
 
 
 	@Before
@@ -64,8 +63,7 @@ public class JSONMappingTest {
 
 		Payload payload = new Payload();
 
-		payload.setSchema(schema);
-//		payload.setSchemaVersion(schemaVersion);
+		payload.setVersion(version);
 		payload.add("value1", value1);
 		payload.add("value2", value2);
 
