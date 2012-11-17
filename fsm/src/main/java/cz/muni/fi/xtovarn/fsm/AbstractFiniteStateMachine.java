@@ -1,42 +1,47 @@
 package cz.muni.fi.xtovarn.fsm;
 
 import cz.muni.fi.xtovarn.fsm.action.Action;
-import cz.muni.fi.xtovarn.fsm.action.ActionContext;
 import cz.muni.fi.xtovarn.heimdall.commons.util.Pair;
 
 import java.util.*;
 
-public abstract class AbstractFiniteStateMachine<T_State extends Enum<T_State>, T_Symbol, T_ActionContext extends ActionContext> {
-	final Class<T_State> statesEnumClass; // Generics Workaround
+/**
+ *
+ * @param <T1> State space type
+ * @param <T2> Symbol
+ * @param <T3> Action Context
+ */
+public abstract class AbstractFiniteStateMachine<T1 extends Enum<T1>, T2, T3> {
+	final Class<T1> statesEnumClass; // Generics Workaround
 
-	private Map<T_State, Map<T_Symbol, Pair<Action<T_ActionContext>, T_State>>> stateTransitionFunction;
+	private Map<T1, Map<T2, Pair<Action<T3>, T1>>> stateTransitionFunction;
 
-	private final T_State startState;
-	private final List<T_State> endStates;
-	private T_State currentState;
+	private final T1 startState;
+	private final List<T1> endStates;
+	private T1 currentState;
 
-	private Queue<T_State> history;
+	private Queue<T1> history;
 
-	public AbstractFiniteStateMachine(T_State startState, T_State[] endStates, Class<T_State> statesEnumClass) { // Generics Workaround (Class<T_State> statesEnumClass)
+	public AbstractFiniteStateMachine(T1 startState, T1[] endStates, Class<T1> statesEnumClass) { // Generics Workaround (Class<T1> statesEnumClass)
 		this.statesEnumClass = statesEnumClass;
 
-		this.stateTransitionFunction = new EnumMap<T_State, Map<T_Symbol, Pair<Action<T_ActionContext>, T_State>>>(statesEnumClass);
+		this.stateTransitionFunction = new EnumMap<>(statesEnumClass);
 		this.startState = startState;
 		this.endStates = Arrays.asList(endStates);
 		this.currentState = startState;
-		this.history = new LinkedList<T_State>();
+		this.history = new LinkedList<>();
 	}
 
-	public void addTransition(T_State sourceState, T_Symbol symbol, T_State targetState, Action<T_ActionContext> action) {
+	public void addTransition(T1 sourceState, T2 symbol, T1 targetState, Action<T3> action) {
 		if (endStates.contains(sourceState)) {
 			throw new IllegalArgumentException("You cannot create transition from an end state");
 		}
 
-		Map<T_Symbol, Pair<Action<T_ActionContext>, T_State>> transition = stateTransitionFunction.get(sourceState);
-		Pair<Action<T_ActionContext>, T_State> targetPair = new Pair<Action<T_ActionContext>, T_State>(action, targetState);
+		Map<T2, Pair<Action<T3>, T1>> transition = stateTransitionFunction.get(sourceState);
+		Pair<Action<T3>, T1> targetPair = new Pair<>(action, targetState);
 
 		if (transition == null) {
-			transition = new HashMap<T_Symbol, Pair<Action<T_ActionContext>, T_State>>();
+			transition = new HashMap<>();
 			transition.put(symbol, targetPair);
 			this.stateTransitionFunction.put(sourceState, transition);
 		} else {
@@ -45,14 +50,14 @@ public abstract class AbstractFiniteStateMachine<T_State extends Enum<T_State>, 
 
 	}
 
-	synchronized public boolean readSymbol(T_Symbol symbol, T_ActionContext actionContext) {
-		T_State nextState = getNextState(symbol);
+	synchronized public boolean readSymbol(T2 symbol, T3 actionContext) {
+		T1 nextState = getNextState(symbol);
 
 		if (nextState == null) {
 			throw new IllegalArgumentException("No such transition under given symbol!");
 		}
 
-		Action<T_ActionContext> actionToPerform = getNextAction(symbol);
+		Action<T3> actionToPerform = getNextAction(symbol);
 
 		if (actionToPerform != null) {
 
@@ -75,7 +80,7 @@ public abstract class AbstractFiniteStateMachine<T_State extends Enum<T_State>, 
 		return true;
 	}
 
-	protected synchronized boolean readSymbol(T_Symbol symbol) {
+	protected synchronized boolean readSymbol(T2 symbol) {
 		return this.readSymbol(symbol, null);
 	}
 
@@ -83,15 +88,15 @@ public abstract class AbstractFiniteStateMachine<T_State extends Enum<T_State>, 
 		this.currentState = history.remove();
 	}
 
-	public Action<T_ActionContext> getNextAction(T_Symbol symbol) {
+	public Action<T3> getNextAction(T2 symbol) {
 		return this.getNextPair(symbol).getFirst();
 	}
 
-	public T_State getNextState(T_Symbol symbol) {
+	public T1 getNextState(T2 symbol) {
 		return this.getNextPair(symbol).getSecond();
 	}
 
-	private Pair<Action<T_ActionContext>, T_State> getNextPair(T_Symbol symbol) {
+	private Pair<Action<T3>, T1> getNextPair(T2 symbol) {
 
 		return this.stateTransitionFunction.get(currentState).get(symbol);
 	}
@@ -100,15 +105,15 @@ public abstract class AbstractFiniteStateMachine<T_State extends Enum<T_State>, 
 		return this.endStates.contains(this.currentState);
 	}
 
-	public T_State getCurrentState() {
+	public T1 getCurrentState() {
 		return this.currentState;
 	}
 
-	public T_State getStartState() {
+	public T1 getStartState() {
 		return this.startState;
 	}
 
-	public List<T_State> getEndStates() {
+	public List<T1> getEndStates() {
 		return this.endStates;
 	}
 }

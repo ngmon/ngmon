@@ -1,8 +1,6 @@
 package cz.muni.fi.xtovarn.fsm;
 
-import cz.muni.fi.xtovarn.fsm.action.ActionContext;
-
-public class IntegerContext implements ActionContext {
+public class IntegerContext {
 
 	private int integer;
 
