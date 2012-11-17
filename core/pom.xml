@@ -34,6 +34,11 @@
 			<artifactId>storage</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>cz.muni.fi.xtovarn</groupId>
+			<artifactId>fsm</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>

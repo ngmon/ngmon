@@ -1,43 +1,46 @@
 package cz.muni.fi.xtovarn.heimdall.netty.handler;
 
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
-import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
+import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerContext;
+import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerEvent;
+import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerFSM;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
-public class DefaultHandler extends SimpleChannelHandler {
+public class DefaultServerHandler extends SimpleChannelHandler {
 
 	private final SecureChannelGroup secureChannelGroup;
 
-	public DefaultHandler(SecureChannelGroup secureChannelGroup) {
+	private final ServerFSM serverStateMachine;
+
+	public DefaultServerHandler(SecureChannelGroup secureChannelGroup) {
 		this.secureChannelGroup = secureChannelGroup;
+		this.serverStateMachine = new ServerFSM(this.secureChannelGroup);
 	}
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
 
+
 		switch (message.getDirective()) {
 			case CONNECT:
 
-				int size = secureChannelGroup.size() + 1;
-				secureChannelGroup.add("xdanos@" + size, e.getChannel());
+				System.out.println(ServerEvent.RECIEVED_CONNECT);
 
-			case CONNECTED:
-				break;
-			case SEND_JSON:
-				break;
-			case SEND_SMILE:
+				this.serverStateMachine.readSymbol(ServerEvent.RECIEVED_CONNECT, new ServerContext(ctx, e, null));
 				break;
 		}
+
 	}
 
 	@Override
-	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		e.getChannel().write(new SimpleMessage(Directive.CONNECTED, "greet(version:0.0.1)".getBytes()));
+	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+		System.out.println(ServerEvent.NETTY_TCP_CONNECTED);
+		this.serverStateMachine.readSymbol(ServerEvent.NETTY_TCP_CONNECTED, null);
 	}
 
 	@Override

@@ -4,11 +4,9 @@ import cz.muni.fi.xtovarn.heimdall.netty.codec.LengthDecoder;
 import cz.muni.fi.xtovarn.heimdall.netty.codec.MessageDecoder;
 import cz.muni.fi.xtovarn.heimdall.netty.codec.MessageEncoder;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
-import cz.muni.fi.xtovarn.heimdall.netty.handler.DefaultHandler;
+import cz.muni.fi.xtovarn.heimdall.netty.handler.DefaultServerHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.handler.codec.compression.ZlibDecoder;
-import org.jboss.netty.handler.codec.compression.ZlibEncoder;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
@@ -32,7 +30,7 @@ public class ServerPipelineFactory implements ChannelPipelineFactory {
 		pipeline.addLast("decoder", new MessageDecoder());
 		pipeline.addLast("encoder", new MessageEncoder());
 
-		pipeline.addLast("default-handler", new DefaultHandler(secureChannelGroup));
+		pipeline.addLast("default-handler", new DefaultServerHandler(secureChannelGroup));
 
 		return pipeline;
 	}

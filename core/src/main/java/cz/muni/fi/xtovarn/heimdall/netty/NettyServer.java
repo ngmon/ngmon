@@ -22,7 +22,6 @@ public class NettyServer implements Startable {
 		this.secureChannelGroup = secureChannelGroup;
 	}
 
-
 	@Override
 	public void start() {
 		ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(2));
@@ -35,6 +34,8 @@ public class NettyServer implements Startable {
 		bootstrap.setOption("child.keepAlive", true);
 
 		bootstrap.bind(new InetSocketAddress(SERVER_PORT));
+
+		System.out.println(getClass().getCanonicalName() + "started");
 	}
 
 	@Override

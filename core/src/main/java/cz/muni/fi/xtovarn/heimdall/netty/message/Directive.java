@@ -12,7 +12,8 @@ public enum Directive {
 	READY(22),
 	GET(23),
 	SEND_JSON(100),
-	SEND_SMILE(101);
+	SEND_SMILE(101),
+	ERROR(111);
 
 	private static final Map<Short, Directive> lookup = new HashMap<Short, Directive>();
 

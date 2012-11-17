@@ -89,7 +89,7 @@
 			</dependency>
 
 
-			<!-- Heimdall deps.-->
+			<!-- Ngmon deps.-->
 
 			<dependency>
 				<groupId>cz.muni.fi.xtovarn</groupId>
@@ -106,6 +106,12 @@
 			<dependency>
 				<groupId>cz.muni.fi.xtovarn</groupId>
 				<artifactId>core</artifactId>
+				<version>0.1-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cz.muni.fi.xtovarn</groupId>
+				<artifactId>fsm</artifactId>
 				<version>0.1-SNAPSHOT</version>
 			</dependency>
 
