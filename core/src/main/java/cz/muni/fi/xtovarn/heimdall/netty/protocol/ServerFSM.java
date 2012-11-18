@@ -10,7 +10,7 @@ import org.jboss.netty.channel.ChannelFuture;
 public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEvent, ServerContext> {
 
 	public ServerFSM(final SecureChannelGroup secureChannelGroup) {
-		super(ServerState.CREATED, new ServerState[]{ServerState.DISCONNECTED}, ServerState.class);
+		super(ServerState.CREATED, new ServerState[]{ServerState.DISCONNECTED}, ServerState.class, true);
 
 		buildTransitions(secureChannelGroup);
 	}

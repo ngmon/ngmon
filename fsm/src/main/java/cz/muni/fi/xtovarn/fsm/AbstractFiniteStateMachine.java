@@ -22,7 +22,9 @@ public abstract class AbstractFiniteStateMachine<T1 extends Enum<T1>, T2, T3> {
 
 	private Queue<T1> history;
 
-	public AbstractFiniteStateMachine(T1 startState, T1[] endStates, Class<T1> statesEnumClass) { // Generics Workaround (Class<T1> statesEnumClass)
+	private final boolean DEBUG;
+
+	public AbstractFiniteStateMachine(T1 startState, T1[] endStates, Class<T1> statesEnumClass, boolean debug) { // Generics Workaround (Class<T1> statesEnumClass)
 		this.statesEnumClass = statesEnumClass;
 
 		this.stateTransitionFunction = new EnumMap<>(statesEnumClass);
@@ -30,6 +32,11 @@ public abstract class AbstractFiniteStateMachine<T1 extends Enum<T1>, T2, T3> {
 		this.endStates = Arrays.asList(endStates);
 		this.currentState = startState;
 		this.history = new LinkedList<>();
+		this.DEBUG = debug;
+	}
+
+	public AbstractFiniteStateMachine(T1 startState, T1[] endStates, Class<T1> statesEnumClass) { // Generics Workaround (Class<T1> statesEnumClass)
+		this(startState, endStates, statesEnumClass, false);
 	}
 
 	public void addTransition(T1 sourceState, T2 symbol, T1 targetState, Action<T3> action) {
@@ -72,6 +79,10 @@ public abstract class AbstractFiniteStateMachine<T1 extends Enum<T1>, T2, T3> {
 		} else if (actionContext != null) {
 			throw new IllegalStateException("You have provided an ActionContext for transition without Action");
 
+		}
+
+		if (DEBUG) {
+			System.out.println(String.format("[%s] %s: %s -> %s", this.toString(), symbol, currentState, nextState));
 		}
 
 		this.history.add(currentState);

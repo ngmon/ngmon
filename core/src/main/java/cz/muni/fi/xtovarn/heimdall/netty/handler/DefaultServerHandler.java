@@ -25,12 +25,8 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
 
-
 		switch (message.getDirective()) {
 			case CONNECT:
-
-				System.out.println(ServerEvent.RECIEVED_CONNECT);
-
 				this.serverStateMachine.readSymbol(ServerEvent.RECIEVED_CONNECT, new ServerContext(ctx, e, null));
 				break;
 		}
@@ -39,7 +35,6 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		System.out.println(ServerEvent.NETTY_TCP_CONNECTED);
 		this.serverStateMachine.readSymbol(ServerEvent.NETTY_TCP_CONNECTED, null);
 	}
 
