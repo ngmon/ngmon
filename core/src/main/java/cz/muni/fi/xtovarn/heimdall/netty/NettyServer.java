@@ -24,7 +24,7 @@ public class NettyServer implements Startable {
 
 	@Override
 	public void start() {
-		ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(2));
+		ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newSingleThreadExecutor(), Executors.newCachedThreadPool(), 2);
 
 		bootstrap = new ServerBootstrap(factory);
 
