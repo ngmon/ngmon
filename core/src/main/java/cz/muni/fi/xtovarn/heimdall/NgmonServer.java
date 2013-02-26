@@ -7,14 +7,14 @@ import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.pipeline.DefaultPipelineFactory;
 import cz.muni.fi.xtovarn.heimdall.pipeline.PipelineFactory;
 import cz.muni.fi.xtovarn.heimdall.storage.EventStore;
-import cz.muni.fi.xtovarn.heimdall.storage.dpl.DefaultEnvironment;
+import cz.muni.fi.xtovarn.heimdall.storage.dpl.DefaultDatabaseEnvironment;
 import cz.muni.fi.xtovarn.heimdall.storage.dpl.EventDataAccessor;
 
 import java.io.File;
 
 public class NgmonServer {
 
-	private final DefaultEnvironment defaultEnvironment;
+	private final DefaultDatabaseEnvironment defaultDatabaseEnvironment;
 	private final NettyServer nettyServer;
 	private final SocketCollector socketCollector;
 
@@ -24,8 +24,8 @@ public class NgmonServer {
 		this.nettyServer = new NettyServer(scg);
 		Dispatcher dispatcher = new Dispatcher(scg);
 
-		this.defaultEnvironment = new DefaultEnvironment();
-		EventStore eventStore = new EventDataAccessor(defaultEnvironment.setup(baseDirectory));
+		this.defaultDatabaseEnvironment = new DefaultDatabaseEnvironment();
+		EventStore eventStore = new EventDataAccessor(defaultDatabaseEnvironment.setup(baseDirectory));
 
 		PipelineFactory pipelineFactory = new DefaultPipelineFactory(eventStore, dispatcher);
 		this.socketCollector = new SocketCollector(pipelineFactory);
@@ -39,7 +39,7 @@ public class NgmonServer {
 
 	public void stop() {
 
-		this.defaultEnvironment.close();
+		this.defaultDatabaseEnvironment.close();
 		this.nettyServer.stop();
 		this.socketCollector.stop();
 	}

@@ -1,15 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall;
 
 import com.sleepycat.je.DatabaseException;
-import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
-import cz.muni.fi.xtovarn.heimdall.collector.SocketCollector;
-import cz.muni.fi.xtovarn.heimdall.netty.NettyServer;
-import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
-import cz.muni.fi.xtovarn.heimdall.pipeline.DefaultPipelineFactory;
-import cz.muni.fi.xtovarn.heimdall.pipeline.PipelineFactory;
-import cz.muni.fi.xtovarn.heimdall.storage.EventStore;
-import cz.muni.fi.xtovarn.heimdall.storage.dpl.DefaultEnvironment;
-import cz.muni.fi.xtovarn.heimdall.storage.dpl.EventDataAccessor;
 
 import java.io.File;
 import java.io.IOException;
