@@ -9,10 +9,8 @@ import java.util.Map;
 @Persistent
 public class Payload {
 
-	private String version;
-
-	public Payload() {
-	}
+	private String schema;
+	private String schemaVersion;
 
 	private Map<String, Object> properties = new LinkedHashMap<>(1);
 
@@ -26,12 +24,20 @@ public class Payload {
 		return properties;
 	}
 
-	public String getVersion() {
-		return version;
+	public String getSchemaVersion() {
+		return schemaVersion;
 	}
 
-	public void setVersion(String version) {
-		this.version = version;
+	public void setSchemaVersion(String schemaVersion) {
+		this.schemaVersion = schemaVersion;
+	}
+
+	public String getSchema() {
+		return schema;
+	}
+
+	public void setSchema(String schema) {
+		this.schema = schema;
 	}
 
 	public Object getValue(String name) {
@@ -41,8 +47,9 @@ public class Payload {
 	@Override
 	public String toString() {
 		return "Payload{" +
-				"version='" + version + '\'' +
-				", properties=" + properties +
-				'}';
+			  "schema='" + schema + '\'' +
+			  ", schemaVersion='" + schemaVersion + '\'' +
+			  ", properties=" + properties +
+			  '}';
 	}
 }

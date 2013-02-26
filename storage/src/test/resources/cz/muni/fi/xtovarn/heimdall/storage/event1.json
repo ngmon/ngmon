@@ -1,0 +1,16 @@
+{"Event": {
+    "occurrenceTime": "2013-02-26T11:25:24.579+0000",
+    "type": "org.linux.cron.Started",
+    "_": {
+        "schema": "http://www.linux.org/schema/monitoring/cron/3.1/events.xsd",
+        "schemaVersion": "3.1",
+        "value": 4648,
+        "value2": "Fax4x46aeEF%aax4x%46aeEF"
+    },
+    "hostname": "domain.localhost.cz",
+    "application": "Cron",
+    "process": "cron",
+    "processId": "4219",
+    "level": 5,
+    "priority": 4
+}}

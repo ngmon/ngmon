@@ -24,7 +24,9 @@ public class JSONMappingTest {
 	String processId = "4219";
 	int level = 5;
 	int priority = 4;
-	String version = "1.0";
+
+	String schema = "http://www.linux.org/schema/monitoring/cron/3.1/events.xsd";
+	String schemaVersion = "1.0";
 	int value1 = 4648;
 	String value2 = "Fax4x46aeEF%aax4x%46aeEF";
 
@@ -34,7 +36,8 @@ public class JSONMappingTest {
 			"\"occurrenceTime\":" + "\"" + ISO8601Utils.format(occurrenceTime, true, TimeZone.getTimeZone("Z")).replace("Z", "+0000") + "\"," +
 			"\"type\":" + "\"" + type + "\"," +
 			"\"_\":{" +
-			"\"version\":" + "\"" + version + "\"," +
+			"\"schema\":" + "\"" + schema + "\"," +
+			"\"schemaVersion\":" + "\"" + schemaVersion + "\"," +
 			"\"value1\":" + value1 +	"," +
 			"\"value2\":"  + "\"" + value2 + "\"" + "}" + "," +
 			"\"id\":" + id + "," +
@@ -63,7 +66,8 @@ public class JSONMappingTest {
 
 		Payload payload = new Payload();
 
-		payload.setVersion(version);
+		payload.setSchemaVersion(schemaVersion);
+		payload.setSchema(schema);
 		payload.add("value1", value1);
 		payload.add("value2", value2);
 
