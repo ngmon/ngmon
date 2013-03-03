@@ -1,13 +1,45 @@
 package cz.muni.fi.xtovarn.heimdall.netty.protocol;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelFuture;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cz.muni.fi.xtovarn.fsm.AbstractFiniteStateMachine;
 import cz.muni.fi.xtovarn.fsm.action.Action;
+import cz.muni.fi.xtovarn.heimdall.connection.ConnectionManager;
+import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
-import org.jboss.netty.channel.ChannelFuture;
 
 public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEvent, ServerContext> {
+	
+	private static class UserStore {
+		
+		private Map<String, String> userMap = new HashMap<>();
+		
+		public UserStore() {
+			for (int i = 0; i < 10; i++) {
+				userMap.put("user" + i, "password" + i);
+			}
+		}
+		
+		public boolean verifyLogin(String login, String passcode) {
+			String userPasscode = userMap.get(login);
+			return userPasscode != null && passcode.equals(userPasscode);
+		}
+		
+	}
+	
+	private ObjectMapper mapper = new ObjectMapper();
+	private UserStore userStore = new UserStore();
+	private ConnectionManager connectionManager = new ConnectionManager();
 
 	public ServerFSM(final SecureChannelGroup secureChannelGroup) {
 		super(ServerState.CREATED, new ServerState[]{ServerState.DISCONNECTED}, ServerState.class, true);
@@ -23,13 +55,32 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 			@Override
 			public boolean perform(ServerContext context) {
 				SimpleMessage message = (SimpleMessage) context.getMessageEvent().getMessage();
+				boolean verified = false;
+				Channel channel = context.getMessageEvent().getChannel();
+				Long connectionId = null;
+				Map<String, Long> connectionIdMap = new HashMap<>();
+				try {
+					User user = mapper.readValue(message.getBody(), User.class);
+					verified = userStore.verifyLogin(user.getLogin(), user.getPasscode());
+					if (verified) {
+						secureChannelGroup.add(user.getLogin(), channel);
+						connectionId = connectionManager.addConnection(user.getLogin(), channel);
+						connectionIdMap.put("connectionId", connectionId);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 
-				String username = new String(message.getBody());
-				secureChannelGroup.add(username, context.getMessageEvent().getChannel());
+				// TODO - move the string constant
+				try {
+					SimpleMessage replyMessage = new SimpleMessage(verified ? Directive.CONNECTED : Directive.ERROR,
+							verified ? mapper.writeValueAsBytes(connectionIdMap) : "".getBytes());
+					ChannelFuture future = channel.write(replyMessage);
+				} catch (JsonProcessingException e) {
+					throw new RuntimeException(e);
+				}
 
-				ChannelFuture future = context.getMessageEvent().getChannel().write(new SimpleMessage(Directive.CONNECTED, "".getBytes()));
-
-				return true;
+				return verified;
 			}
 		});
 	}
