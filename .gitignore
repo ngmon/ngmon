@@ -46,3 +46,6 @@ dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
+
+# Maven Files #
+target/
