@@ -7,7 +7,7 @@ import org.jboss.netty.channel.Channel;
 
 public class ConnectionManager {
 
-	private static class UserConnection {
+	public static class UserConnection {
 		private String login;
 		private Long connectionId;
 		private Channel channel;
@@ -18,6 +18,18 @@ public class ConnectionManager {
 			this.channel = channel;
 		}
 
+		public String getLogin() {
+			return login;
+		}
+
+		public Long getConnectionId() {
+			return connectionId;
+		}
+
+		public Channel getChannel() {
+			return channel;
+		}
+
 	}
 
 	private Long nextConnectionId = 0L;
@@ -25,8 +37,11 @@ public class ConnectionManager {
 	private Map<Channel, UserConnection> channelToConnectionMap = new HashMap<>();
 
 	public Long addConnection(String login, Channel channel) {
-		channelToConnectionMap.put(channel, new UserConnection(login,
-				nextConnectionId, channel));
+		channelToConnectionMap.put(channel, new UserConnection(login, nextConnectionId, channel));
 		return nextConnectionId++;
+	}
+	
+	public UserConnection getUserConnection(Channel channel) {
+		return this.channelToConnectionMap.get(channel);
 	}
 }
