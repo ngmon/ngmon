@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.muni.fi.xtovarn.fsm.AbstractFiniteStateMachine;
 import cz.muni.fi.xtovarn.fsm.action.Action;
 import cz.muni.fi.xtovarn.heimdall.connection.ConnectionManager;
+import cz.muni.fi.xtovarn.heimdall.connection.ConnectionManagerSingleton;
 import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
@@ -39,7 +40,6 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 	
 	private ObjectMapper mapper = new ObjectMapper();
 	private UserStore userStore = new UserStore();
-	private ConnectionManager connectionManager = new ConnectionManager();
 
 	public ServerFSM(final SecureChannelGroup secureChannelGroup) {
 		super(ServerState.CREATED, new ServerState[]{ServerState.DISCONNECTED}, ServerState.class, true);
@@ -64,7 +64,7 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 					verified = userStore.verifyLogin(user.getLogin(), user.getPasscode());
 					if (verified) {
 						secureChannelGroup.add(user.getLogin(), channel);
-						connectionId = connectionManager.addConnection(user.getLogin(), channel);
+						connectionId = ConnectionManagerSingleton.getConnectionManager().addConnection(user.getLogin(), channel);
 						connectionIdMap.put("connectionId", connectionId);
 					}
 				} catch (IOException e) {
