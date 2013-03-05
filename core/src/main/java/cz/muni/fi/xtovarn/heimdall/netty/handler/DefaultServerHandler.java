@@ -52,7 +52,7 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 
 		switch (message.getDirective()) {
 		case CONNECT:
-			this.serverStateMachine.readSymbol(ServerEvent.RECIEVED_CONNECT, new ServerContext(ctx, e, null));
+			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_CONNECT, new ServerContext(ctx, e, null));
 			break;
 		case SUBSCRIBE:
 			if (!this.serverStateMachine.getCurrentState().equals(ServerState.CONNECTED)) {

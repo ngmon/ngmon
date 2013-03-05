@@ -50,7 +50,7 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 	public void buildTransitions(final SecureChannelGroup secureChannelGroup) {
 		this.addTransition(ServerState.CREATED, ServerEvent.NETTY_TCP_CONNECTED, ServerState.PRE_CONNECTED, null);
 
-		this.addTransition(ServerState.PRE_CONNECTED, ServerEvent.RECIEVED_CONNECT, ServerState.CONNECTED, new Action<ServerContext>() {
+		this.addTransition(ServerState.PRE_CONNECTED, ServerEvent.RECEIVED_CONNECT, ServerState.CONNECTED, new Action<ServerContext>() {
 
 			@Override
 			public boolean perform(ServerContext context) {
