@@ -12,9 +12,9 @@ import cz.muni.fi.publishsubscribe.countingtree.Subscription;
 public class SubscriptionManager {
 
 	private CountingTree countingTree = new CountingTree();
-	private Map<Long, Collection<Subscription>> connectionIdToSubscriptions = new HashMap<>();
+	private Map<Integer, Collection<Subscription>> connectionIdToSubscriptions = new HashMap<>();
 
-	public Subscription addSubscription(Long connectionId, Predicate predicate) {
+	public Subscription addSubscription(Integer connectionId, Predicate predicate) {
 		Subscription subscription = new Subscription();
 		this.countingTree.subscribe(predicate, subscription);
 

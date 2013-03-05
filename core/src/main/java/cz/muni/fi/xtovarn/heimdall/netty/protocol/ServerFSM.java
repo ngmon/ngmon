@@ -12,8 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cz.muni.fi.xtovarn.fsm.AbstractFiniteStateMachine;
 import cz.muni.fi.xtovarn.fsm.action.Action;
-import cz.muni.fi.xtovarn.heimdall.connection.ConnectionManager;
-import cz.muni.fi.xtovarn.heimdall.connection.ConnectionManagerSingleton;
 import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
@@ -57,21 +55,19 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 				SimpleMessage message = (SimpleMessage) context.getMessageEvent().getMessage();
 				boolean verified = false;
 				Channel channel = context.getMessageEvent().getChannel();
-				Long connectionId = null;
-				Map<String, Long> connectionIdMap = new HashMap<>();
+				Map<String, Integer> connectionIdMap = new HashMap<>();
 				try {
 					User user = mapper.readValue(message.getBody(), User.class);
 					verified = userStore.verifyLogin(user.getLogin(), user.getPasscode());
 					if (verified) {
 						secureChannelGroup.add(user.getLogin(), channel);
-						connectionId = ConnectionManagerSingleton.getConnectionManager().addConnection(user.getLogin(), channel);
-						connectionIdMap.put("connectionId", connectionId);
+						// TODO - extract the string constant
+						connectionIdMap.put("connectionId", channel.getId());
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 
-				// TODO - move the string constant
 				try {
 					SimpleMessage replyMessage = new SimpleMessage(verified ? Directive.CONNECTED : Directive.ERROR,
 							verified ? mapper.writeValueAsBytes(connectionIdMap) : "".getBytes());

@@ -15,8 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cz.muni.fi.publishsubscribe.countingtree.Predicate;
 import cz.muni.fi.publishsubscribe.countingtree.Subscription;
-import cz.muni.fi.xtovarn.heimdall.connection.ConnectionManager.UserConnection;
-import cz.muni.fi.xtovarn.heimdall.connection.ConnectionManagerSingleton;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
@@ -62,9 +60,7 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 				try {
 					Predicate predicate = SubscriptionParser.parseSubscription(mapper.readValue(message.getBody(),
 							Map.class));
-					UserConnection userConnection = ConnectionManagerSingleton.getConnectionManager()
-							.getUserConnection(channel);
-					Subscription subscription = subscriptionManager.addSubscription(userConnection.getConnectionId(),
+					Subscription subscription = subscriptionManager.addSubscription(e.getChannel().getId(),
 							predicate);
 					Map<String, Long> subscriptionIdMap = new HashMap<>();
 					subscriptionIdMap.put("subscriptionId", subscription.getId());
