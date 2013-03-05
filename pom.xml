@@ -25,7 +25,7 @@
 		<module>pubsub</module>
 		<module>client</module>
 		<module>sensor</module>
-	</modules>
+    </modules>
 
 	<dependencyManagement>
 		<dependencies>
@@ -114,6 +114,12 @@
 				<artifactId>fsm</artifactId>
 				<version>0.1-SNAPSHOT</version>
 			</dependency>
+
+            <dependency>
+                <groupId>cz.muni.fi.xtovarn</groupId>
+                <artifactId>pubsub</artifactId>
+                <version>0.1-SNAPSHOT</version>
+            </dependency>
 
 		</dependencies>
 	</dependencyManagement>
