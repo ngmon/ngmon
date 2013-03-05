@@ -6,7 +6,7 @@
 	<groupId>cz.muni.fi.xtovarn</groupId>
 	<artifactId>pubsub</artifactId>
 	<version>0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+	<packaging>jar</packaging>
 
 	<name>Ngmon - Publish Subscribe</name>
 
@@ -16,11 +16,12 @@
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>com.mycompany</groupId>
+			<artifactId>LangParser</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 
 </project>
