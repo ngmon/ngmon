@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.util.ISO8601Utils;
 import com.sleepycat.persist.EntityStore;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.commons.json.JSONStringParser;
-import cz.muni.fi.xtovarn.heimdall.storage.dpl.DefaultEnvironment;
+import cz.muni.fi.xtovarn.heimdall.storage.dpl.DefaultDatabaseEnvironment;
 import cz.muni.fi.xtovarn.heimdall.storage.dpl.EventDataAccessor;
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +22,7 @@ public class DPLTest {
 	public static final TemporaryFolder JUNIT_TEMPORARY_DIRECTORY = new TemporaryFolder();
 	private static final File BASE_DIRECTORY = JUNIT_TEMPORARY_DIRECTORY.newFolder("junit_testdatabase");
 
-	private DefaultEnvironment myEnvironment;
+	private DefaultDatabaseEnvironment myEnvironment;
 	private EventDataAccessor eventDataAccessor;
 
 	private static final InputStream JSON_FILE_INPUT_STREAM = DPLTest.class.getResourceAsStream("event1.json");
@@ -33,7 +33,7 @@ public class DPLTest {
 	public void setUp() throws Exception {
 
 		// Setup Storage
-		myEnvironment = new DefaultEnvironment();
+		myEnvironment = new DefaultDatabaseEnvironment();
 		EntityStore entityStore = myEnvironment.setup(BASE_DIRECTORY);
 		entityStore.truncateClass(Event.class);
 		eventDataAccessor = new EventDataAccessor(entityStore);
