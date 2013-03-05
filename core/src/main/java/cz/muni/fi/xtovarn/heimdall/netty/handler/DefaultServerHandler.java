@@ -68,7 +68,7 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 							predicate);
 					Map<String, Long> subscriptionIdMap = new HashMap<>();
 					subscriptionIdMap.put("subscriptionId", subscription.getId());
-					channel.write(new SimpleMessage(Directive.SUBSCRIBED, mapper.writeValueAsBytes(subscriptionIdMap)));
+					channel.write(new SimpleMessage(Directive.ACK, mapper.writeValueAsBytes(subscriptionIdMap)));
 					success = true;
 				} catch (IOException | ParseException ex) {
 				}

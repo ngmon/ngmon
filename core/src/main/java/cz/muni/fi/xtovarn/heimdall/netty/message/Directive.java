@@ -8,7 +8,7 @@ public enum Directive {
 	CONNECT(10),
 	CONNECTED(11),
 	SUBSCRIBE(20),
-	SUBSCRIBED(24),
+	ACK(24),
 	UNSUBSCRIBE(21),
 	READY(22),
 	GET(23),
