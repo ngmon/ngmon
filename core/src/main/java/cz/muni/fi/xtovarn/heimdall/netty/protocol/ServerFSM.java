@@ -49,6 +49,10 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 
 		buildTransitions(secureChannelGroup);
 	}
+	
+	private void sendError(Channel channel) {
+		channel.write(new SimpleMessage(Directive.ERROR, "".getBytes()));
+	}
 
 	private void addConnectTransition(final SecureChannelGroup secureChannelGroup) {
 		this.addTransition(ServerState.PRE_CONNECTED, ServerEvent.RECEIVED_CONNECT, ServerState.CONNECTED,
@@ -115,11 +119,11 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 							subscriptionIdMap.put("subscriptionId", subscription.getId());
 							channel.write(new SimpleMessage(Directive.ACK, mapper.writeValueAsBytes(subscriptionIdMap)));
 							success = true;
-						} catch (IOException | ParseException ex) {
-							// TODO - send error here?
+						} catch (IOException | ParseException | IndexOutOfBoundsException ex) {
 						}
 						
-						// TODO - send error here?
+						if (!success)
+							sendError(channel);
 
 						// always changes state back to CONNECTED
 						return true;
