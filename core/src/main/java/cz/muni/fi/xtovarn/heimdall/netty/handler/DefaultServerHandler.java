@@ -31,7 +31,6 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 
 	private final ServerFSM serverStateMachine;
 
-	private SubscriptionManager subscriptionManager = new SubscriptionManager();
 	private ObjectMapper mapper = new ObjectMapper();
 
 	public DefaultServerHandler(SecureChannelGroup secureChannelGroup) {
@@ -53,25 +52,12 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_CONNECT, new ServerContext(ctx, e, null));
 			break;
 		case SUBSCRIBE:
-			if (!this.serverStateMachine.getCurrentState().equals(ServerState.CONNECTED)) {
-				sendError(channel);
-			} else {
-				boolean success = false;
-				try {
-					Predicate predicate = SubscriptionParser.parseSubscription(mapper.readValue(message.getBody(),
-							Map.class));
-					Subscription subscription = subscriptionManager.addSubscription(e.getChannel().getId(),
-							predicate);
-					Map<String, Long> subscriptionIdMap = new HashMap<>();
-					subscriptionIdMap.put("subscriptionId", subscription.getId());
-					channel.write(new SimpleMessage(Directive.ACK, mapper.writeValueAsBytes(subscriptionIdMap)));
-					success = true;
-				} catch (IOException | ParseException ex) {
-				}
-
-				if (!success)
-					sendError(channel);
-			}
+			/*-if (!this.serverStateMachine.getCurrentState().equals(ServerState.CONNECTED)) {
+				sendError(channel);*/
+			// change state to SUBSCRIPTION_RECEIVED immediately, then process
+			// the subscription
+			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_SUBSCRIBE, new ServerContext(ctx, e, null));
+			this.serverStateMachine.readSymbol(ServerEvent.PROCESS_SUBSCRIPTION, new ServerContext(ctx, e, null));
 			break;
 		}
 
