@@ -59,6 +59,9 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_SUBSCRIBE, new ServerContext(ctx, e, null));
 			this.serverStateMachine.readSymbol(ServerEvent.PROCESS_SUBSCRIPTION, new ServerContext(ctx, e, null));
 			break;
+		case UNSUBSCRIBE:
+			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_UNSUBSCRIBE, new ServerContext(ctx, e, null));
+			break;
 		}
 
 	}
