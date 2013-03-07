@@ -69,8 +69,7 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 							verified = userStore.verifyLogin(user.getLogin(), user.getPasscode());
 							if (verified) {
 								secureChannelGroup.add(user.getLogin(), channel);
-								// TODO - extract the string constant
-								connectionIdMap.put("connectionId", channel.getId());
+								connectionIdMap.put(Constants.CONNECTION_ID_TITLE, channel.getId());
 							}
 						} catch (IOException e) {
 							e.printStackTrace();
@@ -116,7 +115,7 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 							Subscription subscription = SubscriptionManagerSingleton.getSubscriptionManager()
 									.addSubscription(channel.getId(), predicate);
 							Map<String, Long> subscriptionIdMap = new HashMap<>();
-							subscriptionIdMap.put("subscriptionId", subscription.getId());
+							subscriptionIdMap.put(Constants.SUBSCRIPTION_ID_TITLE, subscription.getId());
 							channel.write(new SimpleMessage(Directive.ACK, mapper.writeValueAsBytes(subscriptionIdMap)));
 							success = true;
 						} catch (IOException | ParseException | IndexOutOfBoundsException ex) {
