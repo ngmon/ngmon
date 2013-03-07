@@ -1,9 +1,9 @@
 package cz.muni.fi.xtovarn.heimdall.pubsub;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import cz.muni.fi.publishsubscribe.countingtree.CountingTree;
 import cz.muni.fi.publishsubscribe.countingtree.Predicate;
@@ -12,22 +12,30 @@ import cz.muni.fi.publishsubscribe.countingtree.Subscription;
 public class SubscriptionManager {
 
 	private CountingTree countingTree = new CountingTree();
-	private Map<Integer, Collection<Subscription>> connectionIdToSubscriptions = new HashMap<>();
+	private Map<String, Set<Long>> loginToSubscriptionIds = new HashMap<>();
 
-	public synchronized Subscription addSubscription(Integer connectionId, Predicate predicate) {
+	public synchronized Long addSubscription(String login, Predicate predicate) {
 		Subscription subscription = new Subscription();
 		this.countingTree.subscribe(predicate, subscription);
+		Long subscriptionId = subscription.getId();
 
-		Collection<Subscription> subscriptions = connectionIdToSubscriptions.get(connectionId);
-		if (subscriptions == null) {
-			subscriptions = new ArrayList<>();
-			subscriptions.add(subscription);
-			this.connectionIdToSubscriptions.put(connectionId, subscriptions);
+		Set<Long> subscriptionIds = loginToSubscriptionIds.get(login);
+		if (subscriptionIds == null) {
+			subscriptionIds = new HashSet<>();
+			subscriptionIds.add(subscriptionId);
+			this.loginToSubscriptionIds.put(login, subscriptionIds);
 		} else {
-			subscriptions.add(subscription);
+			subscriptionIds.add(subscriptionId);
 		}
-		
-		return subscription;
+
+		return subscriptionId;
+	}
+
+	public synchronized boolean removeSubscription(String login, Long subscriptionId) {
+		Set<Long> subscriptionIds = this.loginToSubscriptionIds.get(login);
+		if (subscriptionIds == null)
+			return false;
+		return subscriptionIds.remove(subscriptionId);
 	}
 
 }

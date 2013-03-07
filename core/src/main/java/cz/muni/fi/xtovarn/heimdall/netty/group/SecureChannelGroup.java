@@ -55,6 +55,10 @@ public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGr
 	public Channel find(String username) {
 		return super.find(convertToId(username));
 	}
+	
+	public String getUsername(Channel channel) {
+		return convertToUsername(channel.getId());
+	}
 
 	public boolean contains(String username) {
 		if (!usernameToId.containsKey(username)) {

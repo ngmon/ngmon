@@ -49,7 +49,7 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 
 		buildTransitions(secureChannelGroup);
 	}
-	
+
 	private void sendError(Channel channel) {
 		channel.write(new SimpleMessage(Directive.ERROR, "".getBytes()));
 	}
@@ -101,7 +101,7 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 				});
 	}
 
-	private void addSubscriptionReceivedTransition(SecureChannelGroup secureChannelGroup) {
+	private void addSubscriptionReceivedTransition(final SecureChannelGroup secureChannelGroup) {
 		this.addTransition(ServerState.SUBSCRIPTION_RECEIVED, ServerEvent.PROCESS_SUBSCRIPTION, ServerState.CONNECTED,
 				new Action<ServerContext>() {
 
@@ -112,19 +112,52 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 						try {
 							Predicate predicate = SubscriptionParser.parseSubscription(mapper.readValue(
 									((SimpleMessage) context.getMessageEvent().getMessage()).getBody(), Map.class));
-							Subscription subscription = SubscriptionManagerSingleton.getSubscriptionManager()
-									.addSubscription(channel.getId(), predicate);
+							Long subscriptionId = SubscriptionManagerSingleton.getSubscriptionManager()
+									.addSubscription(secureChannelGroup.getUsername(channel), predicate);
 							Map<String, Long> subscriptionIdMap = new HashMap<>();
-							subscriptionIdMap.put(Constants.SUBSCRIPTION_ID_TITLE, subscription.getId());
+							subscriptionIdMap.put(Constants.SUBSCRIPTION_ID_TITLE, subscriptionId);
 							channel.write(new SimpleMessage(Directive.ACK, mapper.writeValueAsBytes(subscriptionIdMap)));
 							success = true;
 						} catch (IOException | ParseException | IndexOutOfBoundsException ex) {
 						}
-						
+
 						if (!success)
 							sendError(channel);
 
 						// always changes state back to CONNECTED
+						return true;
+					}
+
+				});
+	}
+
+	private void addUnsubscribeTransition(final SecureChannelGroup secureChannelGroup) {
+		this.addTransition(ServerState.CONNECTED, ServerEvent.RECEIVED_UNSUBSCRIBE, ServerState.CONNECTED,
+				new Action<ServerContext>() {
+
+					@Override
+					public boolean perform(ServerContext context) {
+						Channel channel = context.getMessageEvent().getChannel();
+						boolean success = false;
+						try {
+							Map<String, Long> unsubscribeMap = mapper.readValue(((SimpleMessage) context
+									.getMessageEvent().getMessage()).getBody(), Map.class);
+							Long subscriptionId = unsubscribeMap.get(Constants.SUBSCRIPTION_ID_TITLE);
+							if (subscriptionId != null) {
+								success = SubscriptionManagerSingleton.getSubscriptionManager().removeSubscription(
+										secureChannelGroup.getUsername(channel), subscriptionId);
+							}
+						} catch (IOException e) {
+						}
+
+						if (success) {
+							channel.write(new SimpleMessage(Directive.ACK, "".getBytes()));
+						} else {
+							sendError(channel);
+						}
+
+						// in this case, it probably doesn't matter if true or
+						// false is returned
 						return true;
 					}
 
@@ -136,6 +169,7 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 		this.addConnectTransition(secureChannelGroup);
 		this.addSubscribeToSubscriptionReceivedTransition(secureChannelGroup);
 		this.addSubscriptionReceivedTransition(secureChannelGroup);
+		this.addUnsubscribeTransition(secureChannelGroup);
 	}
 
 }
