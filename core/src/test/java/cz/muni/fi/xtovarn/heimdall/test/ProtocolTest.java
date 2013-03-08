@@ -66,6 +66,14 @@ public class ProtocolTest {
 			}
 		}
 	}
+	
+	private static class DisconnectMessageContainer extends ConnectMessageContainer {
+		
+		public DisconnectMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.DISCONNECT, "".getBytes()));
+		}
+		
+	}
 
 	private static class SubscribeMessageContainer extends ConnectMessageContainer {
 
@@ -203,6 +211,30 @@ public class ProtocolTest {
 			return connectionId;
 		}
 
+	}
+	
+	private static class DisconnectHandler extends ConnectHandler {
+		
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+		
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ACK, message.getDirective());
+			}
+		}
+		
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+		
 	}
 
 	private static class SubscriptionHandler extends ConnectHandler {
@@ -407,6 +439,14 @@ public class ProtocolTest {
 		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
 		pipelineFactory.addHandler("subscribe", new SubscribeWithoutConnectHandler());
 		TestClient client = new TestClient(pipelineFactory, new SubscribeWithoutConnectMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testDisconnectAfterConnect() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("disconnect", new DisconnectHandler());
+		TestClient client = new TestClient(pipelineFactory, new DisconnectMessageContainer());
 		client.run();
 	}
 }
