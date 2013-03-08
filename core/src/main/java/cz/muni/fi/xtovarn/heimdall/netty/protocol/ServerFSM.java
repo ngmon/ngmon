@@ -140,9 +140,9 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 						Channel channel = context.getMessageEvent().getChannel();
 						boolean success = false;
 						try {
-							Map<String, Long> unsubscribeMap = mapper.readValue(((SimpleMessage) context
+							Map<String, Number> unsubscribeMap = mapper.readValue(((SimpleMessage) context
 									.getMessageEvent().getMessage()).getBody(), Map.class);
-							Long subscriptionId = unsubscribeMap.get(Constants.SUBSCRIPTION_ID_TITLE);
+							Long subscriptionId = unsubscribeMap.get(Constants.SUBSCRIPTION_ID_TITLE).longValue();
 							if (subscriptionId != null) {
 								success = SubscriptionManagerSingleton.getSubscriptionManager().removeSubscription(
 										secureChannelGroup.getUsername(channel), subscriptionId);
