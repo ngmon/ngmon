@@ -101,7 +101,7 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 				});
 	}
 
-	private void addSubscriptionReceivedTransition(final SecureChannelGroup secureChannelGroup) {
+	private void addProcessSubscriptionTransition(final SecureChannelGroup secureChannelGroup) {
 		this.addTransition(ServerState.SUBSCRIPTION_RECEIVED, ServerEvent.PROCESS_SUBSCRIPTION, ServerState.CONNECTED,
 				new Action<ServerContext>() {
 
@@ -131,8 +131,20 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 				});
 	}
 
-	private void addUnsubscribeTransition(final SecureChannelGroup secureChannelGroup) {
-		this.addTransition(ServerState.CONNECTED, ServerEvent.RECEIVED_UNSUBSCRIBE, ServerState.CONNECTED,
+	private void addUnsubscribeToUnsubscribeReceivedTransition(final SecureChannelGroup secureChannelGroup) {
+		this.addTransition(ServerState.CONNECTED, ServerEvent.RECEIVED_UNSUBSCRIBE, ServerState.UNSUBSCRIBE_RECEIVED,
+				new Action<ServerContext>() {
+
+					@Override
+					public boolean perform(ServerContext context) {
+						return true;
+					}
+
+				});
+	}
+
+	private void addProcessUnsubscribeTransition(final SecureChannelGroup secureChannelGroup) {
+		this.addTransition(ServerState.UNSUBSCRIBE_RECEIVED, ServerEvent.PROCESS_UNSUBSCRIBE, ServerState.CONNECTED,
 				new Action<ServerContext>() {
 
 					@Override
@@ -168,8 +180,9 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 		this.addTransition(ServerState.CREATED, ServerEvent.NETTY_TCP_CONNECTED, ServerState.PRE_CONNECTED, null);
 		this.addConnectTransition(secureChannelGroup);
 		this.addSubscribeToSubscriptionReceivedTransition(secureChannelGroup);
-		this.addSubscriptionReceivedTransition(secureChannelGroup);
-		this.addUnsubscribeTransition(secureChannelGroup);
+		this.addProcessSubscriptionTransition(secureChannelGroup);
+		this.addUnsubscribeToUnsubscribeReceivedTransition(secureChannelGroup);
+		this.addProcessUnsubscribeTransition(secureChannelGroup);
 	}
 
 }

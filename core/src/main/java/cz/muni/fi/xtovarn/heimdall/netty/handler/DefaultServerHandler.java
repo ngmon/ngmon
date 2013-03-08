@@ -42,25 +42,46 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 		channel.write(new SimpleMessage(Directive.ERROR, "".getBytes()));
 	}
 
+	private ServerEvent directiveToServerEvent(Directive directive) {
+		switch (directive) {
+		case CONNECT:
+			return ServerEvent.RECEIVED_CONNECT;
+		case SUBSCRIBE:
+			return ServerEvent.RECEIVED_SUBSCRIBE;
+		case UNSUBSCRIBE:
+			return ServerEvent.RECEIVED_UNSUBSCRIBE;
+		default:
+			return null;
+		}
+	}
+
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
 		Channel channel = e.getChannel();
 
+		// TODO - add description to the error message (based on current state
+		// and received message)
+		ServerEvent serverEvent = directiveToServerEvent(message.getDirective());
+		if (serverEvent == null || this.serverStateMachine.getNextState(serverEvent) == null) {
+			sendError(channel);
+			return;
+		}
+
+		ServerContext actionContext = new ServerContext(ctx, e, null);
 		switch (message.getDirective()) {
 		case CONNECT:
-			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_CONNECT, new ServerContext(ctx, e, null));
+			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_CONNECT, actionContext);
 			break;
 		case SUBSCRIBE:
-			/*-if (!this.serverStateMachine.getCurrentState().equals(ServerState.CONNECTED)) {
-				sendError(channel);*/
 			// change state to SUBSCRIPTION_RECEIVED immediately, then process
 			// the subscription
-			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_SUBSCRIBE, new ServerContext(ctx, e, null));
-			this.serverStateMachine.readSymbol(ServerEvent.PROCESS_SUBSCRIPTION, new ServerContext(ctx, e, null));
+			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_SUBSCRIBE, actionContext);
+			this.serverStateMachine.readSymbol(ServerEvent.PROCESS_SUBSCRIPTION, actionContext);
 			break;
 		case UNSUBSCRIBE:
-			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_UNSUBSCRIBE, new ServerContext(ctx, e, null));
+			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_UNSUBSCRIBE, actionContext);
+			this.serverStateMachine.readSymbol(ServerEvent.PROCESS_UNSUBSCRIBE, actionContext);
 			break;
 		}
 
