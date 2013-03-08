@@ -12,6 +12,7 @@ public enum Directive {
 	UNSUBSCRIBE(21),
 	READY(22),
 	GET(23),
+	DISCONNECT(25),
 	SEND_JSON(100),
 	SEND_SMILE(101),
 	ERROR(111);

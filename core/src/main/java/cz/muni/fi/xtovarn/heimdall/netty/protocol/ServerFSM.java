@@ -176,6 +176,22 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 				});
 	}
 
+	private void addDisconnectTransition(final SecureChannelGroup secureChannelGroup) {
+		this.addTransition(ServerState.CONNECTED, ServerEvent.RECEIVED_DISCONNECT, ServerState.DISCONNECTED,
+				new Action<ServerContext>() {
+
+					@Override
+					public boolean perform(ServerContext context) {
+						Channel channel = context.getMessageEvent().getChannel();
+
+						SimpleMessage replyMessage = new SimpleMessage(Directive.ACK, "".getBytes());
+						channel.write(replyMessage);
+
+						return true;
+					}
+				});
+	}
+
 	public void buildTransitions(final SecureChannelGroup secureChannelGroup) {
 		this.addTransition(ServerState.CREATED, ServerEvent.NETTY_TCP_CONNECTED, ServerState.PRE_CONNECTED, null);
 		this.addConnectTransition(secureChannelGroup);
@@ -183,6 +199,7 @@ public class ServerFSM extends AbstractFiniteStateMachine<ServerState, ServerEve
 		this.addProcessSubscriptionTransition(secureChannelGroup);
 		this.addUnsubscribeToUnsubscribeReceivedTransition(secureChannelGroup);
 		this.addProcessUnsubscribeTransition(secureChannelGroup);
+		this.addDisconnectTransition(secureChannelGroup);
 	}
 
 }
