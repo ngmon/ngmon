@@ -1,10 +1,5 @@
 package cz.muni.fi.xtovarn.heimdall.netty.handler;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
@@ -13,17 +8,12 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cz.muni.fi.publishsubscribe.countingtree.Predicate;
-import cz.muni.fi.publishsubscribe.countingtree.Subscription;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerContext;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerEvent;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerFSM;
-import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerState;
-import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
-import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionParser;
 
 public class DefaultServerHandler extends SimpleChannelHandler {
 
@@ -50,6 +40,8 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 			return ServerEvent.RECEIVED_SUBSCRIBE;
 		case UNSUBSCRIBE:
 			return ServerEvent.RECEIVED_UNSUBSCRIBE;
+		case DISCONNECT:
+			return ServerEvent.RECEIVED_DISCONNECT;
 		default:
 			return null;
 		}
@@ -71,16 +63,17 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 		ServerContext actionContext = new ServerContext(ctx, e, null);
 		switch (message.getDirective()) {
 		case CONNECT:
-			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_CONNECT, actionContext);
+		case DISCONNECT:
+			this.serverStateMachine.readSymbol(serverEvent, actionContext);
 			break;
 		case SUBSCRIBE:
 			// change state to SUBSCRIPTION_RECEIVED immediately, then process
 			// the subscription
-			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_SUBSCRIBE, actionContext);
+			this.serverStateMachine.readSymbol(serverEvent, actionContext);
 			this.serverStateMachine.readSymbol(ServerEvent.PROCESS_SUBSCRIPTION, actionContext);
 			break;
 		case UNSUBSCRIBE:
-			this.serverStateMachine.readSymbol(ServerEvent.RECEIVED_UNSUBSCRIBE, actionContext);
+			this.serverStateMachine.readSymbol(serverEvent, actionContext);
 			this.serverStateMachine.readSymbol(ServerEvent.PROCESS_UNSUBSCRIBE, actionContext);
 			break;
 		}
