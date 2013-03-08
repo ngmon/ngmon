@@ -115,7 +115,10 @@ public abstract class AbstractFiniteStateMachine<T1 extends Enum<T1>, T2, T3> {
 
 	private Pair<Action<T3>, T1> getNextPair(T2 symbol) {
 
-		return this.stateTransitionFunction.get(currentState).get(symbol);
+		Map<T2, Pair<Action<T3>, T1>> map = this.stateTransitionFunction.get(currentState);
+		if (map == null)
+			return null;
+		return map.get(symbol);
 	}
 
 	synchronized public boolean isEnded() {
