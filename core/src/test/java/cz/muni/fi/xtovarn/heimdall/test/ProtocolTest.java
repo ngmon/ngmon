@@ -13,7 +13,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
+import cz.muni.fi.xtovarn.heimdall.netty.message.Message;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
+import cz.muni.fi.xtovarn.heimdall.netty.protocol.Constants;
+import cz.muni.fi.xtovarn.heimdall.test.SimpleMessageWrapper.PrepareMessageAction;
 
 public class ProtocolTest {
 
@@ -57,7 +60,7 @@ public class ProtocolTest {
 				break;
 			}
 			try {
-				this.addMessage(new SimpleMessage(Directive.CONNECT, getMapper().writeValueAsBytes(user)));
+				this.addMessage(new SimpleMessageWrapper(Directive.CONNECT, getMapper().writeValueAsBytes(user)));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
@@ -76,7 +79,7 @@ public class ProtocolTest {
 
 		public SubscribeMessageContainer(MESSAGE_TYPE messageType) {
 			try {
-				this.addMessage(new SimpleMessage(Directive.SUBSCRIBE, getMapper().writeValueAsBytes(
+				this.addMessage(new SimpleMessageWrapper(Directive.SUBSCRIBE, getMapper().writeValueAsBytes(
 						getSubscriptionMap(messageType))));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
@@ -110,6 +113,47 @@ public class ProtocolTest {
 			}
 
 			return subscriptionMap;
+		}
+
+	}
+
+	private static class UnsubscribeMessageContainer extends SubscribeMessageContainer {
+
+		public UnsubscribeMessageContainer(SubscriptionHandler handler, final boolean validId) {
+			this.addMessage(new SimpleMessageWrapper(new PrepareMessageAction() {
+
+				@Override
+				public Message perform(Object object) {
+					SubscriptionHandler handler = (SubscriptionHandler) object;
+
+					Map<String, Long> unsubscribeMap = new HashMap<>();
+					Long usedId = handler.getSubscriptionId();
+					if (!validId)
+						usedId++;
+					unsubscribeMap.put(Constants.SUBSCRIPTION_ID_TITLE, usedId);
+					try {
+						return new SimpleMessage(Directive.UNSUBSCRIBE, getMapper().writeValueAsBytes(unsubscribeMap));
+					} catch (JsonProcessingException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}, handler));
+		}
+
+	}
+
+	private static class SubscribeWithoutConnectMessageContainer extends MessageContainerImpl {
+
+		public SubscribeWithoutConnectMessageContainer() {
+			try {
+				Map<String, String> subscriptionMap = new HashMap<>();
+				subscriptionMap.put("priority", "#lt 2");
+				this.addMessage(new SimpleMessageWrapper(Directive.SUBSCRIBE, getMapper().writeValueAsBytes(
+						subscriptionMap)));
+
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
 		}
 
 	}
@@ -166,6 +210,7 @@ public class ProtocolTest {
 		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
 
 		private Directive expectedDirective;
+		private Long subscriptionId;
 
 		public SubscriptionHandler() {
 			this(Directive.ACK);
@@ -177,9 +222,9 @@ public class ProtocolTest {
 
 		@Override
 		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-			// parent's processReceivedMessage is not called (it could be, but
-			// that method is tested by a different
-			// test anyway)
+			// parent method must be called in order to save the connection ID
+			super.processReceivedMessage(ctx, e);
+
 			if (getMessageCount() >= super.getMessagesProcessedByHandler()
 					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
 				SimpleMessage message = (SimpleMessage) e.getMessage();
@@ -187,7 +232,7 @@ public class ProtocolTest {
 				if (expectedDirective.equals(Directive.ACK)) {
 					Map<String, Number> subscriptionIdMap = (Map<String, Number>) getMapper().readValue(
 							message.getBody(), Map.class);
-					long subscriptionId = subscriptionIdMap.get("subscriptionId").longValue();
+					subscriptionId = subscriptionIdMap.get(Constants.SUBSCRIPTION_ID_TITLE).longValue();
 					MyAssert.assertNotNull(subscriptionId);
 					System.out.println("Subscription ID: " + subscriptionId);
 				}
@@ -203,6 +248,65 @@ public class ProtocolTest {
 			return getMessagesProcessedByHandlerPrivate();
 		}
 
+		public Long getSubscriptionId() {
+			return subscriptionId;
+		}
+
+	}
+
+	private static class UnsubscribeHandler extends SubscriptionHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		private Directive expectedDirective;
+
+		public UnsubscribeHandler(Directive expectedDirective) {
+			this.expectedDirective = expectedDirective;
+		}
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			super.processReceivedMessage(ctx, e);
+
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(expectedDirective, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+
+	private static class SubscribeWithoutConnectHandler extends TestClientHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
 	}
 
 	@Test
@@ -273,10 +377,36 @@ public class ProtocolTest {
 		testSubscribeHelper(new SubscriptionHandler(Directive.ERROR), new SubscribeMessageContainer(
 				SubscribeMessageContainer.MESSAGE_TYPE.INVALID_NO_ATTRIBUTE));
 	}
-	
+
 	@Test
 	public void testSubscribeInvalidNoOperatorValue() {
 		testSubscribeHelper(new SubscriptionHandler(Directive.ERROR), new SubscribeMessageContainer(
 				SubscribeMessageContainer.MESSAGE_TYPE.INVALID_NO_OPERATOR_VALUE));
+	}
+
+	@Test
+	public void testUnsubscribe() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		UnsubscribeHandler handler = new UnsubscribeHandler(Directive.ACK);
+		pipelineFactory.addHandler("unsubscribe", handler);
+		TestClient client = new TestClient(pipelineFactory, new UnsubscribeMessageContainer(handler, true));
+		client.run();
+	}
+
+	@Test
+	public void testUnsubscribeInvalidSubscriptionId() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		UnsubscribeHandler handler = new UnsubscribeHandler(Directive.ERROR);
+		pipelineFactory.addHandler("unsubscribe", handler);
+		TestClient client = new TestClient(pipelineFactory, new UnsubscribeMessageContainer(handler, false));
+		client.run();
+	}
+	
+	@Test
+	public void testSubscribeWithoutConnectingFirst() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("subscribe", new SubscribeWithoutConnectHandler());
+		TestClient client = new TestClient(pipelineFactory, new SubscribeWithoutConnectMessageContainer());
+		client.run();
 	}
 }

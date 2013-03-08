@@ -5,19 +5,17 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cz.muni.fi.xtovarn.heimdall.netty.message.Message;
-
 public class MessageContainerImpl implements MessageContainer {
 
-	private List<Message> messages = new ArrayList<>();
+	private List<SimpleMessageWrapper> messages = new ArrayList<>();
 	private static ObjectMapper mapper = new ObjectMapper();
 
-	public void addMessage(Message message) {
+	public void addMessage(SimpleMessageWrapper message) {
 		messages.add(message);
 	}
 
 	@Override
-	public List<Message> getMessages() {
+	public List<SimpleMessageWrapper> getMessages() {
 		return messages;
 	}
 
