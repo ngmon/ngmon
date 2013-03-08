@@ -100,11 +100,17 @@ public abstract class AbstractFiniteStateMachine<T1 extends Enum<T1>, T2, T3> {
 	}
 
 	public Action<T3> getNextAction(T2 symbol) {
-		return this.getNextPair(symbol).getFirst();
+		Pair<Action<T3>, T1> nextPair = this.getNextPair(symbol);
+		if (nextPair == null)
+			return null;
+		return nextPair.getFirst();
 	}
 
 	public T1 getNextState(T2 symbol) {
-		return this.getNextPair(symbol).getSecond();
+		Pair<Action<T3>, T1> nextPair = this.getNextPair(symbol);
+		if (nextPair == null)
+			return null;
+		return nextPair.getSecond();
 	}
 
 	private Pair<Action<T3>, T1> getNextPair(T2 symbol) {
