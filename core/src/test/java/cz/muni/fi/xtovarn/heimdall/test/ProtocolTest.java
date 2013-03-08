@@ -74,6 +74,22 @@ public class ProtocolTest {
 		}
 
 	}
+	
+	private static class DisconnectWithoutConnectMessageContainer extends MessageContainerImpl {
+
+		public DisconnectWithoutConnectMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.DISCONNECT, "".getBytes()));
+		}
+
+	}
+	
+	private static class DoubleDisconnectMessageContainer extends DisconnectMessageContainer {
+
+		public DoubleDisconnectMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.DISCONNECT, "".getBytes()));
+		}
+
+	}
 
 	private static class SubscribeAfterDisconnectMessageContainer extends DisconnectMessageContainer {
 
@@ -239,6 +255,54 @@ public class ProtocolTest {
 					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
 				SimpleMessage message = (SimpleMessage) e.getMessage();
 				MyAssert.assertEquals(Directive.ACK, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class DisconnectWithoutConnectHandler extends TestClientHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class DoubleDisconnectHandler extends DisconnectHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
 			}
 		}
 
@@ -495,6 +559,22 @@ public class ProtocolTest {
 		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
 		pipelineFactory.addHandler("subscribe", new SubscribeAfterDisconnectHandler());
 		TestClient client = new TestClient(pipelineFactory, new SubscribeAfterDisconnectMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testDisconnectWithoutConnect() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("disconnect", new DisconnectWithoutConnectHandler());
+		TestClient client = new TestClient(pipelineFactory, new DisconnectWithoutConnectMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testDoubleDisconnect() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("disconnect", new DoubleDisconnectHandler());
+		TestClient client = new TestClient(pipelineFactory, new DoubleDisconnectMessageContainer());
 		client.run();
 	}
 }
