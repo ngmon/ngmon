@@ -19,7 +19,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 
 		switch (message.getDirective()) {
 			case CONNECTED:
-				System.out.println(ClientEvent.RECIEVED_CONNECTED);
+				System.out.println(ClientEvent.RECEIVED_CONNECTED);
 				break;
 		}
 	}
