@@ -22,7 +22,7 @@ public class ClientPipelineFactory implements ChannelPipelineFactory {
 		pipeline.addLast("decoder", new MessageDecoder());
 		pipeline.addLast("encoder", new MessageEncoder());
 
-		pipeline.addLast("default-handler", new DefaultClientHandler());
+		pipeline.addLast(Constants.DEFAULT_CLIENT_HANDLER_TITLE, new DefaultClientHandler());
 
 		return pipeline;
 	}

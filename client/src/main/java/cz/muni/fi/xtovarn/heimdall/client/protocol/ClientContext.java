@@ -8,6 +8,7 @@ public class ClientContext {
 	private final ChannelHandlerContext ctx;
 	private final MessageEvent messageEvent;
 	private final ChannelStateEvent channelStateEvent;
+	private Object object;
 
 	public ClientContext(ChannelHandlerContext ctx, MessageEvent messageEvent, ChannelStateEvent channelStateEvent) {
 		this.ctx = ctx;
@@ -26,4 +27,13 @@ public class ClientContext {
 	public ChannelStateEvent getChannelStateEvent() {
 		return channelStateEvent;
 	}
+
+	public Object getObject() {
+		return object;
+	}
+
+	public void setObject(Object object) {
+		this.object = object;
+	}
+
 }
