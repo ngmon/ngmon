@@ -15,6 +15,7 @@ import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientContext;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientEvent;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientFSM;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
+import cz.muni.fi.xtovarn.heimdall.netty.protocol.Constants;
 
 public class DefaultClientHandler extends SimpleChannelHandler {
 
@@ -23,10 +24,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		System.out.println(ClientEvent.NETTY_TCP_CONNECTED);
 		clientStateMachine.readSymbol(ClientEvent.NETTY_TCP_CONNECTED, null);
-		// e.getChannel().write(new SimpleMessage(Directive.CONNECT,
-		// "danos".getBytes()));
 	}
 
 	@Override
@@ -38,8 +36,12 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 			handleConnected(ctx, e);
 			break;
 		case ERROR:
-			clientStateMachine.readSymbol(ClientEvent.ERROR, new ClientContext(ctx, e, null));
+			clientStateMachine.readSymbol(ClientEvent.ERROR, null);
 			break;
+		case ACK:
+			// TODO - check current machine state and decide which symbol to
+			// read accordingly
+			clientStateMachine.readSymbol(ClientEvent.RECEIVED_SUBSCRIBE_ACK, new ClientContext(ctx, e, null));
 		}
 	}
 
@@ -52,8 +54,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
 		try {
 			Map<String, Number> connectionIdMap = (Map<String, Number>) mapper.readValue(message.getBody(), Map.class);
-			// TODO - extract constant
-			Long connectionId = connectionIdMap.get("connectionId").longValue();
+			Long connectionId = connectionIdMap.get(Constants.CONNECTION_ID_TITLE).longValue();
 			if (connectionId != null) {
 				ClientContext actionContext = new ClientContext(ctx, e, null);
 				actionContext.setObject(connectionId);

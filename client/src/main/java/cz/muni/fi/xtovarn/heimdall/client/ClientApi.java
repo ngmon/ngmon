@@ -1,6 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.client;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -12,6 +13,7 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientContext;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientEvent;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientFSM;
+import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
 import cz.muni.fi.xtovarn.heimdall.entities.User;
 
 public class ClientApi {
@@ -34,6 +36,9 @@ public class ClientApi {
 		bootstrap.setOption("child.keepAlive", true);
 
 		ChannelFuture future = bootstrap.connect(new InetSocketAddress(6000));
+		// TODO - this doesn't wait for DefaultClientHandler.channelConnected()
+		// to finish, so calling connect() too soon may fail (because the
+		// machine might still be in the CREATED state)
 		future.awaitUninterruptibly();
 
 		channel = future.getChannel();
@@ -43,16 +48,21 @@ public class ClientApi {
 		clientFSM = clientHandler.getClientStateMachine();
 	}
 
+	private ClientContext getContextFromChannel() {
+		// TODO - static?
+		return new ClientContext(null, new ClientMessageEvent(channel, null, null, null), null);
+	}
+
 	public void connect(String login, String passcode) {
 		if (login == null || passcode == null || login.isEmpty() || passcode.isEmpty())
 			throw new IllegalArgumentException("connect()");
+
 		User user = new User(login, passcode);
 		// channel.write(new SimpleMessage(Directive.CONNECT,
 		// mapper.writeValueAsBytes(user)));
 
 		// TODO - workaround
-		ClientMessageEvent messageEvent = new ClientMessageEvent(channel, null, null, null);
-		ClientContext actionContext = new ClientContext(null, messageEvent, null);
+		ClientContext actionContext = getContextFromChannel();
 		actionContext.setObject(user);
 		clientFSM.readSymbol(ClientEvent.REQUEST_CONNECT, actionContext);
 	}
@@ -65,8 +75,34 @@ public class ClientApi {
 		return getConnectionId() != null;
 	}
 
+	public void subscribe(Predicate predicate) {
+		if (!isConnected())
+			throw new IllegalStateException("not connected");
+
+		if (predicate == null || predicate.isEmpty())
+			throw new IllegalArgumentException("subscribe()");
+
+		ClientContext actionContext = getContextFromChannel();
+		actionContext.setObject(predicate);
+		clientFSM.readSymbol(ClientEvent.REQUEST_SUBSCRIBE, actionContext);
+	}
+
+	public List<Long> getSubscriptionIds() {
+		return clientFSM.getSubscriptionIds();
+	}
+
+	public Long getLastSubscriptionId() {
+		return clientFSM.getLastSubscriptionId();
+	}
+
+	public boolean wasLastSubscriptionSuccessful() {
+		return clientFSM.wasLastSubscriptionSuccessful();
+	}
+
 	public void stop() {
-		channel.getCloseFuture().awaitUninterruptibly();
+		ChannelFuture future = channel.close();
+		future.awaitUninterruptibly();
+		// channel.getCloseFuture().awaitUninterruptibly();
 		factory.releaseExternalResources();
 	}
 
