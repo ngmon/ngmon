@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cz.muni.fi.xtovarn.fsm.AbstractFiniteStateMachine;
 import cz.muni.fi.xtovarn.fsm.action.Action;
+import cz.muni.fi.xtovarn.heimdall.client.ResultFuture;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
 import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
@@ -26,6 +27,8 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 	private Long connectionId = null;
 	private List<Long> subscriptionIds = new ArrayList<>();
 	private boolean lastSubscriptionSuccessful = false;
+
+	private ResultFuture<Boolean> connectResult = null;
 
 	public ClientFSM(final SecureChannelGroup secureChannelGroup) {
 		super(ClientState.CREATED, new ClientState[] { ClientState.DISCONNECTED }, ClientState.class);
@@ -44,6 +47,7 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 						User user = (User) context.getObject();
 						try {
 							channel.write(new SimpleMessage(Directive.CONNECT, mapper.writeValueAsBytes(user)));
+							connectResult = new ResultFuture<>();
 							return true;
 						} catch (JsonProcessingException e) {
 							return false;
@@ -51,15 +55,36 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 					}
 				});
 
-		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.ERROR, ClientState.PRE_CONNECTED, null);
+		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.ERROR, ClientState.PRE_CONNECTED,
+				new Action<ClientContext>() {
+
+					@Override
+					public boolean perform(ClientContext context) {
+						connectResult.put(false);
+						return true;
+					}
+
+				});
 
 		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.RECEIVED_CONNECTED, ClientState.CONNECTED,
 				new Action<ClientContext>() {
 
 					@Override
 					public boolean perform(ClientContext context) {
-						connectionId = (Long) context.getObject();
-						return true;
+						SimpleMessage message = (SimpleMessage) context.getMessageEvent().getMessage();
+						try {
+							Map<String, Number> connectionIdMap = (Map<String, Number>) mapper.readValue(
+									message.getBody(), Map.class);
+							connectionId = connectionIdMap.get(Constants.CONNECTION_ID_TITLE).longValue();
+							// TODO - might be null if getNewConnectResult()
+							// wasn't called
+							connectResult.put(true);
+							return true;
+						} catch (IOException ex) {
+						}
+
+						connectResult.put(false);
+						throw new RuntimeException("Invalid response from server");
 					}
 
 				});
@@ -126,6 +151,10 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 
 	public boolean wasLastSubscriptionSuccessful() {
 		return lastSubscriptionSuccessful;
+	}
+
+	public ResultFuture<Boolean> getConnectResult() {
+		return connectResult;
 	}
 
 }

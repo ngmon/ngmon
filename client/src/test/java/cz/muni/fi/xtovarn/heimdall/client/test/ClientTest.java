@@ -7,6 +7,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,42 +30,31 @@ public class ClientTest {
 	private ClientApi client = null;
 
 	@Before
-	public void before() throws InterruptedException {
+	public void before() throws InterruptedException, ExecutionException {
 		client = new ClientApi();
-		Thread.sleep(WAIT_TIME);
 	}
 
 	@After
 	public void after() throws InterruptedException {
 		client.stop();
-		client = null;
-		Thread.sleep(WAIT_TIME);
 	}
 
-	private void connectClient() throws InterruptedException {
-		client.connect(VALID_USER_NAME, VALID_USER_PASSWORD);
-		Thread.sleep(WAIT_TIME);
+	@Test
+	public void connect() throws InterruptedException, ExecutionException {
+		Future<Boolean> result = client.connect(VALID_USER_NAME, VALID_USER_PASSWORD);
+		assertTrue(result.get());
 		assertTrue(client.isConnected());
 	}
 
 	@Test
-	public void connect() throws InterruptedException {
-		client.connect(VALID_USER_NAME, VALID_USER_PASSWORD);
-		Thread.sleep(WAIT_TIME);
-		assertTrue(client.isConnected());
-	}
-
-	@Test
-	public void connectInvalidUser() throws InterruptedException {
-		client.connect(INVALID_USER_NAME, VALID_USER_PASSWORD);
-		Thread.sleep(WAIT_TIME);
+	public void connectInvalidUser() throws InterruptedException, ExecutionException {
+		assertFalse(client.connect(INVALID_USER_NAME, VALID_USER_PASSWORD).get());
 		assertFalse(client.isConnected());
 	}
 
 	@Test
-	public void connectInvalidPassword() throws InterruptedException {
-		client.connect(INVALID_USER_NAME, INVALID_USER_PASSWORD);
-		Thread.sleep(WAIT_TIME);
+	public void connectInvalidPassword() throws InterruptedException, ExecutionException {
+		assertFalse(client.connect(INVALID_USER_NAME, INVALID_USER_PASSWORD).get());
 		assertFalse(client.isConnected());
 	}
 
@@ -74,8 +66,8 @@ public class ClientTest {
 	}
 
 	@Test
-	public void subscribe() throws InterruptedException {
-		connectClient();
+	public void subscribe() throws InterruptedException, ExecutionException {
+		connect();
 		assertEquals(0, client.getSubscriptionIds().size());
 		client.subscribe(getPredicate());
 		Thread.sleep(WAIT_TIME);

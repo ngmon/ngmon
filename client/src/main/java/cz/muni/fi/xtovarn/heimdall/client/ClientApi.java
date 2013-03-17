@@ -3,6 +3,7 @@ package cz.muni.fi.xtovarn.heimdall.client;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -23,6 +24,7 @@ public class ClientApi {
 	private Channel channel = null;
 	private DefaultClientHandler clientHandler = null;
 	private ClientFSM clientFSM = null;
+	private boolean preconnected = false;
 
 	public ClientApi() {
 		factory = new NioClientSocketChannelFactory(Executors.newSingleThreadExecutor(),
@@ -36,10 +38,6 @@ public class ClientApi {
 		bootstrap.setOption("child.keepAlive", true);
 
 		ChannelFuture future = bootstrap.connect(new InetSocketAddress(6000));
-		// TODO - this doesn't wait for DefaultClientHandler.channelConnected()
-		// to finish, so calling connect() too soon may fail (because the
-		// machine might still be in the CREATED state)
-		future.awaitUninterruptibly();
 
 		channel = future.getChannel();
 
@@ -53,18 +51,23 @@ public class ClientApi {
 		return new ClientContext(null, new ClientMessageEvent(channel, null, null, null), null);
 	}
 
-	public void connect(String login, String passcode) {
+	public Future<Boolean> connect(String login, String passcode) throws InterruptedException {
 		if (login == null || passcode == null || login.isEmpty() || passcode.isEmpty())
 			throw new IllegalArgumentException("connect()");
 
+		if (!preconnected) {
+			clientHandler.getChannelConnectedResult().get();
+			preconnected = true;
+		}
+
 		User user = new User(login, passcode);
-		// channel.write(new SimpleMessage(Directive.CONNECT,
-		// mapper.writeValueAsBytes(user)));
 
 		// TODO - workaround
 		ClientContext actionContext = getContextFromChannel();
 		actionContext.setObject(user);
 		clientFSM.readSymbol(ClientEvent.REQUEST_CONNECT, actionContext);
+
+		return clientFSM.getConnectResult();
 	}
 
 	public Long getConnectionId() {
