@@ -2,6 +2,7 @@ package cz.muni.fi.xtovarn.heimdall.client;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -25,6 +26,7 @@ public class ClientApi {
 	private DefaultClientHandler clientHandler = null;
 	private ClientFSM clientFSM = null;
 	private boolean preconnected = false;
+	private boolean connected = false;
 
 	public ClientApi() {
 		factory = new NioClientSocketChannelFactory(Executors.newSingleThreadExecutor(),
@@ -51,12 +53,25 @@ public class ClientApi {
 		return new ClientContext(null, new ClientMessageEvent(channel, null, null, null), null);
 	}
 
+	public boolean isConnected() throws InterruptedException, ExecutionException {
+		if (!preconnected)
+			return false;
+		boolean result = false;
+		if (!connected) {
+			connected = clientFSM.getConnectResult().get();
+		}
+
+		return connected;
+	}
+
 	public Future<Boolean> connect(String login, String passcode) throws InterruptedException {
 		if (login == null || passcode == null || login.isEmpty() || passcode.isEmpty())
 			throw new IllegalArgumentException("connect()");
 
 		if (!preconnected) {
-			clientHandler.getChannelConnectedResult().get();
+			if (!clientHandler.getChannelConnectedResult().get().equals(true)) {
+				throw new IllegalStateException("not preconnected");
+			}
 			preconnected = true;
 		}
 
@@ -74,13 +89,17 @@ public class ClientApi {
 		return clientFSM.getConnectionId();
 	}
 
-	public boolean isConnected() {
+	/*-public boolean isConnected() {
 		return getConnectionId() != null;
-	}
+	}*/
 
-	public Future<Long> subscribe(Predicate predicate) {
+	private void checkConnected() throws InterruptedException, ExecutionException {
 		if (!isConnected())
 			throw new IllegalStateException("not connected");
+	}
+
+	public Future<Long> subscribe(Predicate predicate) throws InterruptedException, ExecutionException {
+		checkConnected();
 
 		if (predicate == null || predicate.isEmpty())
 			throw new IllegalArgumentException("subscribe()");

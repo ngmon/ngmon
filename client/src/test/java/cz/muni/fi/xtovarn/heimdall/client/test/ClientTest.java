@@ -21,7 +21,6 @@ import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
 
 public class ClientTest {
 
-	private static final int WAIT_TIME = 1000;
 	private static final String VALID_USER_PASSWORD = "password0";
 	private static final String VALID_USER_NAME = "user0";
 	private static final String INVALID_USER_NAME = "userFoo";
@@ -76,7 +75,7 @@ public class ClientTest {
 	}
 
 	@Test
-	public void subscribeWithoutConnect() throws InterruptedException {
+	public void subscribeWithoutConnect() throws InterruptedException, ExecutionException {
 		try {
 			assertNull(client.subscribe(getPredicate()));
 			fail();
