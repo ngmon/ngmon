@@ -78,7 +78,7 @@ public class ClientApi {
 		return getConnectionId() != null;
 	}
 
-	public void subscribe(Predicate predicate) {
+	public Future<Long> subscribe(Predicate predicate) {
 		if (!isConnected())
 			throw new IllegalStateException("not connected");
 
@@ -88,6 +88,7 @@ public class ClientApi {
 		ClientContext actionContext = getContextFromChannel();
 		actionContext.setObject(predicate);
 		clientFSM.readSymbol(ClientEvent.REQUEST_SUBSCRIBE, actionContext);
+		return clientFSM.getSubscribeResult();
 	}
 
 	public List<Long> getSubscriptionIds() {

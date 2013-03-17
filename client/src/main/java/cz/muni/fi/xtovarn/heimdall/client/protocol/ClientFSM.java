@@ -29,6 +29,7 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 	private boolean lastSubscriptionSuccessful = false;
 
 	private ResultFuture<Boolean> connectResult = null;
+	private ResultFuture<Long> subscribeResult = null;
 
 	public ClientFSM(final SecureChannelGroup secureChannelGroup) {
 		super(ClientState.CREATED, new ClientState[] { ClientState.DISCONNECTED }, ClientState.class);
@@ -96,11 +97,13 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 					public boolean perform(ClientContext context) {
 						Channel channel = context.getMessageEvent().getChannel();
 						Predicate predicate = (Predicate) context.getObject();
+						subscribeResult = new ResultFuture<>();
 						try {
 							channel.write(new SimpleMessage(Directive.SUBSCRIBE, mapper.writeValueAsBytes(predicate
 									.toStringMap())));
 							return true;
 						} catch (JsonProcessingException e) {
+							subscribeResult.put(null);
 							return false;
 						}
 					}
@@ -114,10 +117,11 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 					public boolean perform(ClientContext context) {
 						SimpleMessage message = (SimpleMessage) context.getMessageEvent().getMessage();
 						boolean success = false;
+						Long subscriptionId = null;
 						try {
 							Map<String, Number> subscriptionIdMap = (Map<String, Number>) mapper.readValue(
 									message.getBody(), Map.class);
-							Long subscriptionId = subscriptionIdMap.get(Constants.SUBSCRIPTION_ID_TITLE).longValue();
+							subscriptionId = subscriptionIdMap.get(Constants.SUBSCRIPTION_ID_TITLE).longValue();
 							if (subscriptionId != null) {
 								subscriptionIds.add(subscriptionId);
 								success = true;
@@ -126,6 +130,7 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 						}
 
 						lastSubscriptionSuccessful = success;
+						subscribeResult.put(subscriptionId);
 
 						return true;
 					}
@@ -155,6 +160,10 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 
 	public ResultFuture<Boolean> getConnectResult() {
 		return connectResult;
+	}
+
+	public ResultFuture<Long> getSubscribeResult() {
+		return subscribeResult;
 	}
 
 }

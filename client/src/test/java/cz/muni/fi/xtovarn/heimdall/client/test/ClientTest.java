@@ -69,8 +69,7 @@ public class ClientTest {
 	public void subscribe() throws InterruptedException, ExecutionException {
 		connect();
 		assertEquals(0, client.getSubscriptionIds().size());
-		client.subscribe(getPredicate());
-		Thread.sleep(WAIT_TIME);
+		assertNotNull(client.subscribe(getPredicate()).get());
 		assertTrue(client.wasLastSubscriptionSuccessful());
 		assertEquals(1, client.getSubscriptionIds().size());
 		assertNotNull(client.getLastSubscriptionId());
@@ -79,10 +78,9 @@ public class ClientTest {
 	@Test
 	public void subscribeWithoutConnect() throws InterruptedException {
 		try {
-			client.subscribe(getPredicate());
+			assertNull(client.subscribe(getPredicate()));
 			fail();
 		} catch (IllegalStateException e) {
-			Thread.sleep(WAIT_TIME);
 			assertFalse(client.wasLastSubscriptionSuccessful());
 			assertEquals(0, client.getSubscriptionIds().size());
 			assertNull(client.getLastSubscriptionId());
