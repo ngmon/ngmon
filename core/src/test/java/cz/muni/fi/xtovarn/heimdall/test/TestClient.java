@@ -41,9 +41,15 @@ public class TestClient {
 				NettyServer.SERVER_PORT));
 		future.awaitUninterruptibly();
 		channel = future.getChannel();
-		for (Message message : messageContainer.getMessages()) {
-			future = channel.write(message);
+		for (SimpleMessageWrapper message : messageContainer.getMessages()) {
+			future = channel.write(message.getMessage());
 			future.awaitUninterruptibly();
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			channel = future.getChannel();
 		}
 		/*-future.addListener(new ChannelFutureListener() {

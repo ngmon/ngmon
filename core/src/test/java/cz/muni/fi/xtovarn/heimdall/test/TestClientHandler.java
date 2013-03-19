@@ -21,7 +21,7 @@ public class TestClientHandler extends SimpleChannelHandler {
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
 			throws Exception {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
-		System.out.println("Message number: " + (messageCount + 1));
+		System.out.println("Message number: " + messageCount);
 		System.out.println("Directive: " + message.getDirective().toString());
 		// System.out.println("Body1: " + Arrays.toString(message.getBody()));
 		System.out.println("Body: " + new String(message.getBody()));
