@@ -1,5 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall.client;
 
+import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientProtocolContext;
 import cz.muni.fi.xtovarn.heimdall.netty.codec.LengthDecoder;
 import cz.muni.fi.xtovarn.heimdall.netty.codec.MessageDecoder;
 import cz.muni.fi.xtovarn.heimdall.netty.codec.MessageEncoder;
@@ -22,7 +23,7 @@ public class ClientPipelineFactory implements ChannelPipelineFactory {
 		pipeline.addLast("decoder", new MessageDecoder());
 		pipeline.addLast("encoder", new MessageEncoder());
 
-		pipeline.addLast(Constants.DEFAULT_CLIENT_HANDLER_TITLE, new DefaultClientHandler());
+		pipeline.addLast(Constants.DEFAULT_CLIENT_HANDLER_TITLE, new DefaultClientHandler(new ClientProtocolContext()));
 
 		return pipeline;
 	}

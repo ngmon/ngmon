@@ -1,20 +1,20 @@
 package cz.muni.fi.xtovarn.heimdall.client.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import cz.muni.fi.xtovarn.heimdall.client.ClientApi;
+import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Constraint;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Operator;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
@@ -26,11 +26,15 @@ public class ClientTest {
 	private static final String INVALID_USER_NAME = "userFoo";
 	private static final String INVALID_USER_PASSWORD = "passwordFoo";
 
+	private static final int TIMEOUT_VALUE = 5;
+	private static final TimeUnit TIMEOUT_TIME_UNIT = TimeUnit.MINUTES;
+
 	private ClientApi client = null;
 
 	@Before
-	public void before() throws InterruptedException, ExecutionException {
-		client = new ClientApi();
+	public void before() throws InterruptedException, ExecutionException, TimeoutException {
+		client = ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE,
+				TIMEOUT_TIME_UNIT);
 	}
 
 	@After
@@ -40,21 +44,21 @@ public class ClientTest {
 
 	@Test
 	public void connect() throws InterruptedException, ExecutionException {
-		Future<Boolean> result = client.connect(VALID_USER_NAME, VALID_USER_PASSWORD);
-		assertTrue(result.get());
 		assertTrue(client.isConnected());
 	}
 
 	@Test
-	public void connectInvalidUser() throws InterruptedException, ExecutionException {
-		assertFalse(client.connect(INVALID_USER_NAME, VALID_USER_PASSWORD).get());
-		assertFalse(client.isConnected());
+	public void connectInvalidUser() throws InterruptedException, ExecutionException, TimeoutException {
+		ClientApi client2 = ClientConnectionFactory.getClient(INVALID_USER_NAME, INVALID_USER_PASSWORD, TIMEOUT_VALUE,
+				TIMEOUT_TIME_UNIT);
+		assertNull(client2);
 	}
 
 	@Test
-	public void connectInvalidPassword() throws InterruptedException, ExecutionException {
-		assertFalse(client.connect(INVALID_USER_NAME, INVALID_USER_PASSWORD).get());
-		assertFalse(client.isConnected());
+	public void connectInvalidPassword() throws InterruptedException, ExecutionException, TimeoutException {
+		ClientApi client2 = ClientConnectionFactory.getClient(INVALID_USER_NAME, INVALID_USER_PASSWORD, TIMEOUT_VALUE,
+				TIMEOUT_TIME_UNIT);
+		assertNull(client2);
 	}
 
 	private Predicate getPredicate() {
@@ -65,7 +69,7 @@ public class ClientTest {
 	}
 
 	@Test
-	public void subscribe() throws InterruptedException, ExecutionException {
+	public void subcribe() throws InterruptedException, ExecutionException {
 		connect();
 		assertEquals(0, client.getSubscriptionIds().size());
 		assertNotNull(client.subscribe(getPredicate()).get());
@@ -74,16 +78,18 @@ public class ClientTest {
 		assertNotNull(client.getLastSubscriptionId());
 	}
 
-	@Test
+	// can't test this, since I need to get the client through the connection
+	// factory
+	/*-@Test
 	public void subscribeWithoutConnect() throws InterruptedException, ExecutionException {
 		try {
-			assertNull(client.subscribe(getPredicate()));
+			client.subscribe(getPredicate());
 			fail();
 		} catch (IllegalStateException e) {
 			assertFalse(client.wasLastSubscriptionSuccessful());
 			assertEquals(0, client.getSubscriptionIds().size());
 			assertNull(client.getLastSubscriptionId());
 		}
-	}
+	}*/
 
 }

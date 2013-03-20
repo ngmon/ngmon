@@ -39,22 +39,7 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 
 	public void buildTransitions(final SecureChannelGroup secureChannelGroup) {
 		this.addTransition(ClientState.CREATED, ClientEvent.NETTY_TCP_CONNECTED, ClientState.PRE_CONNECTED, null);
-		this.addTransition(ClientState.PRE_CONNECTED, ClientEvent.REQUEST_CONNECT, ClientState.WAITING_FOR_ACK,
-				new Action<ClientContext>() {
-
-					@Override
-					public boolean perform(ClientContext context) {
-						Channel channel = context.getMessageEvent().getChannel();
-						User user = (User) context.getObject();
-						try {
-							channel.write(new SimpleMessage(Directive.CONNECT, mapper.writeValueAsBytes(user)));
-							connectResult = new ResultFuture<>();
-							return true;
-						} catch (JsonProcessingException e) {
-							return false;
-						}
-					}
-				});
+		this.addTransition(ClientState.PRE_CONNECTED, ClientEvent.REQUEST_CONNECT, ClientState.WAITING_FOR_ACK, null);
 
 		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.ERROR, ClientState.PRE_CONNECTED,
 				new Action<ClientContext>() {
@@ -67,28 +52,7 @@ public class ClientFSM extends AbstractFiniteStateMachine<ClientState, ClientEve
 
 				});
 
-		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.RECEIVED_CONNECTED, ClientState.CONNECTED,
-				new Action<ClientContext>() {
-
-					@Override
-					public boolean perform(ClientContext context) {
-						SimpleMessage message = (SimpleMessage) context.getMessageEvent().getMessage();
-						try {
-							Map<String, Number> connectionIdMap = (Map<String, Number>) mapper.readValue(
-									message.getBody(), Map.class);
-							connectionId = connectionIdMap.get(Constants.CONNECTION_ID_TITLE).longValue();
-							// TODO - might be null if getNewConnectResult()
-							// wasn't called
-							connectResult.put(true);
-							return true;
-						} catch (IOException ex) {
-						}
-
-						connectResult.put(false);
-						throw new RuntimeException("Invalid response from server");
-					}
-
-				});
+		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.RECEIVED_CONNECTED, ClientState.CONNECTED, null);
 
 		this.addTransition(ClientState.CONNECTED, ClientEvent.REQUEST_SUBSCRIBE, ClientState.WAITING_FOR_ACK,
 				new Action<ClientContext>() {

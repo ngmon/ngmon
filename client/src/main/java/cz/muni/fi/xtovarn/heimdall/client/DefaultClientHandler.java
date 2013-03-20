@@ -9,13 +9,23 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientContext;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientEvent;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientFSM;
+import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientProtocolContext;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 
 public class DefaultClientHandler extends SimpleChannelHandler {
 
 	private ClientFSM clientStateMachine = new ClientFSM(null);
+	private ClientProtocolContext clientProtocolContext;
 
 	private ResultFuture<Boolean> channelConnectedResult = new ResultFuture<>();
+
+	public DefaultClientHandler(ClientProtocolContext clientProtocolContext) {
+		this.clientProtocolContext = clientProtocolContext;
+	}
+
+	public ClientProtocolContext getClientProtocolContext() {
+		return clientProtocolContext;
+	}
 
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
@@ -29,12 +39,21 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 
 		switch (message.getDirective()) {
 		case CONNECTED:
-			clientStateMachine.readSymbol(ClientEvent.RECEIVED_CONNECTED, new ClientContext(ctx, e, null));
+			clientProtocolContext.connectResponse(e);
+			clientStateMachine.readSymbol(ClientEvent.RECEIVED_CONNECTED, null);
 			break;
 		case ERROR:
 			// TODO - exception if I get error and don't have action
 			// (ClientContext != null)
-			clientStateMachine.readSymbol(ClientEvent.ERROR, new ClientContext(ctx, e, null));
+			switch (clientStateMachine.getCurrentState()) {
+			// TODO - this only works for response to CONNECT message now
+			case WAITING_FOR_ACK:
+				clientProtocolContext.connectResponse(e);
+				break;
+			default:
+				clientStateMachine.readSymbol(ClientEvent.ERROR, new ClientContext(ctx, e, null));
+				break;
+			}
 			break;
 		case ACK:
 			// TODO - check current machine state and decide which symbol to
