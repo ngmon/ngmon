@@ -6,7 +6,6 @@ import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
-import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientContext;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientEvent;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientFSM;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientProtocolContext;
@@ -43,23 +42,12 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 			clientStateMachine.readSymbol(ClientEvent.RECEIVED_CONNECTED);
 			break;
 		case ERROR:
-			// TODO - exception if I get error and don't have action
-			// (ClientContext != null)
-			switch (clientStateMachine.getCurrentState()) {
-			// TODO - this only works for response to CONNECT message now
-			case WAITING_FOR_ACK:
-				clientProtocolContext.connectResponse(e);
-				break;
-			default:
-				// TODO
-				break;
-			}
+			clientProtocolContext.errorResponse(e);
+			clientStateMachine.readSymbol(ClientEvent.ERROR);
 			break;
 		case ACK:
-			// TODO - check current machine state and decide which symbol to
-			// read accordingly
-			clientProtocolContext.subscribeResponse(e);
-			clientStateMachine.readSymbol(ClientEvent.RECEIVED_SUBSCRIBE_ACK);
+			clientProtocolContext.ackResponse(e);
+			clientStateMachine.readSymbol(ClientEvent.RECEIVED_ACK);
 		}
 	}
 

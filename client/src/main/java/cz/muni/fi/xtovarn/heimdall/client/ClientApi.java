@@ -105,17 +105,15 @@ public class ClientApi {
 		return clientProtocolContext.wasLastSubscriptionSuccessful();
 	}
 
-	/*-public Future<Boolean> unsubscribe(Long subscriptionId) throws InterruptedException, ExecutionException {
-		checkConnected();
+	public Future<Boolean> unsubscribe(Long subscriptionId) throws InterruptedException, ExecutionException {
+		checkFsmState(ClientState.CONNECTED);
 
 		if (subscriptionId == null)
 			throw new IllegalArgumentException("unsubscribe()");
 
-		ClientContext actionContext = getContextFromChannel();
-		actionContext.setObject(subscriptionId);
-		clientFSM.readSymbol(ClientEvent.REQUEST_UNSUBSCRIBE, actionContext);
-		return clientFSM.getUnsubscribeResult();
-	}*/
+		clientFSM.readSymbol(ClientEvent.REQUEST_UNSUBSCRIBE);
+		return clientProtocolContext.unsubscribeRequest(channel, subscriptionId);
+	}
 
 	public void stop() {
 		ChannelFuture future = channel.close();

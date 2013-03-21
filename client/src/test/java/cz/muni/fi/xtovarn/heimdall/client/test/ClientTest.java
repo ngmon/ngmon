@@ -1,6 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.client.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -35,6 +36,8 @@ public class ClientTest {
 	public void before() throws InterruptedException, ExecutionException, TimeoutException {
 		client = ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE,
 				TIMEOUT_TIME_UNIT);
+		assertNotNull(client);
+		assertTrue(client.isConnected());
 	}
 
 	@After
@@ -44,7 +47,6 @@ public class ClientTest {
 
 	@Test
 	public void connect() throws InterruptedException, ExecutionException {
-		assertTrue(client.isConnected());
 	}
 
 	@Test
@@ -69,13 +71,24 @@ public class ClientTest {
 	}
 
 	@Test
-	public void subcribe() throws InterruptedException, ExecutionException {
-		connect();
+	public void subscribe() throws InterruptedException, ExecutionException {
 		assertEquals(0, client.getSubscriptionIds().size());
 		assertNotNull(client.subscribe(getPredicate()).get());
 		assertTrue(client.wasLastSubscriptionSuccessful());
 		assertEquals(1, client.getSubscriptionIds().size());
 		assertNotNull(client.getLastSubscriptionId());
+	}
+
+	@Test
+	public void unsubscribe() throws InterruptedException, ExecutionException {
+		subscribe();
+		assertTrue(client.unsubscribe(client.getLastSubscriptionId()).get());
+	}
+
+	@Test
+	public void unsubscribeInvalidId() throws InterruptedException, ExecutionException {
+		subscribe();
+		assertFalse(client.unsubscribe(client.getLastSubscriptionId() + 1).get());
 	}
 
 	// can't test this, since I need to get the client through the connection

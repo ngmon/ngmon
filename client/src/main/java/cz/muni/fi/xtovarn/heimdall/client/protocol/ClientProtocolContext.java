@@ -3,6 +3,7 @@ package cz.muni.fi.xtovarn.heimdall.client.protocol;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -26,16 +27,20 @@ public class ClientProtocolContext {
 
 	private ResultFuture<Boolean> connectResult = null;
 	private ResultFuture<Long> subscribeResult = null;
+	private ResultFuture<Boolean> unsubscribeResult = null;
 
 	private Long connectionId = null;
-	
+
 	private List<Long> subscriptionIds = new ArrayList<>();
 	private boolean lastSubscriptionSuccessful = false;
+
+	private ClientEvent lastRequest = null;
 
 	public Future<Boolean> connectRequest(Channel channel, User user) {
 		try {
 			connectResult = new ResultFuture<>();
 			channel.write(new SimpleMessage(Directive.CONNECT, mapper.writeValueAsBytes(user)));
+			lastRequest = ClientEvent.REQUEST_CONNECT;
 		} catch (JsonProcessingException e) {
 			// TODO - or throw RuntimeException?
 			connectResult.put(false);
@@ -76,6 +81,7 @@ public class ClientProtocolContext {
 		try {
 			subscribeResult = new ResultFuture<>();
 			channel.write(new SimpleMessage(Directive.SUBSCRIBE, mapper.writeValueAsBytes(predicate.toStringMap())));
+			lastRequest = ClientEvent.REQUEST_SUBSCRIBE;
 			return subscribeResult;
 		} catch (JsonProcessingException e) {
 			subscribeResult.put(null);
@@ -88,8 +94,8 @@ public class ClientProtocolContext {
 		Long subscriptionId = null;
 		try {
 			@SuppressWarnings("unchecked")
-			Map<String, Number> subscriptionIdMap = (Map<String, Number>) mapper.readValue(
-					message.getBody(), Map.class);
+			Map<String, Number> subscriptionIdMap = (Map<String, Number>) mapper
+					.readValue(message.getBody(), Map.class);
 			subscriptionId = subscriptionIdMap.get(Constants.SUBSCRIPTION_ID_TITLE).longValue();
 			if (subscriptionId != null) {
 				subscriptionIds.add(subscriptionId);
@@ -99,7 +105,6 @@ public class ClientProtocolContext {
 
 		lastSubscriptionSuccessful = subscriptionId != null;
 		subscribeResult.put(subscriptionId);
-		
 	}
 
 	public boolean wasLastSubscriptionSuccessful() {
@@ -109,12 +114,63 @@ public class ClientProtocolContext {
 	public List<Long> getSubscriptionIds() {
 		return Collections.unmodifiableList(subscriptionIds);
 	}
-	
+
 	public Long getLastSubscriptionId() {
 		if (subscriptionIds.isEmpty())
 			return null;
 		else
 			return subscriptionIds.get(subscriptionIds.size() - 1);
+	}
+
+	public Future<Boolean> unsubscribeRequest(Channel channel, Long subscriptionId) {
+		try {
+			unsubscribeResult = new ResultFuture<>();
+			Map<String, Long> unsubscribeMap = new HashMap<>();
+			unsubscribeMap.put(Constants.SUBSCRIPTION_ID_TITLE, subscriptionId);
+			channel.write(new SimpleMessage(Directive.UNSUBSCRIBE, mapper.writeValueAsBytes(unsubscribeMap)));
+			lastRequest = ClientEvent.REQUEST_UNSUBSCRIBE;
+			return unsubscribeResult;
+		} catch (JsonProcessingException e) {
+			unsubscribeResult.put(false);
+			return unsubscribeResult;
+		}
+	}
+
+	public void unsubscribeResponse(MessageEvent e) {
+		SimpleMessage message = (SimpleMessage) e.getMessage();
+		unsubscribeResult.put(message.getDirective().equals(Directive.ACK));
+	}
+
+	public ClientEvent getLastRequest() {
+		return lastRequest;
+	}
+
+	public void ackResponse(MessageEvent e) {
+		switch (getLastRequest()) {
+		case REQUEST_SUBSCRIBE:
+			subscribeResponse(e);
+			break;
+		case REQUEST_UNSUBSCRIBE:
+			unsubscribeResponse(e);
+			break;
+		default:
+			throw new IllegalArgumentException();
+		}
+	}
+
+	public void errorResponse(MessageEvent e) {
+		// TODO - what if lastRequest == null?
+		switch (getLastRequest()) {
+		case REQUEST_CONNECT:
+			connectResponse(e);
+			break;
+		case REQUEST_SUBSCRIBE:
+			subscribeResponse(e);
+			break;
+		case REQUEST_UNSUBSCRIBE:
+			unsubscribeResponse(e);
+			break;
+		}
 	}
 
 }
