@@ -58,7 +58,8 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 		case ACK:
 			// TODO - check current machine state and decide which symbol to
 			// read accordingly
-			clientStateMachine.readSymbol(ClientEvent.RECEIVED_SUBSCRIBE_ACK, new ClientContext(ctx, e, null));
+			clientProtocolContext.subscribeResponse(e);
+			clientStateMachine.readSymbol(ClientEvent.RECEIVED_SUBSCRIBE_ACK, null);
 		}
 	}
 

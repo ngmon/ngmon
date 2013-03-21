@@ -13,7 +13,6 @@ import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 
-import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientContext;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientEvent;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientFSM;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientProtocolContext;
@@ -29,8 +28,6 @@ public class ClientApi {
 	private DefaultClientHandler clientHandler = null;
 	private ClientProtocolContext clientProtocolContext = null;
 	private ClientFSM clientFSM = null;
-	private boolean preconnected = false;
-	private boolean connected = false;
 
 	public ClientApi(long timeout, TimeUnit unit) throws InterruptedException {
 		factory = new NioClientSocketChannelFactory(Executors.newSingleThreadExecutor(),
@@ -54,14 +51,9 @@ public class ClientApi {
 		clientProtocolContext = clientHandler.getClientProtocolContext();
 		clientFSM = clientHandler.getClientStateMachine();
 	}
-	
+
 	public Future<Boolean> getChannelConnectedResult() {
 		return clientHandler.getChannelConnectedResult();
-	}
-
-	private ClientContext getContextFromChannel() {
-		// TODO - static?
-		return new ClientContext(null, new ClientMessageEvent(channel, null, null, null), null);
 	}
 
 	public void checkFsmState(ClientState state) {
@@ -91,33 +83,26 @@ public class ClientApi {
 		return clientProtocolContext.isConnected();
 	}
 
-	private void checkConnected() throws InterruptedException, ExecutionException {
-		if (!isConnected())
-			throw new IllegalStateException("not connected");
-	}
-
 	public Future<Long> subscribe(Predicate predicate) throws InterruptedException, ExecutionException {
-		checkConnected();
+		checkFsmState(ClientState.CONNECTED);
 
 		if (predicate == null || predicate.isEmpty())
 			throw new IllegalArgumentException("subscribe()");
 
-		ClientContext actionContext = getContextFromChannel();
-		actionContext.setObject(predicate);
-		clientFSM.readSymbol(ClientEvent.REQUEST_SUBSCRIBE, actionContext);
-		return clientFSM.getSubscribeResult();
+		clientFSM.readSymbol(ClientEvent.REQUEST_SUBSCRIBE, null);
+		return clientProtocolContext.subscribeRequest(channel, predicate);
 	}
 
 	public List<Long> getSubscriptionIds() {
-		return clientFSM.getSubscriptionIds();
+		return clientProtocolContext.getSubscriptionIds();
 	}
 
 	public Long getLastSubscriptionId() {
-		return clientFSM.getLastSubscriptionId();
+		return clientProtocolContext.getLastSubscriptionId();
 	}
 
 	public boolean wasLastSubscriptionSuccessful() {
-		return clientFSM.wasLastSubscriptionSuccessful();
+		return clientProtocolContext.wasLastSubscriptionSuccessful();
 	}
 
 	/*-public Future<Boolean> unsubscribe(Long subscriptionId) throws InterruptedException, ExecutionException {
