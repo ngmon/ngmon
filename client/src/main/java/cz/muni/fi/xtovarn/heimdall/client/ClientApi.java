@@ -71,7 +71,7 @@ public class ClientApi {
 
 		User user = new User(login, passcode);
 
-		clientFSM.readSymbol(ClientEvent.REQUEST_CONNECT, null);
+		clientFSM.readSymbol(ClientEvent.REQUEST_CONNECT);
 		return clientProtocolContext.connectRequest(channel, user);
 	}
 
@@ -89,7 +89,7 @@ public class ClientApi {
 		if (predicate == null || predicate.isEmpty())
 			throw new IllegalArgumentException("subscribe()");
 
-		clientFSM.readSymbol(ClientEvent.REQUEST_SUBSCRIBE, null);
+		clientFSM.readSymbol(ClientEvent.REQUEST_SUBSCRIBE);
 		return clientProtocolContext.subscribeRequest(channel, predicate);
 	}
 

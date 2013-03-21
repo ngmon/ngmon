@@ -29,7 +29,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		clientStateMachine.readSymbol(ClientEvent.NETTY_TCP_CONNECTED, null);
+		clientStateMachine.readSymbol(ClientEvent.NETTY_TCP_CONNECTED);
 		channelConnectedResult.put(true);
 	}
 
@@ -40,7 +40,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 		switch (message.getDirective()) {
 		case CONNECTED:
 			clientProtocolContext.connectResponse(e);
-			clientStateMachine.readSymbol(ClientEvent.RECEIVED_CONNECTED, null);
+			clientStateMachine.readSymbol(ClientEvent.RECEIVED_CONNECTED);
 			break;
 		case ERROR:
 			// TODO - exception if I get error and don't have action
@@ -51,7 +51,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 				clientProtocolContext.connectResponse(e);
 				break;
 			default:
-				clientStateMachine.readSymbol(ClientEvent.ERROR, new ClientContext(ctx, e, null));
+				// TODO
 				break;
 			}
 			break;
@@ -59,7 +59,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 			// TODO - check current machine state and decide which symbol to
 			// read accordingly
 			clientProtocolContext.subscribeResponse(e);
-			clientStateMachine.readSymbol(ClientEvent.RECEIVED_SUBSCRIBE_ACK, null);
+			clientStateMachine.readSymbol(ClientEvent.RECEIVED_SUBSCRIBE_ACK);
 		}
 	}
 
