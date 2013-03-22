@@ -28,7 +28,7 @@ public class ClientTest {
 	private static final String INVALID_USER_PASSWORD = "passwordFoo";
 
 	private static final int TIMEOUT_VALUE = 5;
-	private static final TimeUnit TIMEOUT_TIME_UNIT = TimeUnit.MINUTES;
+	private static final TimeUnit TIMEOUT_TIME_UNIT = TimeUnit.SECONDS;
 
 	private ClientApi client = null;
 

@@ -36,18 +36,23 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
 
+		// it's crucial to change the state before calling ProtocolContext
+		// method, otherwise the user of the client may get the result
+		// (Future<>) before the state is changed and call another
+		// client method, which requires the new state, causing it to fail
 		switch (message.getDirective()) {
 		case CONNECTED:
-			clientProtocolContext.connectResponse(e);
 			clientStateMachine.readSymbol(ClientEvent.RECEIVED_CONNECTED);
+			clientProtocolContext.connectResponse(e);
 			break;
 		case ERROR:
-			clientProtocolContext.errorResponse(e);
 			clientStateMachine.readSymbol(ClientEvent.ERROR);
+			clientProtocolContext.errorResponse(e);
 			break;
 		case ACK:
-			clientProtocolContext.ackResponse(e);
 			clientStateMachine.readSymbol(ClientEvent.RECEIVED_ACK);
+			clientProtocolContext.ackResponse(e);
+			break;
 		}
 	}
 

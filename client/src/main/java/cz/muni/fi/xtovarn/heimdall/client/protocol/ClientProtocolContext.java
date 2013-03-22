@@ -39,8 +39,15 @@ public class ClientProtocolContext {
 	public Future<Boolean> connectRequest(Channel channel, User user) {
 		try {
 			connectResult = new ResultFuture<>();
-			channel.write(new SimpleMessage(Directive.CONNECT, mapper.writeValueAsBytes(user)));
+			// this must be done before the message is sent
+			// (otherwise it might happen that after sending the request
+			// to server, but before the lastRequest is set, the server
+			// processes the request, sends back a reply, client handler
+			// (messageReceived()) is called, and some methods (ackResponse(),
+			// errorResponse()) will want to read the lastRequest value)
+			// the same goes for similar methods, like subscribeRequest
 			lastRequest = ClientEvent.REQUEST_CONNECT;
+			channel.write(new SimpleMessage(Directive.CONNECT, mapper.writeValueAsBytes(user)));
 		} catch (JsonProcessingException e) {
 			// TODO - or throw RuntimeException?
 			connectResult.put(false);
@@ -80,8 +87,9 @@ public class ClientProtocolContext {
 	public Future<Long> subscribeRequest(Channel channel, Predicate predicate) {
 		try {
 			subscribeResult = new ResultFuture<>();
-			channel.write(new SimpleMessage(Directive.SUBSCRIBE, mapper.writeValueAsBytes(predicate.toStringMap())));
+			// this must be done before the message is sent
 			lastRequest = ClientEvent.REQUEST_SUBSCRIBE;
+			channel.write(new SimpleMessage(Directive.SUBSCRIBE, mapper.writeValueAsBytes(predicate.toStringMap())));
 			return subscribeResult;
 		} catch (JsonProcessingException e) {
 			subscribeResult.put(null);
@@ -127,8 +135,9 @@ public class ClientProtocolContext {
 			unsubscribeResult = new ResultFuture<>();
 			Map<String, Long> unsubscribeMap = new HashMap<>();
 			unsubscribeMap.put(Constants.SUBSCRIPTION_ID_TITLE, subscriptionId);
-			channel.write(new SimpleMessage(Directive.UNSUBSCRIBE, mapper.writeValueAsBytes(unsubscribeMap)));
+			// this must be done before the message is sent
 			lastRequest = ClientEvent.REQUEST_UNSUBSCRIBE;
+			channel.write(new SimpleMessage(Directive.UNSUBSCRIBE, mapper.writeValueAsBytes(unsubscribeMap)));
 			return unsubscribeResult;
 		} catch (JsonProcessingException e) {
 			unsubscribeResult.put(false);
