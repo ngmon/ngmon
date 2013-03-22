@@ -6,25 +6,24 @@ import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerContext;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerEvent;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerFSM;
+import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerProtocolContext;
 
 public class DefaultServerHandler extends SimpleChannelHandler {
 
 	private final SecureChannelGroup secureChannelGroup;
 
 	private final ServerFSM serverStateMachine;
-
-	private ObjectMapper mapper = new ObjectMapper();
+	private ServerProtocolContext serverProtocolContext;
 
 	public DefaultServerHandler(SecureChannelGroup secureChannelGroup) {
 		this.secureChannelGroup = secureChannelGroup;
+		this.serverProtocolContext = new ServerProtocolContext(secureChannelGroup);
 		this.serverStateMachine = new ServerFSM(this.secureChannelGroup);
 	}
 
@@ -63,18 +62,27 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 		ServerContext actionContext = new ServerContext(ctx, e, null);
 		switch (message.getDirective()) {
 		case CONNECT:
+			if (this.serverProtocolContext.connect(actionContext))
+				this.serverStateMachine.readSymbol(serverEvent);
+			break;
 		case DISCONNECT:
-			this.serverStateMachine.readSymbol(serverEvent, actionContext);
+			this.serverProtocolContext.disconnect(actionContext);
+			this.serverStateMachine.readSymbol(serverEvent);
 			break;
 		case SUBSCRIBE:
 			// change state to SUBSCRIPTION_RECEIVED immediately, then process
 			// the subscription
-			this.serverStateMachine.readSymbol(serverEvent, actionContext);
-			this.serverStateMachine.readSymbol(ServerEvent.PROCESS_SUBSCRIPTION, actionContext);
+			this.serverStateMachine.readSymbol(serverEvent);
+			this.serverProtocolContext.processSubscription(actionContext);
+			this.serverStateMachine.readSymbol(ServerEvent.SUBSCRIPTION_PROCESSED);
 			break;
 		case UNSUBSCRIBE:
-			this.serverStateMachine.readSymbol(serverEvent, actionContext);
-			this.serverStateMachine.readSymbol(ServerEvent.PROCESS_UNSUBSCRIBE, actionContext);
+			this.serverStateMachine.readSymbol(serverEvent);
+			this.serverProtocolContext.processUnsubscribe(actionContext);
+			this.serverStateMachine.readSymbol(ServerEvent.UNSUBSCRIBE_PROCESSED);
+			break;
+		default:
+			sendError(channel);
 			break;
 		}
 
@@ -82,7 +90,7 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		this.serverStateMachine.readSymbol(ServerEvent.NETTY_TCP_CONNECTED, null);
+		this.serverStateMachine.readSymbol(ServerEvent.NETTY_TCP_CONNECTED);
 	}
 
 	@Override
