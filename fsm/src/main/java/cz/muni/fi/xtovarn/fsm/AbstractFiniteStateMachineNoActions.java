@@ -22,6 +22,10 @@ public abstract class AbstractFiniteStateMachineNoActions<T1 extends Enum<T1>, T
         this.currentState = startState;
 	    this.DEBUG = debug;
     }
+    
+    public AbstractFiniteStateMachineNoActions(T1 startState, T1[] endStates, Class<T1> statesEnumClass) {
+    	this(startState, endStates, statesEnumClass, false);
+    }
 
     public void addTransition(T1 sourceState, T2 symbol, T1 targetState) {
         if (endStates.contains(sourceState)) {

@@ -6,7 +6,7 @@ import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 public class ClientFSM extends AbstractFiniteStateMachineNoActions<ClientState, ClientEvent> {
 
 	public ClientFSM(final SecureChannelGroup secureChannelGroup) {
-		super(ClientState.CREATED, new ClientState[] { ClientState.DISCONNECTED }, ClientState.class, false);
+		super(ClientState.CREATED, new ClientState[] { ClientState.DISCONNECTED }, ClientState.class);
 
 		buildTransitions(secureChannelGroup);
 	}
