@@ -1,5 +1,9 @@
 package cz.muni.fi.xtovarn.heimdall.commons.entity;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -8,12 +12,13 @@ import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.Relationship;
 import com.sleepycat.persist.model.SecondaryKey;
 
-import java.util.Date;
+import cz.muni.fi.publishsubscribe.countingtree.Attribute;
+import cz.muni.fi.publishsubscribe.countingtree.AttributeValue;
 
 @Entity
 @JsonRootName("Event")
 @JsonPropertyOrder({"occurrenceTime", "type", "_"})
-public class Event {
+public class Event implements cz.muni.fi.publishsubscribe.countingtree.Event {
 
 	@PrimaryKey(sequence = "event_long_sequence")
 	private long id;
@@ -47,9 +52,15 @@ public class Event {
 
 	@JsonProperty("_")
 	private Payload payload;
+	
+	private List<Attribute<? extends Comparable<?>>> attributes = new ArrayList<>();
 
 	public Event(){
 		this.payload = new Payload();
+	}
+	
+	private <TA extends Comparable<TA>> void addAttribute(String name, Class<TA> type, TA value) {
+		attributes.add(new Attribute<TA>(name, new AttributeValue<TA>(value, type)));
 	}
 
 	public long getId() {
@@ -58,6 +69,7 @@ public class Event {
 
 	public void setId(long id) {
 		this.id = id;
+		addAttribute("Id", Long.class, id);
 	}
 
 	public Date getOccurrenceTime() {
@@ -66,6 +78,7 @@ public class Event {
 
 	public void setOccurrenceTime(Date occurrenceTime) {
 		this.occurrenceTime = occurrenceTime;
+		addAttribute("occurenceTime", Date.class, occurrenceTime);
 	}
 
 	public Date getDetectionTime() {
@@ -74,6 +87,7 @@ public class Event {
 
 	public void setDetectionTime(Date detectionTime) {
 		this.detectionTime = detectionTime;
+		addAttribute("detectionTime", Date.class, detectionTime);
 	}
 
 	public String getHostname() {
@@ -82,6 +96,7 @@ public class Event {
 
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
+		addAttribute("hostname", String.class, hostname);
 	}
 
 	public String getType() {
@@ -90,6 +105,7 @@ public class Event {
 
 	public void setType(String type) {
 		this.type = type;
+		addAttribute("type", String.class, type);
 	}
 
 	public String getApplication() {
@@ -98,6 +114,7 @@ public class Event {
 
 	public void setApplication(String application) {
 		this.application = application;
+		addAttribute("application", String.class, application);
 	}
 
 	public String getProcess() {
@@ -106,6 +123,7 @@ public class Event {
 
 	public void setProcess(String process) {
 		this.process = process;
+		addAttribute("process", String.class, process);
 	}
 
 	public String getProcessId() {
@@ -114,6 +132,7 @@ public class Event {
 
 	public void setProcessId(String processId) {
 		this.processId = processId;
+		addAttribute("processId", String.class, processId);
 	}
 
 	public int getLevel() {
@@ -122,6 +141,7 @@ public class Event {
 
 	public void setLevel(int level) {
 		this.level = level;
+		addAttribute("level", Long.class, new Long(level));
 	}
 
 	public int getPriority() {
@@ -130,6 +150,7 @@ public class Event {
 
 	public void setPriority(int priority) {
 		this.priority = priority;
+		addAttribute("priority", Long.class, new Long(priority));
 	}
 
 	public Payload getPayload() {
@@ -172,5 +193,12 @@ public class Event {
 	@Override
 	public int hashCode() {
 		return (int) (id ^ (id >>> 32));
+	}
+
+	@Override
+	public List<Attribute<? extends Comparable<?>>> getAttributes() {
+		// TODO - check there are no duplicate attributes
+		// (happens if some set...() method is called more than once)
+		return attributes;
 	}
 }
