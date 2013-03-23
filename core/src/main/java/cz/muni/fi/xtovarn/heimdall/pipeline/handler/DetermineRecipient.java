@@ -2,27 +2,25 @@ package cz.muni.fi.xtovarn.heimdall.pipeline.handler;
 
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.dispatcher.Subscription;
+import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
+import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManagerSingleton;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class DetermineRecipient implements Handler {
 
+	private SubscriptionManager subscriptionManager;
+
+	public DetermineRecipient() {
+		subscriptionManager = SubscriptionManagerSingleton.getSubscriptionManager();
+	}
+
 	@Override
 	public Object handle(Object o) {
-		Set<String> recipients = new HashSet<String>(1);
+		Event event = (Event) o;
+		Set<String> recipients = subscriptionManager.getRecipients(event);
 
-		recipients.add("xdanos@1");
-		recipients.add("xdanos@2");
-		recipients.add("xdanos@3");
-		recipients.add("xdanos@4");
-		recipients.add("xdanos@5");
-		recipients.add("xdanos@6");
-		recipients.add("xdanos@7");
-		recipients.add("xdanos@8");
-		recipients.add("xdanos@9");
-		recipients.add("xdanos@10");
-
-		return new Subscription(recipients, (Event) o);
+		return new Subscription(recipients, event);
 	}
 }
