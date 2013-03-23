@@ -13,6 +13,7 @@ public enum Directive {
 	READY(22),
 	GET(23),
 	DISCONNECT(25),
+	STOP(26),
 	SEND_JSON(100),
 	SEND_SMILE(101),
 	ERROR(111);

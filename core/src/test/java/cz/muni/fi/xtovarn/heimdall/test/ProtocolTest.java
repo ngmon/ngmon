@@ -74,7 +74,7 @@ public class ProtocolTest {
 		}
 
 	}
-	
+
 	private static class DisconnectWithoutConnectMessageContainer extends MessageContainerImpl {
 
 		public DisconnectWithoutConnectMessageContainer() {
@@ -82,7 +82,7 @@ public class ProtocolTest {
 		}
 
 	}
-	
+
 	private static class DoubleDisconnectMessageContainer extends DisconnectMessageContainer {
 
 		public DoubleDisconnectMessageContainer() {
@@ -110,7 +110,13 @@ public class ProtocolTest {
 	private static class SubscribeMessageContainer extends ConnectMessageContainer {
 
 		public enum MESSAGE_TYPE {
-			VALID, INVALID_LESS_THAN_STRING, INVALID_NO_OPERATOR, INVALID_OPERATOR, INVALID_NO_VALUE, INVALID_NO_ATTRIBUTE, INVALID_NO_OPERATOR_VALUE
+			VALID,
+			INVALID_LESS_THAN_STRING,
+			INVALID_NO_OPERATOR,
+			INVALID_OPERATOR,
+			INVALID_NO_VALUE,
+			INVALID_NO_ATTRIBUTE,
+			INVALID_NO_OPERATOR_VALUE
 		}
 
 		public SubscribeMessageContainer() {
@@ -198,6 +204,126 @@ public class ProtocolTest {
 
 	}
 
+	private static class ReadyMessageContainer extends ConnectMessageContainer {
+
+		public ReadyMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.READY, "".getBytes()));
+		}
+
+	}
+	
+	private static class SubscribeAfterReadyMessageContainer extends ReadyMessageContainer {
+
+		public SubscribeAfterReadyMessageContainer() {
+			try {
+				Map<String, String> subscriptionMap = new HashMap<>();
+				subscriptionMap.put("priority", "#lt 2");
+				this.addMessage(new SimpleMessageWrapper(Directive.SUBSCRIBE, getMapper().writeValueAsBytes(
+						subscriptionMap)));
+
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+	}
+	
+	private static class ReadyAfterReadyMessageContainer extends ReadyMessageContainer {
+
+		public ReadyAfterReadyMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.READY, "".getBytes()));
+		}
+
+	}
+
+	private static class ReadyWithoutConnectMessageContainer extends MessageContainerImpl {
+
+		public ReadyWithoutConnectMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.READY, "".getBytes()));
+		}
+
+	}
+
+	private static class ReadyAfterDisconnectMessageContainer extends DisconnectMessageContainer {
+
+		public ReadyAfterDisconnectMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.READY, "".getBytes()));
+		}
+
+	}
+
+	private static class StopMessageContainer extends ReadyMessageContainer {
+
+		public StopMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.STOP, "".getBytes()));
+		}
+
+	}
+	
+	private static class StopAfterStopMessageContainer extends StopMessageContainer {
+
+		public StopAfterStopMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.STOP, "".getBytes()));
+		}
+
+	}
+	
+	private static class StopWithoutReadyMessageContainer extends ConnectMessageContainer {
+
+		public StopWithoutReadyMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.STOP, "".getBytes()));
+		}
+
+	}
+	
+	private static class StopWithoutConnectMessageContainer extends MessageContainerImpl {
+
+		public StopWithoutConnectMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.STOP, "".getBytes()));
+		}
+
+	}
+	
+	private static class StopAfterDisconnectMessageContainer extends DisconnectMessageContainer {
+
+		public StopAfterDisconnectMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.STOP, "".getBytes()));
+		}
+
+	}
+	
+	private static class GetMessageContainer extends ConnectMessageContainer {
+
+		public GetMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.GET, "".getBytes()));
+		}
+
+	}
+	
+	private static class GetWhenSendingMessageContainer extends ReadyMessageContainer {
+		
+		public GetWhenSendingMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.GET, "".getBytes()));
+		}
+		
+	}
+	
+	private static class GetWithoutConnectMessageContainer extends MessageContainerImpl {
+
+		public GetWithoutConnectMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.GET, "".getBytes()));
+		}
+
+	}
+	
+	private static class GetAfterDisconnectMessageContainer extends DisconnectMessageContainer {
+
+		public GetAfterDisconnectMessageContainer() {
+			this.addMessage(new SimpleMessageWrapper(Directive.GET, "".getBytes()));
+		}
+
+	}
+
 	private static class ConnectHandler extends TestClientHandler {
 
 		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
@@ -268,7 +394,7 @@ public class ProtocolTest {
 		}
 
 	}
-	
+
 	private static class DisconnectWithoutConnectHandler extends TestClientHandler {
 
 		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
@@ -292,7 +418,7 @@ public class ProtocolTest {
 		}
 
 	}
-	
+
 	private static class DoubleDisconnectHandler extends DisconnectHandler {
 
 		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
@@ -445,6 +571,342 @@ public class ProtocolTest {
 		}
 	}
 
+	private static class ReadyHandler extends ConnectHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ACK, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class SubscribeAfterReadyHandler extends ReadyHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class ReadyAfterReadyHandler extends ReadyHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class ReadyWithoutConnectHandler extends TestClientHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class ReadyAfterDisconnectHandler extends DisconnectHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class StopHandler extends ReadyHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ACK, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class StopAfterStopHandler extends StopHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class StopWithoutReadyHandler extends ConnectHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class StopWithoutConnectHandler extends TestClientHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class StopAfterDisconnectHandler extends DisconnectHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class GetHandler extends ConnectHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ACK, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class GetWhenSendingHandler extends ReadyHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class GetWithoutConnectHandler extends TestClientHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+	
+	private static class GetAfterDisconnectHandler extends DisconnectHandler {
+
+		private static final int MESSAGES_PROCESSED_BY_HANDLER = 1;
+
+		@Override
+		public void processReceivedMessage(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+			if (getMessageCount() >= super.getMessagesProcessedByHandler()
+					&& getMessageCount() < getMessagesProcessedByHandlerPrivate()) {
+				SimpleMessage message = (SimpleMessage) e.getMessage();
+				MyAssert.assertEquals(Directive.ERROR, message.getDirective());
+			}
+		}
+
+		private int getMessagesProcessedByHandlerPrivate() {
+			return super.getMessagesProcessedByHandler() + MESSAGES_PROCESSED_BY_HANDLER;
+		}
+
+		@Override
+		public int getMessagesProcessedByHandler() {
+			return getMessagesProcessedByHandlerPrivate();
+		}
+
+	}
+
 	@Test
 	public void testConnect() throws JsonProcessingException {
 		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
@@ -561,7 +1023,7 @@ public class ProtocolTest {
 		TestClient client = new TestClient(pipelineFactory, new SubscribeAfterDisconnectMessageContainer());
 		client.run();
 	}
-	
+
 	@Test
 	public void testDisconnectWithoutConnect() {
 		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
@@ -569,12 +1031,124 @@ public class ProtocolTest {
 		TestClient client = new TestClient(pipelineFactory, new DisconnectWithoutConnectMessageContainer());
 		client.run();
 	}
-	
+
 	@Test
 	public void testDoubleDisconnect() {
 		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
 		pipelineFactory.addHandler("disconnect", new DoubleDisconnectHandler());
 		TestClient client = new TestClient(pipelineFactory, new DoubleDisconnectMessageContainer());
+		client.run();
+	}
+
+	@Test
+	public void testReady() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("ready", new ReadyHandler());
+		TestClient client = new TestClient(pipelineFactory, new ReadyMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testReadyWithoutConnect() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("ready", new ReadyWithoutConnectHandler());
+		TestClient client = new TestClient(pipelineFactory, new ReadyWithoutConnectMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testReadyAfterDisconnect() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("ready", new ReadyAfterDisconnectHandler());
+		TestClient client = new TestClient(pipelineFactory, new ReadyAfterDisconnectMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testStop() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("stop", new StopHandler());
+		TestClient client = new TestClient(pipelineFactory, new StopMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testStopWithoutReady() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("stop", new StopWithoutReadyHandler());
+		TestClient client = new TestClient(pipelineFactory, new StopWithoutReadyMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testStopWithoutConnect() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("stop", new StopWithoutConnectHandler());
+		TestClient client = new TestClient(pipelineFactory, new StopWithoutConnectMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testStopAfterDisconnect() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("stop", new StopAfterDisconnectHandler());
+		TestClient client = new TestClient(pipelineFactory, new StopAfterDisconnectMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testGet() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("get", new GetHandler());
+		TestClient client = new TestClient(pipelineFactory, new GetMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testGetWhenSending() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("get", new GetWhenSendingHandler());
+		TestClient client = new TestClient(pipelineFactory, new GetWhenSendingMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testGetWithoutConnect() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("get", new GetWithoutConnectHandler());
+		TestClient client = new TestClient(pipelineFactory, new GetWithoutConnectMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testGetAfterDisconnect() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("get", new GetAfterDisconnectHandler());
+		TestClient client = new TestClient(pipelineFactory, new GetAfterDisconnectMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testReadyAfterReady() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("ready", new ReadyAfterReadyHandler());
+		TestClient client = new TestClient(pipelineFactory, new ReadyAfterReadyMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testStopAfterStop() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("stop", new StopAfterStopHandler());
+		TestClient client = new TestClient(pipelineFactory, new StopAfterStopMessageContainer());
+		client.run();
+	}
+	
+	@Test
+	public void testSubscribeAfterReady() {
+		ConfigurableClientPipelineFactory pipelineFactory = new ConfigurableClientPipelineFactory();
+		pipelineFactory.addHandler("subscribe", new SubscribeAfterReadyHandler());
+		TestClient client = new TestClient(pipelineFactory, new SubscribeAfterReadyMessageContainer());
 		client.run();
 	}
 }

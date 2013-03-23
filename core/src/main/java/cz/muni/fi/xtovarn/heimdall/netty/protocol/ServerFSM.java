@@ -19,6 +19,10 @@ public class ServerFSM extends AbstractFiniteStateMachineNoActions<ServerState, 
 		this.addTransition(ServerState.CONNECTED, ServerEvent.RECEIVED_UNSUBSCRIBE, ServerState.UNSUBSCRIBE_RECEIVED);
 		this.addTransition(ServerState.UNSUBSCRIBE_RECEIVED, ServerEvent.UNSUBSCRIBE_PROCESSED, ServerState.CONNECTED);
 		this.addTransition(ServerState.CONNECTED, ServerEvent.RECEIVED_DISCONNECT, ServerState.DISCONNECTED);
+		this.addTransition(ServerState.CONNECTED, ServerEvent.READY, ServerState.SENDING);
+		this.addTransition(ServerState.SENDING, ServerEvent.STOP, ServerState.CONNECTED);
+		// workaround so I don't have to check the state is CONNECTED when I receive GET (somewhere else manually)
+		this.addTransition(ServerState.CONNECTED, ServerEvent.GET, ServerState.CONNECTED);
 	}
 
 }

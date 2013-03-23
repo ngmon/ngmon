@@ -128,5 +128,24 @@ public class ServerProtocolContext {
 			sendError(channel);
 		}
 	}
+	
+	private void sendAck(Channel channel) {
+		channel.write(new SimpleMessage(Directive.ACK, "".getBytes()));
+	}
+
+	public void processReady(ServerContext actionContext) {
+		// TODO - implement
+		sendAck(actionContext.getMessageEvent().getChannel());
+	}
+
+	public void processStop(ServerContext actionContext) {
+		// TODO - implement
+		sendAck(actionContext.getMessageEvent().getChannel());
+	}
+
+	public void processGet(ServerContext actionContext) {
+		// TODO - implement
+		sendAck(actionContext.getMessageEvent().getChannel());
+	}
 
 }

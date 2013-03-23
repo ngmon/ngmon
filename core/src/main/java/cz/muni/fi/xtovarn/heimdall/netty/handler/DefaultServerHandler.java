@@ -41,6 +41,12 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 			return ServerEvent.RECEIVED_UNSUBSCRIBE;
 		case DISCONNECT:
 			return ServerEvent.RECEIVED_DISCONNECT;
+		case READY:
+			return ServerEvent.READY;
+		case STOP:
+			return ServerEvent.STOP;
+		case GET:
+			return ServerEvent.GET;
 		default:
 			return null;
 		}
@@ -54,7 +60,8 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 		// TODO - add description to the error message (based on current state
 		// and received message)
 		ServerEvent serverEvent = directiveToServerEvent(message.getDirective());
-		if (serverEvent == null || this.serverStateMachine.getNextState(serverEvent) == null) {
+		if (serverEvent == null || this.serverStateMachine.isEnded()
+				|| this.serverStateMachine.getNextState(serverEvent) == null) {
 			sendError(channel);
 			return;
 		}
@@ -80,6 +87,18 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 			this.serverStateMachine.readSymbol(serverEvent);
 			this.serverProtocolContext.processUnsubscribe(actionContext);
 			this.serverStateMachine.readSymbol(ServerEvent.UNSUBSCRIBE_PROCESSED);
+			break;
+		case READY:
+			this.serverStateMachine.readSymbol(serverEvent);
+			this.serverProtocolContext.processReady(actionContext);
+			break;
+		case STOP:
+			this.serverStateMachine.readSymbol(serverEvent);
+			this.serverProtocolContext.processStop(actionContext);
+			break;
+		case GET:
+			// the state doesn't change
+			this.serverProtocolContext.processGet(actionContext);
 			break;
 		default:
 			sendError(channel);
