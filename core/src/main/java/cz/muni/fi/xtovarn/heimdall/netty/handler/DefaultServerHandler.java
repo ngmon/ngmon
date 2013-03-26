@@ -114,6 +114,10 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 
 	@Override
 	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+		// this is probably unnecessary, since the disconnected channels are
+		// removed from the ChannelGroup automatically
+		this.serverProtocolContext.disconnect(e.getChannel());
+		// TODO - set the machine state to DISCONNECTED?
 		System.out.println("Channel disconnected...");
 	}
 }

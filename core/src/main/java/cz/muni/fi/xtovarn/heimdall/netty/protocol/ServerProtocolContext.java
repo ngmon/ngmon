@@ -80,6 +80,12 @@ public class ServerProtocolContext {
 
 		SimpleMessage replyMessage = new SimpleMessage(Directive.ACK, "".getBytes());
 		channel.write(replyMessage);
+		
+		disconnect(channel);
+	}
+	
+	public void disconnect(Channel channel) {
+		secureChannelGroup.remove(channel);
 	}
 
 	private void sendError(Channel channel) {
@@ -128,7 +134,7 @@ public class ServerProtocolContext {
 			sendError(channel);
 		}
 	}
-	
+
 	private void sendAck(Channel channel) {
 		channel.write(new SimpleMessage(Directive.ACK, "".getBytes()));
 	}
