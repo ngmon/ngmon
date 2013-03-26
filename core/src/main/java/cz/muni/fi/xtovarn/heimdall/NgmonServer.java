@@ -27,7 +27,7 @@ public class NgmonServer {
 		this.defaultDatabaseEnvironment = new DefaultDatabaseEnvironment();
 		EventStore eventStore = new EventDataAccessor(defaultDatabaseEnvironment.setup(baseDirectory));
 
-		PipelineFactory pipelineFactory = new DefaultPipelineFactory(eventStore, dispatcher);
+		PipelineFactory pipelineFactory = new DefaultPipelineFactory(eventStore, dispatcher, scg);
 		this.socketCollector = new SocketCollector(pipelineFactory);
 	}
 
