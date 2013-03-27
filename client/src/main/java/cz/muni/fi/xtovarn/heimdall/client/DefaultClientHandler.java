@@ -9,6 +9,7 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientEvent;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientFSM;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientProtocolContext;
+import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 
 public class DefaultClientHandler extends SimpleChannelHandler {
@@ -32,25 +33,44 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 		channelConnectedResult.put(true);
 	}
 
+	private ClientEvent directiveToClientEvent(Directive directive) {
+		switch (directive) {
+		case CONNECTED:
+			return ClientEvent.RECEIVED_CONNECTED;
+		case ERROR:
+			return ClientEvent.ERROR;
+		case ACK:
+			return ClientEvent.RECEIVED_ACK;
+		default:
+			return null;
+		}
+	}
+
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
+
+		ClientEvent clientEvent = directiveToClientEvent(message.getDirective());
+		if (clientEvent == null || this.clientStateMachine.isEnded()
+				|| this.clientStateMachine.getNextState(clientEvent) == null) {
+			// TODO - use checked exception?
+			throw new IllegalStateException("Unexpected response from server");
+		}
 
 		// it's crucial to change the state before calling ProtocolContext
 		// method, otherwise the user of the client may get the result
 		// (Future<>) before the state is changed and call another
 		// client method, which requires the new state, causing it to fail
+		clientStateMachine.readSymbol(clientEvent);
+		
 		switch (message.getDirective()) {
 		case CONNECTED:
-			clientStateMachine.readSymbol(ClientEvent.RECEIVED_CONNECTED);
 			clientProtocolContext.connectResponse(e);
 			break;
 		case ERROR:
-			clientStateMachine.readSymbol(ClientEvent.ERROR);
 			clientProtocolContext.errorResponse(e);
 			break;
 		case ACK:
-			clientStateMachine.readSymbol(ClientEvent.RECEIVED_ACK);
 			clientProtocolContext.ackResponse(e);
 			break;
 		}
