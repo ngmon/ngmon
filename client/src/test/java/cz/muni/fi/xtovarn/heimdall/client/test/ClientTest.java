@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import cz.muni.fi.xtovarn.heimdall.client.ClientApi;
 import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory;
+import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory.ConnectionException;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Constraint;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Operator;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
@@ -33,7 +34,7 @@ public class ClientTest {
 	private ClientApi client = null;
 
 	@Before
-	public void before() throws InterruptedException, ExecutionException, TimeoutException {
+	public void before() throws ConnectionException {
 		client = ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE,
 				TIMEOUT_TIME_UNIT);
 		assertNotNull(client);
@@ -50,14 +51,14 @@ public class ClientTest {
 	}
 
 	@Test
-	public void connectInvalidUser() throws InterruptedException, ExecutionException, TimeoutException {
+	public void connectInvalidUser() throws ConnectionException {
 		ClientApi client2 = ClientConnectionFactory.getClient(INVALID_USER_NAME, INVALID_USER_PASSWORD, TIMEOUT_VALUE,
 				TIMEOUT_TIME_UNIT);
 		assertNull(client2);
 	}
 
 	@Test
-	public void connectInvalidPassword() throws InterruptedException, ExecutionException, TimeoutException {
+	public void connectInvalidPassword() throws ConnectionException {
 		ClientApi client2 = ClientConnectionFactory.getClient(INVALID_USER_NAME, INVALID_USER_PASSWORD, TIMEOUT_VALUE,
 				TIMEOUT_TIME_UNIT);
 		assertNull(client2);
