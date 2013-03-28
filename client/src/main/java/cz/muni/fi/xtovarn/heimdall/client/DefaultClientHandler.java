@@ -33,14 +33,15 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 		channelConnectedResult.put(true);
 	}
 
-	private ClientEvent directiveToClientEvent(Directive directive) {
+	private ClientEvent directiveToClientEvent(Directive directive, ClientEvent lastRequest) {
 		switch (directive) {
 		case CONNECTED:
 			return ClientEvent.RECEIVED_CONNECTED;
 		case ERROR:
 			return ClientEvent.ERROR;
 		case ACK:
-			return ClientEvent.RECEIVED_ACK;
+			return lastRequest.equals(ClientEvent.REQUEST_READY) ? ClientEvent.RECEIVED_ACK_FOR_READY
+					: ClientEvent.RECEIVED_ACK;
 		default:
 			return null;
 		}
@@ -50,7 +51,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
 
-		ClientEvent clientEvent = directiveToClientEvent(message.getDirective());
+		ClientEvent clientEvent = directiveToClientEvent(message.getDirective(), clientProtocolContext.getLastRequest());
 		if (clientEvent == null || this.clientStateMachine.isEnded()
 				|| this.clientStateMachine.getNextState(clientEvent) == null) {
 			// TODO - use checked exception?
@@ -62,7 +63,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 		// (Future<>) before the state is changed and call another
 		// client method, which requires the new state, causing it to fail
 		clientStateMachine.readSymbol(clientEvent);
-		
+
 		switch (message.getDirective()) {
 		case CONNECTED:
 			clientProtocolContext.connectResponse(e);

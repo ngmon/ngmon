@@ -28,6 +28,8 @@ public class ClientProtocolContext {
 	private ResultFuture<Boolean> connectResult = null;
 	private ResultFuture<Long> subscribeResult = null;
 	private ResultFuture<Boolean> unsubscribeResult = null;
+	private ResultFuture<Boolean> readyRequest = null;
+	private ResultFuture<Boolean> stopRequest = null;
 
 	private Long connectionId = null;
 
@@ -162,6 +164,12 @@ public class ClientProtocolContext {
 		case REQUEST_UNSUBSCRIBE:
 			unsubscribeResponse(e);
 			break;
+		case REQUEST_READY:
+			readyRequest.put(true);
+			break;
+		case REQUEST_STOP:
+			stopRequest.put(true);
+			break;
 		default:
 			throw new IllegalArgumentException();
 		}
@@ -179,7 +187,29 @@ public class ClientProtocolContext {
 		case REQUEST_UNSUBSCRIBE:
 			unsubscribeResponse(e);
 			break;
+		case REQUEST_READY:
+			readyRequest.put(false);
+			break;
+		case REQUEST_STOP:
+			stopRequest.put(false);
+			break;
 		}
+	}
+
+	public Future<Boolean> readyRequest(Channel channel) {
+		readyRequest = new ResultFuture<>();
+		lastRequest = ClientEvent.REQUEST_READY;
+		channel.write(new SimpleMessage(Directive.READY, "".getBytes()));
+		
+		return readyRequest;
+	}
+	
+	public Future<Boolean> stopRequest(Channel channel) {
+		stopRequest = new ResultFuture<>();
+		lastRequest = ClientEvent.REQUEST_STOP;
+		channel.write(new SimpleMessage(Directive.STOP, "".getBytes()));
+		
+		return stopRequest;
 	}
 
 }

@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -105,5 +104,39 @@ public class ClientTest {
 			assertNull(client.getLastSubscriptionId());
 		}
 	}*/
+
+	@Test
+	public void readyWithNoSubscriptions() throws InterruptedException, ExecutionException {
+		assertTrue(client.ready().get());
+	}
+
+	@Test
+	public void readyWithOneSubscription() throws InterruptedException, ExecutionException {
+		subscribe();
+		assertTrue(client.ready().get());
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void stopWithoutReady() throws InterruptedException, ExecutionException {
+		assertFalse(client.stopSending().get());
+	}
+
+	@Test
+	public void stop() throws InterruptedException, ExecutionException {
+		readyWithOneSubscription();
+		assertTrue(client.stopSending().get());
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void readyAfterReady() throws InterruptedException, ExecutionException {
+		readyWithNoSubscriptions();
+		client.ready();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void stopAfterStop() throws InterruptedException, ExecutionException {
+		stop();
+		client.stopSending();
+	}
 
 }

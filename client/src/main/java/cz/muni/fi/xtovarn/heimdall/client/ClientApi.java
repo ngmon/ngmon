@@ -21,7 +21,11 @@ public interface ClientApi {
 	public boolean wasLastSubscriptionSuccessful();
 
 	public Future<Boolean> unsubscribe(Long subscriptionId) throws InterruptedException, ExecutionException;
+	
+	public Future<Boolean> ready();
 
 	public void stop();
+
+	public Future<Boolean> stopSending();
 
 }

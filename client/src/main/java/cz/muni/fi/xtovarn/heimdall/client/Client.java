@@ -154,4 +154,20 @@ public class Client implements ClientApi {
 		factory.releaseExternalResources();
 	}
 
+	@Override
+	public Future<Boolean> ready() {
+		checkFsmState(ClientState.CONNECTED);
+		
+		clientFSM.readSymbol(ClientEvent.REQUEST_READY);
+		return clientProtocolContext.readyRequest(channel);
+	}
+	
+	@Override
+	public Future<Boolean> stopSending() {
+		checkFsmState(ClientState.SENDING);
+		
+		clientFSM.readSymbol(ClientEvent.REQUEST_STOP);
+		return clientProtocolContext.stopRequest(channel);
+	}
+
 }
