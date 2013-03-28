@@ -140,13 +140,15 @@ public class ServerProtocolContext {
 	}
 
 	public void processReady(ServerContext actionContext) {
-		// TODO - implement
-		sendAck(actionContext.getMessageEvent().getChannel());
+		Channel channel = actionContext.getMessageEvent().getChannel();
+		secureChannelGroup.setReceiving(channel, true);
+		sendAck(channel);
 	}
 
 	public void processStop(ServerContext actionContext) {
-		// TODO - implement
-		sendAck(actionContext.getMessageEvent().getChannel());
+		Channel channel = actionContext.getMessageEvent().getChannel();
+		secureChannelGroup.setReceiving(channel, false);
+		sendAck(channel);
 	}
 
 	public void processGet(ServerContext actionContext) {

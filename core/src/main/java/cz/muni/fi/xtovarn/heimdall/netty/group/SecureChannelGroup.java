@@ -15,32 +15,43 @@
  */
 package cz.muni.fi.xtovarn.heimdall.netty.group;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGroup {
 
 	private ConcurrentMap<String, Integer> usernameToId = new ConcurrentHashMap<String, Integer>();
 	private ConcurrentMap<Integer, String> idToUsername = new ConcurrentHashMap<Integer, String>();
+	// Set might be better for this, but there is no ConcurrentHashSet...
+	private ConcurrentMap<String, Boolean> receivingUsers = new ConcurrentHashMap<>();
 
 	/* Util methods */
 	private int convertToId(String username) {
 		return usernameToId.get(username);
 	}
+
 	private String convertToUsername(int id) {
 		return idToUsername.get(id);
 	}
+
 	private void removeById(Integer id) {
-		usernameToId.remove(convertToUsername(id));
+		String username = convertToUsername(id);
+		usernameToId.remove(username);
 		idToUsername.remove(id);
+		receivingUsers.remove(username);
 	}
+
 	private void removeByUsername(String username) {
 		usernameToId.remove(username);
-		idToUsername.remove(convertToId(username));
+		int id = convertToId(username);
+		idToUsername.remove(id);
+		receivingUsers.remove(username);
 	}
 
 	public boolean add(String username, Channel channel) {
@@ -55,7 +66,7 @@ public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGr
 	public Channel find(String username) {
 		return super.find(convertToId(username));
 	}
-	
+
 	public String getUsername(Channel channel) {
 		return convertToUsername(channel.getId());
 	}
@@ -85,5 +96,19 @@ public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGr
 		}
 
 		return true;
+	}
+
+	public boolean setReceiving(Channel channel, boolean receiving) {
+		String username = getUsername(channel);
+		if (username == null)
+			return false;
+
+		// another option is to remove the item if receiving == false
+		receivingUsers.put(username, receiving);
+		return true;
+	}
+
+	public Set<String> getReceivingUsers() {
+		return Collections.unmodifiableSet(receivingUsers.keySet());
 	}
 }

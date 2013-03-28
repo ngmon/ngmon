@@ -28,7 +28,6 @@ public class DetermineRecipient implements Handler {
 		Event event = (Event) o;
 
 		Set<String> recipients;
-		Set<String> connectedRecipients = new HashSet<>();
 
 		try {
 			// get matching recipients
@@ -36,12 +35,9 @@ public class DetermineRecipient implements Handler {
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | IntrospectionException e) {
 			throw new RuntimeException(e);
 		}
+		
+		recipients.retainAll(secureChannelGroup.getReceivingUsers());
 
-		for (String recipient : recipients) {
-			if (secureChannelGroup.find(recipient) != null)
-				connectedRecipients.add(recipient);
-		}
-
-		return new Subscription(connectedRecipients, event);
+		return new Subscription(recipients, event);
 	}
 }
