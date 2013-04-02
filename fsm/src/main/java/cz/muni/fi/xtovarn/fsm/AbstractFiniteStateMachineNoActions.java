@@ -10,6 +10,8 @@ public abstract class AbstractFiniteStateMachineNoActions<T1 extends Enum<T1>, T
 	private final T1 startState;
 	private final Set<T1> endStates;
 	private T1 currentState;
+	
+	private Queue<T1> history;
 
 	private final boolean DEBUG;
 
@@ -20,6 +22,7 @@ public abstract class AbstractFiniteStateMachineNoActions<T1 extends Enum<T1>, T
 		this.startState = startState;
 		this.endStates = new HashSet<>(Arrays.asList(endStates));
 		this.currentState = startState;
+		this.history = new LinkedList<>();
 		this.DEBUG = debug;
 	}
 
@@ -62,7 +65,12 @@ public abstract class AbstractFiniteStateMachineNoActions<T1 extends Enum<T1>, T
 			System.out.println(String.format("[%s] %s: %s -> %s", this.toString(), symbol, currentState, nextState));
 		}
 
+		this.history.add(currentState);
 		this.currentState = nextState;
+	}
+	
+	synchronized protected void rollback() {
+		this.currentState = history.remove();
 	}
 
 	public synchronized T1 getNextState(T2 symbol) {
