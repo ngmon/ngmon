@@ -13,6 +13,7 @@ import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerContext;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerEvent;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerFSM;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerProtocolContext;
+import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
 
 public class DefaultServerHandler extends SimpleChannelHandler {
 
@@ -21,9 +22,9 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 	private final ServerFSM serverStateMachine;
 	private ServerProtocolContext serverProtocolContext;
 
-	public DefaultServerHandler(SecureChannelGroup secureChannelGroup) {
+	public DefaultServerHandler(SecureChannelGroup secureChannelGroup, SubscriptionManager subscriptionManager) {
 		this.secureChannelGroup = secureChannelGroup;
-		this.serverProtocolContext = new ServerProtocolContext(secureChannelGroup);
+		this.serverProtocolContext = new ServerProtocolContext(secureChannelGroup, subscriptionManager);
 		this.serverStateMachine = new ServerFSM(this.secureChannelGroup);
 	}
 

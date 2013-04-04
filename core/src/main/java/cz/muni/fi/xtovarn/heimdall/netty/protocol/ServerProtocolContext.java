@@ -17,7 +17,7 @@ import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
-import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManagerSingleton;
+import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
 import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionParser;
 
 public class ServerProtocolContext {
@@ -42,9 +42,11 @@ public class ServerProtocolContext {
 	private ObjectMapper mapper = new ObjectMapper();
 	private SecureChannelGroup secureChannelGroup;
 	private UserStore userStore = new UserStore();
+	private final SubscriptionManager subscriptionManager;
 
-	public ServerProtocolContext(SecureChannelGroup secureChannelGroup) {
+	public ServerProtocolContext(SecureChannelGroup secureChannelGroup, SubscriptionManager subscriptionManager) {
 		this.secureChannelGroup = secureChannelGroup;
+		this.subscriptionManager = subscriptionManager;
 	}
 
 	public boolean connect(ServerContext actionContext) {
@@ -80,10 +82,10 @@ public class ServerProtocolContext {
 
 		SimpleMessage replyMessage = new SimpleMessage(Directive.ACK, "".getBytes());
 		channel.write(replyMessage);
-		
+
 		disconnect(channel);
 	}
-	
+
 	public void disconnect(Channel channel) {
 		secureChannelGroup.remove(channel);
 	}
@@ -100,8 +102,8 @@ public class ServerProtocolContext {
 			@SuppressWarnings("unchecked")
 			Predicate predicate = SubscriptionParser.parseSubscription(mapper.readValue(
 					((SimpleMessage) messageEvent.getMessage()).getBody(), Map.class));
-			Long subscriptionId = SubscriptionManagerSingleton.getSubscriptionManager().addSubscription(
-					secureChannelGroup.getUsername(channel), predicate);
+			Long subscriptionId = this.subscriptionManager.addSubscription(secureChannelGroup.getUsername(channel),
+					predicate);
 			Map<String, Long> subscriptionIdMap = new HashMap<>();
 			subscriptionIdMap.put(Constants.SUBSCRIPTION_ID_TITLE, subscriptionId);
 			channel.write(new SimpleMessage(Directive.ACK, mapper.writeValueAsBytes(subscriptionIdMap)));
@@ -122,8 +124,8 @@ public class ServerProtocolContext {
 					.getMessage()).getBody(), Map.class);
 			Long subscriptionId = unsubscribeMap.get(Constants.SUBSCRIPTION_ID_TITLE).longValue();
 			if (subscriptionId != null) {
-				success = SubscriptionManagerSingleton.getSubscriptionManager().removeSubscription(
-						secureChannelGroup.getUsername(channel), subscriptionId);
+				success = this.subscriptionManager.removeSubscription(secureChannelGroup.getUsername(channel),
+						subscriptionId);
 			}
 		} catch (IOException e) {
 		}
