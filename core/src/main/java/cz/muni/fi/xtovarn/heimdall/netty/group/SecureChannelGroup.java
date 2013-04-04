@@ -103,8 +103,11 @@ public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGr
 		if (username == null)
 			return false;
 
-		// another option is to remove the item if receiving == false
-		receivingUsers.put(username, receiving);
+		if (receiving)
+			receivingUsers.put(username, receiving);
+		else
+			receivingUsers.remove(username);
+			
 		return true;
 	}
 
