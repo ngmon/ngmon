@@ -32,27 +32,6 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 		channel.write(new SimpleMessage(Directive.ERROR, "".getBytes()));
 	}
 
-	private ServerEvent directiveToServerEvent(Directive directive) {
-		switch (directive) {
-		case CONNECT:
-			return ServerEvent.RECEIVED_CONNECT;
-		case SUBSCRIBE:
-			return ServerEvent.RECEIVED_SUBSCRIBE;
-		case UNSUBSCRIBE:
-			return ServerEvent.RECEIVED_UNSUBSCRIBE;
-		case DISCONNECT:
-			return ServerEvent.RECEIVED_DISCONNECT;
-		case READY:
-			return ServerEvent.READY;
-		case STOP:
-			return ServerEvent.STOP;
-		case GET:
-			return ServerEvent.GET;
-		default:
-			return null;
-		}
-	}
-
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
@@ -60,7 +39,7 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 
 		// TODO - add description to the error message (based on current state
 		// and received message)
-		ServerEvent serverEvent = directiveToServerEvent(message.getDirective());
+		ServerEvent serverEvent = HandlerUtils.directiveToServerEvent(message.getDirective());
 		if (serverEvent == null || this.serverStateMachine.isEnded()
 				|| this.serverStateMachine.getNextState(serverEvent) == null) {
 			sendError(channel);
