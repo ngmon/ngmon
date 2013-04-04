@@ -69,7 +69,7 @@ public abstract class AbstractFiniteStateMachineNoActions<T1 extends Enum<T1>, T
 		this.currentState = nextState;
 	}
 	
-	synchronized protected void rollback() {
+	synchronized public void rollback() {
 		this.currentState = history.remove();
 	}
 

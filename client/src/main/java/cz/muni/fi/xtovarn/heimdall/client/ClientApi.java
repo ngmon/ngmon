@@ -27,5 +27,7 @@ public interface ClientApi {
 	public void stop();
 
 	public Future<Boolean> stopSending();
+	
+	public void reset();
 
 }

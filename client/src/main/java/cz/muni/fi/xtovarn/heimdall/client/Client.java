@@ -170,4 +170,11 @@ public class Client implements ClientApi {
 		return clientProtocolContext.stopRequest(channel);
 	}
 
+	@Override
+	public void reset() {
+		checkFsmState(ClientState.WAITING_FOR_ACK);
+		
+		clientFSM.rollback();
+	}
+
 }
