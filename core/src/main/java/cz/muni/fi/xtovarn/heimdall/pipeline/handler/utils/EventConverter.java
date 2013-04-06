@@ -64,10 +64,6 @@ public class EventConverter {
 			// ugly unchecked casts
 			pubSubEvent.addAttribute(new Attribute<>(attributeName, new AttributeValue<>((T1) result,
 					(Class<T1>) typeToClass(resultType))));
-
-			System.out.println("Method name = " + methodName);
-			System.out.println("Method return type = " + resultClass);
-			System.out.println("Method value = " + result);
 		}
 
 		return pubSubEvent;
