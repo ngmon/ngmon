@@ -43,6 +43,10 @@ public class EventConverter {
 			String attributeName = methodName.substring(3);
 			if (attributeName.isEmpty())
 				continue;
+			// change the first letter to lowercase (for example when method
+			// name is "getData", the corresponding attribute name is "data")
+			attributeName = Character.toLowerCase(attributeName.charAt(0))
+					+ (attributeName.length() > 1 ? attributeName.substring(1) : "");
 
 			TYPE resultType;
 			// String, Date, long, int
