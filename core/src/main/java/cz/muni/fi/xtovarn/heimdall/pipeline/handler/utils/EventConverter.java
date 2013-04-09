@@ -49,36 +49,30 @@ public class EventConverter {
 					+ (attributeName.length() > 1 ? attributeName.substring(1) : "");
 
 			TYPE resultType;
+			Class<? extends Comparable<?>> newResultClass = null;
 			// String, Date, long, int
 			if (resultClass.equals(Integer.TYPE) || resultClass.equals(Integer.class) || resultClass.equals(Long.TYPE)
-					|| resultClass.equals(Long.class)) {
+					|| resultClass.equals(Long.class) || resultClass.equals(Short.TYPE)
+					|| resultClass.equals(Short.class)) {
 				resultType = TYPE.INTEGER;
+				// we need to explicitly cast any (integral) number type to long
+				result = ((Number) result).longValue();
+				newResultClass = Long.class;
 			} else if (resultClass.equals(String.class)) {
 				resultType = TYPE.STRING;
+				newResultClass = String.class;
 			} else if (resultClass.equals(Date.class)) {
 				resultType = TYPE.DATE;
+				newResultClass = Date.class;
 			} else {
 				throw new IllegalArgumentException("Type " + resultClass + " is not supported");
 			}
 
 			// ugly unchecked casts
 			pubSubEvent.addAttribute(new Attribute<>(attributeName, new AttributeValue<>((T1) result,
-					(Class<T1>) typeToClass(resultType))));
+					(Class<T1>) newResultClass)));
 		}
 
 		return pubSubEvent;
-	}
-
-	private Class<? extends Comparable<?>> typeToClass(TYPE type) {
-		switch (type) {
-		case INTEGER:
-			return Long.class;
-		case STRING:
-			return String.class;
-		case DATE:
-			return Date.class;
-		default:
-			throw new IllegalArgumentException(type + " is not supported");
-		}
 	}
 }
