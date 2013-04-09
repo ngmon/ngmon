@@ -21,7 +21,7 @@ public class JSONMappingTest {
 	String type = "org.linux.cron.Started";
 	String application = "Cron";
 	String process = "cron";
-	String processId = "4219";
+	int processId = 4219;
 	int level = 5;
 	int priority = 4;
 
@@ -45,7 +45,7 @@ public class JSONMappingTest {
 			"\"hostname\":" + "\"" + hostname + "\"," +
 			"\"application\":" + "\"" + application + "\"," +
 			"\"process\":" + "\"" + process + "\"," +
-			"\"processId\":" + "\"" + processId + "\"," +
+			"\"processId\":" + processId + "," +
 			"\"level\":" + level + "," +
 			"\"priority\":" + priority +
 			"}}";

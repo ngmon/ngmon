@@ -37,7 +37,7 @@ public class Event {
 	private String process;
 
 	@SecondaryKey(name = "processId", relate = Relationship.MANY_TO_ONE)
-	private String processId;
+	private int processId;
 
 	@SecondaryKey(name = "level", relate = Relationship.MANY_TO_ONE)
 	private int level;
@@ -108,11 +108,11 @@ public class Event {
 		this.process = process;
 	}
 
-	public String getProcessId() {
+	public int getProcessId() {
 		return processId;
 	}
 
-	public void setProcessId(String processId) {
+	public void setProcessId(int processId) {
 		this.processId = processId;
 	}
 
@@ -150,7 +150,7 @@ public class Event {
 				", type='" + type + '\'' +
 				", application='" + application + '\'' +
 				", process='" + process + '\'' +
-				", processId='" + processId + '\'' +
+				", processId=" + processId +
 				", level=" + level +
 				", priority=" + priority +
 				", payload=" + payload +
