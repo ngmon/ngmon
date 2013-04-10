@@ -18,6 +18,9 @@ import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.Constants;
 import cz.muni.fi.xtovarn.heimdall.test.SimpleMessageWrapper.PrepareMessageAction;
 
+/**
+ * ONLY FOR LEGACY REASONS - DON'T USE, USE PROTOCOLTEST2 INSTEAD!
+ */
 public class ProtocolTest {
 
 	@Before

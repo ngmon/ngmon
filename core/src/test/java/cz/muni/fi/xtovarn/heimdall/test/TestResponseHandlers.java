@@ -43,13 +43,23 @@ public class TestResponseHandlers {
 			return connectionId;
 		}
 	};
-	
-	public static final ResponseHandler ACK_RESPONSE_HANDLER =new ResponseHandler() {
+
+	public static final ResponseHandler ACK_RESPONSE_HANDLER = new ResponseHandler() {
 
 		@Override
 		public Object processResponse(MessageEvent messageEvent) {
 			SimpleMessage message = (SimpleMessage) messageEvent.getMessage();
 			Assert.assertEquals(Directive.ACK, message.getDirective());
+			return null;
+		}
+	};
+
+	public static final ResponseHandler ERROR_RESPONSE_HANDLER = new ResponseHandler() {
+
+		@Override
+		public Object processResponse(MessageEvent messageEvent) {
+			SimpleMessage message = (SimpleMessage) messageEvent.getMessage();
+			Assert.assertEquals(Directive.ERROR, message.getDirective());
 			return null;
 		}
 	};

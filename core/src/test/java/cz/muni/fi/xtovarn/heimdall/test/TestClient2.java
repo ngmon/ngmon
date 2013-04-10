@@ -30,7 +30,7 @@ import cz.muni.fi.xtovarn.heimdall.netty.protocol.Constants;
 public class TestClient2 {
 
 	public interface TestMessage {
-		public Message getMessage(Map<String, Message> responseMap);
+		public Message getMessage(Map<String, Object> responseMap);
 	}
 
 	public interface ResponseHandler {
@@ -95,7 +95,7 @@ public class TestClient2 {
 
 			// send the message to server
 			CountDownLatch latch = channelHandler.getNewMessageReceivedLatch();
-			channel.write(message.getMessage(Collections.unmodifiableMap(responseMap))).awaitUninterruptibly();
+			channel.write(message.getMessage(Collections.unmodifiableMap(responseObjects))).awaitUninterruptibly();
 			// wait for the server response (will not work in async mode)
 			latch.await(TIMEOUT, TIMEOUT_UNIT);
 			// save the response data (for example subscription ID)
@@ -189,7 +189,7 @@ public class TestClient2 {
 			boolean unsubscribeInStop) {
 		TestMessage testMessage = new TestMessage() {
 			@Override
-			public Message getMessage(Map<String, Message> responseMap) {
+			public Message getMessage(Map<String, Object> responseObjects) {
 				return message;
 			}
 		};
