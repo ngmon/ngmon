@@ -13,6 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import cz.muni.fi.xtovarn.heimdall.client.Client;
 import cz.muni.fi.xtovarn.heimdall.client.ClientApi;
 import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory;
 import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory.ConnectionException;
@@ -30,11 +31,11 @@ public class ClientTest {
 	private static final int TIMEOUT_VALUE = 5;
 	private static final TimeUnit TIMEOUT_TIME_UNIT = TimeUnit.SECONDS;
 
-	private ClientApi client = null;
+	private Client client = null;
 
 	@Before
 	public void before() throws ConnectionException {
-		client = ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE,
+		client = (Client) ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE,
 				TIMEOUT_TIME_UNIT);
 		assertNotNull(client);
 		assertTrue(client.isConnected());

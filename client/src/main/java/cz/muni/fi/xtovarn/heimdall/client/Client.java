@@ -75,18 +75,10 @@ public class Client implements ClientApi {
 		return clientProtocolContext.connectRequest(channel, user);
 	}
 
-	/* (non-Javadoc)
-	 * @see cz.muni.fi.xtovarn.heimdall.client.ClientApi#getConnectionId()
-	 */
-	@Override
 	public Long getConnectionId() {
 		return clientProtocolContext.getConnectionId();
 	}
 
-	/* (non-Javadoc)
-	 * @see cz.muni.fi.xtovarn.heimdall.client.ClientApi#isConnected()
-	 */
-	@Override
 	public boolean isConnected() {
 		return clientProtocolContext.isConnected();
 	}
@@ -105,26 +97,14 @@ public class Client implements ClientApi {
 		return clientProtocolContext.subscribeRequest(channel, predicate);
 	}
 
-	/* (non-Javadoc)
-	 * @see cz.muni.fi.xtovarn.heimdall.client.ClientApi#getSubscriptionIds()
-	 */
-	@Override
 	public List<Long> getSubscriptionIds() {
 		return clientProtocolContext.getSubscriptionIds();
 	}
 
-	/* (non-Javadoc)
-	 * @see cz.muni.fi.xtovarn.heimdall.client.ClientApi#getLastSubscriptionId()
-	 */
-	@Override
 	public Long getLastSubscriptionId() {
 		return clientProtocolContext.getLastSubscriptionId();
 	}
 
-	/* (non-Javadoc)
-	 * @see cz.muni.fi.xtovarn.heimdall.client.ClientApi#wasLastSubscriptionSuccessful()
-	 */
-	@Override
 	public boolean wasLastSubscriptionSuccessful() {
 		return clientProtocolContext.wasLastSubscriptionSuccessful();
 	}
