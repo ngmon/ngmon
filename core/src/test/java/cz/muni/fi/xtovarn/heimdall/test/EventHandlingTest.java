@@ -152,48 +152,48 @@ public class EventHandlingTest {
 
 	@Test
 	public void testSubscribeOnTypeEqualsStarted5() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "eq", "org.linux.cron.Started5", 1);
+		testSubscribeOnePredicate("type", "eq", "'org.linux.cron.Started5'", 1);
 	}
 
 	@Test
 	public void testSubscribeOnTypeEqualsStarted20() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "eq", "org.linux.cron.Started20", 0);
+		testSubscribeOnePredicate("type", "eq", "'org.linux.cron.Started20'", 0);
 	}
 
 	@Test
 	public void testSubscribeOnTypePrefixStarted20() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "pref", "org.linux.cron.Started20", 0);
+		testSubscribeOnePredicate("type", "pref", "'org.linux.cron.Started20'", 0);
 	}
 
 	@Test
 	public void testSubscribeOnTypePrefixStarted() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "pref", "org.linux.cron.Started", 10);
+		testSubscribeOnePredicate("type", "pref", "'org.linux.cron.Started'", 10);
 	}
 
 	@Test
 	public void testSubscribeOnTypePrefixStarted1() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "pref", "org.linux.cron.Started1", 2);
+		testSubscribeOnePredicate("type", "pref", "'org.linux.cron.Started1'", 2);
 	}
 
 	@Test
 	public void testSubscribeOnTypePrefixFoo() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "pref", "foo", 0);
+		testSubscribeOnePredicate("type", "pref", "'foo'", 0);
 	}
 
 	@Test
 	public void testSubscribeOnNonexistingAttributeEqualsFoo() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("foo", "eq", "foo", 0);
+		testSubscribeOnePredicate("foo", "eq", "'foo'", 0);
 	}
 
 	@Test
 	public void testSubscribeOnNonexistingAttributePrefixFoo() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("foo", "pref", "foo", 0);
+		testSubscribeOnePredicate("foo", "pref", "'foo'", 0);
 	}
 
 	@Test
 	public void testTwoPredicatesInOneSubscriptionNoneMatched2() throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
-		subscriptionMap.put("type", "#eq org.linux.cron.Started8");
+		subscriptionMap.put("type", "#eq 'org.linux.cron.Started8'");
 		subscriptionMap.put("processId", "#eq 5000");
 		testSubscribeOneSubscription(subscriptionMap, 0);
 	}
@@ -201,7 +201,7 @@ public class EventHandlingTest {
 	@Test
 	public void testTwoPredicatesInOneSubscriptionNoneMatched() throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
-		subscriptionMap.put("type", "#eq org.linux.cron.Started20");
+		subscriptionMap.put("type", "#eq 'org.linux.cron.Started20'");
 		subscriptionMap.put("processId", "#eq 5000");
 		testSubscribeOneSubscription(subscriptionMap, 0);
 	}
@@ -209,7 +209,7 @@ public class EventHandlingTest {
 	@Test
 	public void testTwoPredicatesInOneSubscriptionNoneMatched5() throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
-		subscriptionMap.put("type", "#pref org.linux.cron.Started5");
+		subscriptionMap.put("type", "#pref 'org.linux.cron.Started5'");
 		subscriptionMap.put("processId", "#eq 5000");
 		testSubscribeOneSubscription(subscriptionMap, 0);
 	}
@@ -217,7 +217,7 @@ public class EventHandlingTest {
 	@Test
 	public void testTwoPredicatesInOneSubscriptionNoneMatched4() throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
-		subscriptionMap.put("type", "#pref org.linux.cron.Started1");
+		subscriptionMap.put("type", "#pref 'org.linux.cron.Started1'");
 		subscriptionMap.put("processId", "#eq 5000");
 		testSubscribeOneSubscription(subscriptionMap, 0);
 	}
@@ -225,7 +225,7 @@ public class EventHandlingTest {
 	@Test
 	public void testTwoPredicatesInOneSubscriptionNoneMatched3() throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
-		subscriptionMap.put("type", "#eq org.linux.cron.Started20");
+		subscriptionMap.put("type", "#eq 'org.linux.cron.Started20'");
 		subscriptionMap.put("processId", "#eq 4219");
 		testSubscribeOneSubscription(subscriptionMap, 0);
 	}
@@ -233,7 +233,7 @@ public class EventHandlingTest {
 	@Test
 	public void testTwoPredicatesInOneSubscriptionAllMatched() throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
-		subscriptionMap.put("type", "#pref org.linux.cron.Started");
+		subscriptionMap.put("type", "#pref 'org.linux.cron.Started'");
 		subscriptionMap.put("processId", "#eq 4219");
 		testSubscribeOneSubscription(subscriptionMap, 10);
 	}
@@ -241,7 +241,7 @@ public class EventHandlingTest {
 	@Test
 	public void testTwoPredicatesInOneSubscriptionOneMatched() throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
-		subscriptionMap.put("type", "#pref org.linux.cron.Started5");
+		subscriptionMap.put("type", "#pref 'org.linux.cron.Started5'");
 		subscriptionMap.put("processId", "#eq 4219");
 		testSubscribeOneSubscription(subscriptionMap, 1);
 	}
@@ -249,7 +249,7 @@ public class EventHandlingTest {
 	@Test
 	public void testTwoPredicatesInOneSubscriptionTwoMatched() throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
-		subscriptionMap.put("type", "#pref org.linux.cron.Started1");
+		subscriptionMap.put("type", "#pref 'org.linux.cron.Started1'");
 		subscriptionMap.put("processId", "#eq 4219");
 		testSubscribeOneSubscription(subscriptionMap, 2);
 	}
@@ -269,42 +269,42 @@ public class EventHandlingTest {
 	@Test
 	public void testTwoSubscriptionsOneMatched() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#eq org.linux.cron.Started8", "processId", "#eq 5000"),
+				getSubscriptionMapsForTwoSubscriptions("type", "#eq 'org.linux.cron.Started8'", "processId", "#eq 5000"),
 				1);
 	}
 
 	@Test
 	public void testTwoSubscriptionsNoneMatched() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#eq org.linux.cron.Started20", "processId", "#eq 5000"),
+				getSubscriptionMapsForTwoSubscriptions("type", "#eq 'org.linux.cron.Started20'", "processId", "#eq 5000"),
 				0);
 	}
 
 	@Test
 	public void testTwoSubscriptionsOneMatched2() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#pref org.linux.cron.Started5", "processId", "#eq 5000"),
+				getSubscriptionMapsForTwoSubscriptions("type", "#pref 'org.linux.cron.Started5'", "processId", "#eq 5000"),
 				1);
 	}
 
 	@Test
 	public void testTwoSubscriptionsTwoMatched() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#pref \'org.linux.cron.Started1\'", "processId",
+				getSubscriptionMapsForTwoSubscriptions("type", "#pref 'org.linux.cron.Started1'", "processId",
 						"#eq 5000"), 2);
 	}
 
 	@Test
 	public void testTwoSubscriptionsAllMatched() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#eq org.linux.cron.Started20", "processId", "#eq 4219"),
+				getSubscriptionMapsForTwoSubscriptions("type", "#eq 'org.linux.cron.Started20'", "processId", "#eq 4219"),
 				10);
 	}
 
 	@Test
 	public void testTwoSubscriptionsAllMatched2() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#pref org.linux.cron.Started", "processId", "#eq 4219"),
+				getSubscriptionMapsForTwoSubscriptions("type", "#pref 'org.linux.cron.Started'", "processId", "#eq 4219"),
 				10);
 	}
 

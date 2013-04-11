@@ -156,7 +156,7 @@ public class ProtocolTest {
 		connect();
 		testClient.addMessage(
 				new SimpleMessage(Directive.SUBSCRIBE, mapper.writeValueAsBytesNoExceptions(getSubscriptionMap(
-						"priority", "#lt abcd"))), SUBSCRIPTION_ID_KEY, TestResponseHandlers.ERROR_RESPONSE_HANDLER);
+						"priority", "#lt 'abcd'"))), SUBSCRIPTION_ID_KEY, TestResponseHandlers.ERROR_RESPONSE_HANDLER);
 		testClient.run();
 	}
 
@@ -165,7 +165,7 @@ public class ProtocolTest {
 		connect();
 		testClient.addMessage(
 				new SimpleMessage(Directive.SUBSCRIBE, mapper.writeValueAsBytesNoExceptions(getSubscriptionMap(
-						"priority", "foo"))), SUBSCRIPTION_ID_KEY, TestResponseHandlers.ERROR_RESPONSE_HANDLER);
+						"priority", "'foo'"))), SUBSCRIPTION_ID_KEY, TestResponseHandlers.ERROR_RESPONSE_HANDLER);
 		testClient.run();
 	}
 
