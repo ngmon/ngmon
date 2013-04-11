@@ -1,12 +1,12 @@
-package cz.muni.fi.xtovarn.heimdall.test;
+package cz.muni.fi.xtovarn.heimdall.test.util;
 
 import java.util.concurrent.CountDownLatch;
 
 import org.jboss.netty.channel.MessageEvent;
 
-import cz.muni.fi.xtovarn.heimdall.test.TestClient2.MessageHandler;
+import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.MessageHandler;
 
-class MessageHandlerWithCounter implements MessageHandler {
+public class MessageHandlerWithCounter implements MessageHandler {
 
 	private int messageCount = 0;
 	private CountDownLatch countDownLatch = null;

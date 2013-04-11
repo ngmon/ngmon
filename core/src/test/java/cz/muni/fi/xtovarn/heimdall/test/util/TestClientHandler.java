@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.test;
+package cz.muni.fi.xtovarn.heimdall.test.util;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -11,10 +11,10 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
-import cz.muni.fi.xtovarn.heimdall.test.TestClient2.MessageHandler;
-import cz.muni.fi.xtovarn.heimdall.test.TestClient2.ResponseHandler;
+import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.MessageHandler;
+import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.ResponseHandler;
 
-public class TestClient2Handler extends SimpleChannelHandler {
+public class TestClientHandler extends SimpleChannelHandler {
 
 	private int messageCount = 0;
 
@@ -26,7 +26,7 @@ public class TestClient2Handler extends SimpleChannelHandler {
 	private Object lastResponseObject = null;
 	private MessageHandler unsolicitedMessageHandler;
 
-	public TestClient2Handler(List<ResponseHandler> responseHandlers, MessageHandler unsolicitedMessageHandler) {
+	public TestClientHandler(List<ResponseHandler> responseHandlers, MessageHandler unsolicitedMessageHandler) {
 		this.responseHandlers = responseHandlers;
 		this.unsolicitedMessageHandler = unsolicitedMessageHandler;
 	}

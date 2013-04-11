@@ -18,6 +18,11 @@ import org.junit.Test;
 import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
+import cz.muni.fi.xtovarn.heimdall.test.util.MessageHandlerWithCounter;
+import cz.muni.fi.xtovarn.heimdall.test.util.ObjectMapperWrapper;
+import cz.muni.fi.xtovarn.heimdall.test.util.TestClient;
+import cz.muni.fi.xtovarn.heimdall.test.util.TestResponseHandlers;
+import cz.muni.fi.xtovarn.heimdall.test.util.TestSensor;
 
 public class EventHandlingTest {
 
@@ -29,11 +34,11 @@ public class EventHandlingTest {
 	private static final String VALID_USER_PASSCODE = "password0";
 	private static ObjectMapperWrapper mapper = new ObjectMapperWrapper();
 
-	private TestClient2 testClient = null;
+	private TestClient testClient = null;
 
 	@Before
 	public void setUp() {
-		testClient = new TestClient2();
+		testClient = new TestClient();
 	}
 
 	@After
@@ -87,7 +92,7 @@ public class EventHandlingTest {
 		// countDownLatch.await(TestClient2.TIMEOUT, TestClient2.TIMEOUT_UNIT);
 
 		// wait a while for all events to arrive
-		Thread.sleep(TestClient2.EVENT_TIMEOUT_IN_MILLIS);
+		Thread.sleep(TestClient.EVENT_TIMEOUT_IN_MILLIS);
 
 		Assert.assertEquals(expectedEventCount, messageHandler.getMessageCount());
 	}
@@ -119,7 +124,7 @@ public class EventHandlingTest {
 		br.close();
 		sensor.close();
 
-		Thread.sleep(TestClient2.EVENT_TIMEOUT_IN_MILLIS);
+		Thread.sleep(TestClient.EVENT_TIMEOUT_IN_MILLIS);
 
 		Assert.assertEquals(expectedEventCount, messageHandler.getMessageCount());
 	}
@@ -299,7 +304,7 @@ public class EventHandlingTest {
 	@Test
 	public void testTwoSubscriptionsTwoMatched() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#pref org.linux.cron.Started1", "processId", "#eq 5000"),
+				getSubscriptionMapsForTwoSubscriptions("type", "#pref \'org.linux.cron.Started1\'", "processId", "#eq 5000"),
 				2);
 	}
 
@@ -341,7 +346,7 @@ public class EventHandlingTest {
 		br.close();
 		sensor.close();
 
-		Thread.sleep(TestClient2.EVENT_TIMEOUT_IN_MILLIS);
+		Thread.sleep(TestClient.EVENT_TIMEOUT_IN_MILLIS);
 
 		Assert.assertEquals(0, messageHandler.getMessageCount());
 	}
@@ -374,7 +379,7 @@ public class EventHandlingTest {
 		br.close();
 		sensor.close();
 
-		Thread.sleep(TestClient2.EVENT_TIMEOUT_IN_MILLIS);
+		Thread.sleep(TestClient.EVENT_TIMEOUT_IN_MILLIS);
 
 		Assert.assertEquals(0, messageHandler.getMessageCount());
 	}

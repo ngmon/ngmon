@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.test;
+package cz.muni.fi.xtovarn.heimdall.test.util;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

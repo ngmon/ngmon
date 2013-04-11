@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.test;
+package cz.muni.fi.xtovarn.heimdall.test.util;
 
 import java.util.Map;
 
@@ -8,7 +8,7 @@ import org.junit.Assert;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.Constants;
-import cz.muni.fi.xtovarn.heimdall.test.TestClient2.ResponseHandler;
+import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.ResponseHandler;
 
 public class TestResponseHandlers {
 

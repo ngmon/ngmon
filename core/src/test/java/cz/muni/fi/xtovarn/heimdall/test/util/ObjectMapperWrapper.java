@@ -1,11 +1,11 @@
-package cz.muni.fi.xtovarn.heimdall.test;
+package cz.muni.fi.xtovarn.heimdall.test.util;
 
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-class ObjectMapperWrapper extends ObjectMapper {
+public class ObjectMapperWrapper extends ObjectMapper {
 
 	private static final long serialVersionUID = 1L;
 

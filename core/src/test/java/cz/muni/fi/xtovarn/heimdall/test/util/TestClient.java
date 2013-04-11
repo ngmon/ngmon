@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.test;
+package cz.muni.fi.xtovarn.heimdall.test.util;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import cz.muni.fi.xtovarn.heimdall.netty.message.Message;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.Constants;
 
-public class TestClient2 {
+public class TestClient {
 
 	public interface TestMessage {
 		public Message getMessage(Map<String, Object> responseMap);
@@ -57,7 +57,6 @@ public class TestClient2 {
 	public static final long EVENT_TIMEOUT_IN_MILLIS = 1000;
 
 	private List<TestMessage> messages = new ArrayList<>();
-	private Map<String, Message> responseMap = new HashMap<>();
 	private Map<String, Object> responseObjects = new HashMap<>();
 	private List<String> responseKeys = new ArrayList<>();
 	private List<ResponseHandler> responseHandlers = new ArrayList<>();
@@ -66,7 +65,7 @@ public class TestClient2 {
 	private Collection<Long> subscriptionIds = new ArrayList<>();
 	private Channel channel = null;
 	private ChannelFactory factory;
-	private TestClient2Handler channelHandler;
+	private TestClientHandler channelHandler;
 	private int messagesProcessed = 0;
 	private ObjectMapper mapper = new ObjectMapper();
 
@@ -76,7 +75,7 @@ public class TestClient2 {
 		factory = new NioClientSocketChannelFactory(Executors.newSingleThreadExecutor(),
 				Executors.newSingleThreadExecutor());
 		ClientBootstrap bootstrap = new ClientBootstrap(factory);
-		TestClient2PipelineFactory pipelineFactory = new TestClient2PipelineFactory(responseHandlers,
+		TestClientPipelineFactory pipelineFactory = new TestClientPipelineFactory(responseHandlers,
 				unsolicitedMessageHandler);
 		bootstrap.setPipelineFactory(pipelineFactory);
 		bootstrap.setOption("tcpNoDelay", true);
@@ -84,7 +83,7 @@ public class TestClient2 {
 		ChannelFuture future = bootstrap.connect(new InetSocketAddress(NettyServer.SERVER_PORT));
 		future.awaitUninterruptibly();
 		channel = future.getChannel();
-		channelHandler = (TestClient2Handler) channel.getPipeline().getContext(MESSAGE_HANDLER_TITLE).getHandler();
+		channelHandler = (TestClientHandler) channel.getPipeline().getContext(MESSAGE_HANDLER_TITLE).getHandler();
 
 		int messagesCount = messages.size();
 		for (messagesProcessed = 0; messagesProcessed < messagesCount; messagesProcessed++) {
