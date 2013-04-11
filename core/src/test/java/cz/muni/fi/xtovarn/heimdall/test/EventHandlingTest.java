@@ -3,7 +3,6 @@ package cz.muni.fi.xtovarn.heimdall.test;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,7 +29,6 @@ import cz.muni.fi.xtovarn.heimdall.test.util.TestSensor;
 public class EventHandlingTest {
 
 	private static final String CONNECTION_ID_KEY = "connectionId";
-	private static final String SUBSCRIPTION_ID_1_KEY = "subscriptionId1";
 	private static final String SUBSCRIPTION_ID_KEY_PREFIX = "subscriptionId";
 
 	private static final String VALID_USER_LOGIN = "user0";
@@ -44,14 +42,14 @@ public class EventHandlingTest {
 	public void setUp() throws DatabaseException, IOException, InterruptedException {
 		this.ngmon = new NgmonLauncher();
 		this.ngmon.start();
-		
+
 		testClient = new TestClient();
 	}
 
 	@After
 	public void tearDown() {
 		testClient.stop();
-		
+
 		this.ngmon.stop();
 	}
 
@@ -71,43 +69,8 @@ public class EventHandlingTest {
 				TestResponseHandlers.ACK_RESPONSE_HANDLER);
 	}
 
-	@Test
-	public void testSubscribeGetEventsFromString() throws InterruptedException, UnknownHostException, IOException {
-		connect();
-
-		final Map<String, String> subscriptionMap = new HashMap<>();
-		subscriptionMap.put("type", "#eq org.linux.cron.Started1");
-		testClient.addMessage(
-				new SimpleMessage(Directive.SUBSCRIBE, mapper.writeValueAsBytesNoExceptions(subscriptionMap)),
-				SUBSCRIPTION_ID_1_KEY, TestResponseHandlers.SUBSCRIBE_RESPONSE_HANDLER, true);
-
-		ready();
-
-		MessageHandlerWithCounter messageHandler = new MessageHandlerWithCounter();
-		int expectedEventCount = 1;
-		// CountDownLatch countDownLatch =
-		// messageHandler.setAndGetCountDownLatch(expectedEventCount);
-		testClient.addUnsolicitedMessageHandler(messageHandler);
-
-		testClient.run(false);
-
-		TestSensor sensor = new TestSensor();
-		String matchingEvent = "{\"Event\": { \"occurrenceTime\": \"2013-02-26T11:25:24.579+0000\", \"type\": \"org.linux.cron.Started1\", \"_\": { \"schema\": \"http://www.linux.org/schema/monitoring/cron/3.1/events.xsd\", \"schemaVersion\": \"3.1\", \"value\": 4648, \"value2\": \"Fax4x46aeEF%aax4x%46aeEF\" }, \"hostname\": \"domain.localhost.cz\", \"application\": \"Cron\", \"process\": \"cron\", \"processId\": \"4219\", \"level\": 5, \"priority\": 4 }}";
-		sensor.sendString(matchingEvent);
-		String notMatchingEvent = "{\"Event\": { \"occurrenceTime\": \"2013-02-26T11:25:24.579+0000\", \"type\": \"org.linux.cron.Started2\", \"_\": { \"schema\": \"http://www.linux.org/schema/monitoring/cron/3.1/events.xsd\", \"schemaVersion\": \"3.1\", \"value\": 4648, \"value2\": \"Fax4x46aeEF%aax4x%46aeEF\" }, \"hostname\": \"domain.localhost.cz\", \"application\": \"Cron\", \"process\": \"cron\", \"processId\": \"4219\", \"level\": 5, \"priority\": 4 }}";
-		sensor.sendString(notMatchingEvent);
-		sensor.close();
-
-		// countDownLatch.await(TestClient2.TIMEOUT, TestClient2.TIMEOUT_UNIT);
-
-		// wait a while for all events to arrive
-		Thread.sleep(TestClient.EVENT_TIMEOUT_IN_MILLIS);
-
-		Assert.assertEquals(expectedEventCount, messageHandler.getMessageCount());
-	}
-
-	private void testSubscribe(Collection<Map<String, String>> subscriptionMaps, int expectedEventCount)
-			throws InterruptedException, IOException {
+	private void testSubscribe(Collection<Map<String, String>> subscriptionMaps, int expectedEventCount,
+			boolean includeReady, boolean includeStop) throws InterruptedException, IOException {
 		connect();
 
 		int i = 1;
@@ -117,7 +80,11 @@ public class EventHandlingTest {
 					SUBSCRIPTION_ID_KEY_PREFIX + i++, TestResponseHandlers.SUBSCRIBE_RESPONSE_HANDLER, true);
 		}
 
-		ready();
+		if (includeReady)
+			ready();
+
+		if (includeStop)
+			stop();
 
 		MessageHandlerWithCounter messageHandler = new MessageHandlerWithCounter();
 		testClient.addUnsolicitedMessageHandler(messageHandler);
@@ -135,14 +102,24 @@ public class EventHandlingTest {
 
 		Thread.sleep(TestClient.EVENT_TIMEOUT_IN_MILLIS);
 
-		Assert.assertEquals(expectedEventCount, messageHandler.getMessageCount());
+		Assert.assertEquals((!includeReady || includeStop) ? 0 : expectedEventCount, messageHandler.getMessageCount());
+	}
+
+	private void testSubscribe(Collection<Map<String, String>> subscriptionMaps, int expectedEventCount)
+			throws InterruptedException, IOException {
+		testSubscribe(subscriptionMaps, expectedEventCount, true, false);
+	}
+
+	private void testSubscribeOneSubscription(Map<String, String> subscriptionMap, int expectedEventCount,
+			boolean includeReady, boolean includeStop) throws InterruptedException, IOException {
+		List<Map<String, String>> subscriptionMaps = new ArrayList<>();
+		subscriptionMaps.add(subscriptionMap);
+		testSubscribe(subscriptionMaps, expectedEventCount, includeReady, includeStop);
 	}
 
 	private void testSubscribeOneSubscription(Map<String, String> subscriptionMap, int expectedEventCount)
 			throws InterruptedException, IOException {
-		List<Map<String, String>> subscriptionMaps = new ArrayList<>();
-		subscriptionMaps.add(subscriptionMap);
-		testSubscribe(subscriptionMaps, expectedEventCount);
+		testSubscribeOneSubscription(subscriptionMap, expectedEventCount, true, false);
 	}
 
 	private void testSubscribeOnePredicate(String attribute, String operator, String value, int expectedEventCount)
@@ -313,8 +290,8 @@ public class EventHandlingTest {
 	@Test
 	public void testTwoSubscriptionsTwoMatched() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#pref \'org.linux.cron.Started1\'", "processId", "#eq 5000"),
-				2);
+				getSubscriptionMapsForTwoSubscriptions("type", "#pref \'org.linux.cron.Started1\'", "processId",
+						"#eq 5000"), 2);
 	}
 
 	@Test
@@ -333,63 +310,15 @@ public class EventHandlingTest {
 
 	@Test
 	public void testSubscribeWithoutReady() throws IOException, InterruptedException {
-		connect();
-
 		Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("processId", "#eq 4219");
-		testClient.addMessage(
-				new SimpleMessage(Directive.SUBSCRIBE, mapper.writeValueAsBytesNoExceptions(subscriptionMap)),
-				SUBSCRIPTION_ID_1_KEY, TestResponseHandlers.SUBSCRIBE_RESPONSE_HANDLER, true);
-
-		MessageHandlerWithCounter messageHandler = new MessageHandlerWithCounter();
-		testClient.addUnsolicitedMessageHandler(messageHandler);
-
-		testClient.run(false);
-
-		TestSensor sensor = new TestSensor();
-		BufferedReader br = new BufferedReader(new FileReader("src/main/resources/events.jsons"));
-		String line;
-		while ((line = br.readLine()) != null) {
-			sensor.sendString(line);
-		}
-		br.close();
-		sensor.close();
-
-		Thread.sleep(TestClient.EVENT_TIMEOUT_IN_MILLIS);
-
-		Assert.assertEquals(0, messageHandler.getMessageCount());
+		testSubscribeOneSubscription(subscriptionMap, 0, false, false);
 	}
 
 	@Test
 	public void testSubscribeWithStop() throws IOException, InterruptedException {
-		connect();
-
 		Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("processId", "#eq 4219");
-		testClient.addMessage(
-				new SimpleMessage(Directive.SUBSCRIBE, mapper.writeValueAsBytesNoExceptions(subscriptionMap)),
-				SUBSCRIPTION_ID_1_KEY, TestResponseHandlers.SUBSCRIBE_RESPONSE_HANDLER, true);
-
-		ready();
-
-		stop();
-
-		MessageHandlerWithCounter messageHandler = new MessageHandlerWithCounter();
-		testClient.addUnsolicitedMessageHandler(messageHandler);
-
-		testClient.run(false);
-
-		TestSensor sensor = new TestSensor();
-		BufferedReader br = new BufferedReader(new FileReader("src/main/resources/events.jsons"));
-		String line;
-		while ((line = br.readLine()) != null) {
-			sensor.sendString(line);
-		}
-		br.close();
-		sensor.close();
-
-		Thread.sleep(TestClient.EVENT_TIMEOUT_IN_MILLIS);
-
-		Assert.assertEquals(0, messageHandler.getMessageCount());
+		testSubscribeOneSubscription(subscriptionMap, 0, true, true);
 	}
 }
