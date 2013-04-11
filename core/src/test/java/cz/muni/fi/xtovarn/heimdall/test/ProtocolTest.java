@@ -1,5 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall.test;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,11 +10,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sleepycat.je.DatabaseException;
+
 import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Message;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.Constants;
+import cz.muni.fi.xtovarn.heimdall.test.util.NgmonLauncher;
 import cz.muni.fi.xtovarn.heimdall.test.util.ObjectMapperWrapper;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestResponseHandlers;
@@ -31,16 +35,23 @@ public class ProtocolTest {
 	private static final String SUBSCRIPTION_ID_KEY = "subscriptionId";
 
 	private static ObjectMapperWrapper mapper = new ObjectMapperWrapper();
+	
+	private NgmonLauncher ngmon = null;
 	private TestClient testClient = null;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws DatabaseException, IOException, InterruptedException {
+		this.ngmon = new NgmonLauncher();
+		this.ngmon.start();
+		
 		testClient = new TestClient();
 	}
 
 	@After
 	public void tearDown() {
 		testClient.stop();
+		
+		this.ngmon.stop();
 	}
 
 	private void connect() {
