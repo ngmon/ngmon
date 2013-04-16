@@ -1,5 +1,8 @@
 package cz.muni.fi.xtovarn.heimdall.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,20 +12,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.netty.channel.MessageEvent;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.sleepycat.je.DatabaseException;
 
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.json.JSONEventMapper;
 import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
+import cz.muni.fi.xtovarn.heimdall.netty.message.Message;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
-import cz.muni.fi.xtovarn.heimdall.test.util.MessageHandlerWithCounter;
 import cz.muni.fi.xtovarn.heimdall.test.util.NgmonLauncher;
 import cz.muni.fi.xtovarn.heimdall.test.util.ObjectMapperWrapper;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient;
+import cz.muni.fi.xtovarn.heimdall.test.util.TestMessageHandler;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestResponseHandlers;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestSensor;
 
@@ -73,7 +79,7 @@ public class EventHandlingTest {
 				TestResponseHandlers.ACK_RESPONSE_HANDLER);
 	}
 
-	private void testSubscribe(Collection<Map<String, String>> subscriptionMaps, int expectedEventCount,
+	private List<MessageEvent> testSubscribe(Collection<Map<String, String>> subscriptionMaps, int expectedEventCount,
 			String jsonFileName, boolean includeReady, boolean includeStop) throws InterruptedException, IOException {
 		connect();
 
@@ -90,7 +96,7 @@ public class EventHandlingTest {
 		if (includeStop)
 			stop();
 
-		MessageHandlerWithCounter messageHandler = new MessageHandlerWithCounter();
+		TestMessageHandler messageHandler = new TestMessageHandler();
 		testClient.addUnsolicitedMessageHandler(messageHandler);
 
 		testClient.run(false);
@@ -106,34 +112,39 @@ public class EventHandlingTest {
 
 		Thread.sleep(TestClient.EVENT_TIMEOUT_IN_MILLIS);
 
-		Assert.assertEquals((!includeReady || includeStop) ? 0 : expectedEventCount, messageHandler.getMessageCount());
+		assertEquals((!includeReady || includeStop) ? 0 : expectedEventCount, messageHandler.getMessageCount());
+
+		return messageHandler.getMessageEventList();
 	}
 
-	private void testSubscribe(Collection<Map<String, String>> subscriptionMaps, int expectedEventCount,
+	private List<MessageEvent> testSubscribe(Collection<Map<String, String>> subscriptionMaps, int expectedEventCount,
 			String jsonFileName) throws InterruptedException, IOException {
-		testSubscribe(subscriptionMaps, expectedEventCount, jsonFileName, INCLUDE_READY_DEFAULT, INCLUDE_STOP_DEFAULT);
+		return testSubscribe(subscriptionMaps, expectedEventCount, jsonFileName, INCLUDE_READY_DEFAULT,
+				INCLUDE_STOP_DEFAULT);
 	}
 
-	private void testSubscribeOneSubscription(Map<String, String> subscriptionMap, int expectedEventCount,
-			String jsonFileName, boolean includeReady, boolean includeStop) throws InterruptedException, IOException {
+	private List<MessageEvent> testSubscribeOneSubscription(Map<String, String> subscriptionMap,
+			int expectedEventCount, String jsonFileName, boolean includeReady, boolean includeStop)
+			throws InterruptedException, IOException {
 		List<Map<String, String>> subscriptionMaps = new ArrayList<>();
 		subscriptionMaps.add(subscriptionMap);
-		testSubscribe(subscriptionMaps, expectedEventCount, jsonFileName, includeReady, includeStop);
+		return testSubscribe(subscriptionMaps, expectedEventCount, jsonFileName, includeReady, includeStop);
 	}
 
-	private void testSubscribeOneSubscription(Map<String, String> subscriptionMap, int expectedEventCount,
-			String jsonFileName) throws InterruptedException, IOException {
+	private List<MessageEvent> testSubscribeOneSubscription(Map<String, String> subscriptionMap,
+			int expectedEventCount, String jsonFileName) throws InterruptedException, IOException {
 		List<Map<String, String>> subscriptionMaps = new ArrayList<>();
 		subscriptionMaps.add(subscriptionMap);
-		testSubscribe(subscriptionMaps, expectedEventCount, jsonFileName, INCLUDE_READY_DEFAULT, INCLUDE_STOP_DEFAULT);
+		return testSubscribe(subscriptionMaps, expectedEventCount, jsonFileName, INCLUDE_READY_DEFAULT,
+				INCLUDE_STOP_DEFAULT);
 	}
 
-	private void testSubscribeOnePredicate(String attribute, String operator, String value, int expectedEventCount,
-			String jsonFileName) throws InterruptedException, IOException {
+	private List<MessageEvent> testSubscribeOnePredicate(String attribute, String operator, String value,
+			int expectedEventCount, String jsonFileName) throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put(attribute, "#" + operator + " " + value);
 
-		testSubscribeOneSubscription(subscriptionMap, expectedEventCount, jsonFileName, INCLUDE_READY_DEFAULT,
+		return testSubscribeOneSubscription(subscriptionMap, expectedEventCount, jsonFileName, INCLUDE_READY_DEFAULT,
 				INCLUDE_STOP_DEFAULT);
 	}
 
@@ -159,7 +170,21 @@ public class EventHandlingTest {
 
 	@Test
 	public void testSubscribeOnTypeEqualsStarted5() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "eq", "'org.linux.cron.Started5'", 1, JSON_FILE_1);
+		List<MessageEvent> messageEventList = testSubscribeOnePredicate("type", "eq", "'org.linux.cron.Started5'", 1,
+				JSON_FILE_1);
+		assertEquals(1, messageEventList.size());
+		MessageEvent messageEvent = messageEventList.get(0);
+		Message message = (Message) messageEvent.getMessage();
+		Directive directive = message.getDirective();
+		assertTrue(directive.equals(Directive.SEND_JSON) || directive.equals(Directive.SEND_SMILE));
+		Event event = JSONEventMapper.bytesToEvent(message.getBody());
+		assertEquals("Cron", event.getApplication());
+		assertEquals("domain.localhost.cz", event.getHostname());
+		assertEquals(5, event.getLevel());
+		assertEquals(4, event.getPriority());
+		assertEquals("cron", event.getProcess());
+		assertEquals(4219, event.getProcessId());
+		assertEquals("org.linux.cron.Started5", event.getType());
 	}
 
 	@Test
@@ -328,52 +353,52 @@ public class EventHandlingTest {
 		subscriptionMap.put("processId", "#eq 4219");
 		testSubscribeOneSubscription(subscriptionMap, 0, JSON_FILE_1, true, true);
 	}
-	
+
 	@Test
 	public void testApplicationCron() throws InterruptedException, IOException {
 		testSubscribeOnePredicate("application", "eq", "'Cron'", 4, JSON_FILE_2);
 	}
-	
+
 	@Test
 	public void testApplicationCronLowerCase() throws InterruptedException, IOException {
 		testSubscribeOnePredicate("application", "eq", "'cron'", 1, JSON_FILE_2);
 	}
-	
+
 	@Test
 	public void testApplicationCronPrefix() throws InterruptedException, IOException {
 		testSubscribeOnePredicate("application", "pref", "'Cron'", 6, JSON_FILE_2);
 	}
-	
+
 	@Test
 	public void testApplicationCronPrefixLowerCase() throws InterruptedException, IOException {
 		testSubscribeOnePredicate("application", "pref", "'cron'", 1, JSON_FILE_2);
 	}
-	
+
 	@Test
 	public void testApplicationBaPrefix() throws InterruptedException, IOException {
 		testSubscribeOnePredicate("application", "pref", "'ba'", 2, JSON_FILE_2);
 	}
-	
+
 	@Test
 	public void testLevelLessThan5() throws InterruptedException, IOException {
 		testSubscribeOnePredicate("level", "lt", "5", 4, JSON_FILE_2);
 	}
-	
+
 	@Test
 	public void testLevelLessThanOrEqualTo5() throws InterruptedException, IOException {
 		testSubscribeOnePredicate("level", "le", "5", 10, JSON_FILE_2);
 	}
-	
+
 	@Test
 	public void testLevelLessThan4() throws InterruptedException, IOException {
 		testSubscribeOnePredicate("level", "lt", "4", 4, JSON_FILE_2);
 	}
-	
+
 	@Test
 	public void testLevelGreaterThan6() throws InterruptedException, IOException {
 		testSubscribeOnePredicate("level", "gt", "6", 0, JSON_FILE_2);
 	}
-	
+
 	@Test
 	public void testApplicationCronPrefixLevelLessThan4() throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
