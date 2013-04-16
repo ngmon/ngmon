@@ -29,6 +29,7 @@ import cz.muni.fi.xtovarn.heimdall.test.util.TestSensor;
 public class EventHandlingTest {
 
 	private static final String JSON_FILE_1 = "events.jsons";
+	private static final String JSON_FILE_2 = "events2.jsons";
 	private static final String CONNECTION_ID_KEY = "connectionId";
 	private static final String SUBSCRIPTION_ID_KEY_PREFIX = "subscriptionId";
 	private static final boolean INCLUDE_READY_DEFAULT = true;
@@ -326,5 +327,58 @@ public class EventHandlingTest {
 		Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("processId", "#eq 4219");
 		testSubscribeOneSubscription(subscriptionMap, 0, JSON_FILE_1, true, true);
+	}
+	
+	@Test
+	public void testApplicationCron() throws InterruptedException, IOException {
+		testSubscribeOnePredicate("application", "eq", "'Cron'", 4, JSON_FILE_2);
+	}
+	
+	@Test
+	public void testApplicationCronLowerCase() throws InterruptedException, IOException {
+		testSubscribeOnePredicate("application", "eq", "'cron'", 1, JSON_FILE_2);
+	}
+	
+	@Test
+	public void testApplicationCronPrefix() throws InterruptedException, IOException {
+		testSubscribeOnePredicate("application", "pref", "'Cron'", 6, JSON_FILE_2);
+	}
+	
+	@Test
+	public void testApplicationCronPrefixLowerCase() throws InterruptedException, IOException {
+		testSubscribeOnePredicate("application", "pref", "'cron'", 1, JSON_FILE_2);
+	}
+	
+	@Test
+	public void testApplicationBaPrefix() throws InterruptedException, IOException {
+		testSubscribeOnePredicate("application", "pref", "'ba'", 2, JSON_FILE_2);
+	}
+	
+	@Test
+	public void testLevelLessThan5() throws InterruptedException, IOException {
+		testSubscribeOnePredicate("level", "lt", "5", 4, JSON_FILE_2);
+	}
+	
+	@Test
+	public void testLevelLessThanOrEqualTo5() throws InterruptedException, IOException {
+		testSubscribeOnePredicate("level", "le", "5", 10, JSON_FILE_2);
+	}
+	
+	@Test
+	public void testLevelLessThan4() throws InterruptedException, IOException {
+		testSubscribeOnePredicate("level", "lt", "4", 4, JSON_FILE_2);
+	}
+	
+	@Test
+	public void testLevelGreaterThan6() throws InterruptedException, IOException {
+		testSubscribeOnePredicate("level", "gt", "6", 0, JSON_FILE_2);
+	}
+	
+	@Test
+	public void testApplicationCronPrefixLevelLessThan4() throws InterruptedException, IOException {
+		final Map<String, String> subscriptionMap = new HashMap<>();
+		subscriptionMap.put("application", "#pref 'Cron'");
+		subscriptionMap.put("level", "#lt 4");
+		testSubscribeOneSubscription(subscriptionMap, 3, JSON_FILE_2);
 	}
 }
