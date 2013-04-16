@@ -6,9 +6,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,21 +25,52 @@ import cz.muni.fi.xtovarn.heimdall.client.Client;
 import cz.muni.fi.xtovarn.heimdall.client.ClientApi;
 import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory;
 import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory.ConnectionException;
+import cz.muni.fi.xtovarn.heimdall.client.EventReceivedHandler;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Constraint;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Operator;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
 import cz.muni.fi.xtovarn.heimdall.client.test.util.NgmonLauncher;
+import cz.muni.fi.xtovarn.heimdall.client.test.util.TestSensor;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 
 public class ClientTest {
+
+	private static class TestEventHandler implements EventReceivedHandler {
+		private AtomicInteger count = new AtomicInteger(0);
+		private List<Event> events = new ArrayList<>();
+
+		@Override
+		public void handleEvent(Event event) {
+			count.incrementAndGet();
+			addEventToList(event);
+		}
+
+		private synchronized void addEventToList(Event event) {
+			events.add(event);
+		}
+
+		public AtomicInteger getCount() {
+			return count;
+		}
+
+		public List<Event> getEvents() {
+			return events;
+		}
+
+	}
 
 	private static final String VALID_USER_PASSWORD = "password0";
 	private static final String VALID_USER_NAME = "user0";
 	private static final String INVALID_USER_NAME = "userFoo";
 	private static final String INVALID_USER_PASSWORD = "passwordFoo";
+	private static final String JSON_FILE_NAME = "events2.jsons";
 
 	private static final int TIMEOUT_VALUE = 5;
 	private static final TimeUnit TIMEOUT_TIME_UNIT = TimeUnit.SECONDS;
-	
+	private static final long EVENT_TIMEOUT_IN_MILLIS = 1000;
+
+	private TestEventHandler testEventHandler = new TestEventHandler();
+
 	private NgmonLauncher ngmon = null;
 
 	private Client client = null;
@@ -43,7 +79,7 @@ public class ClientTest {
 	public void setUp() throws ConnectionException, DatabaseException, IOException, InterruptedException {
 		this.ngmon = new NgmonLauncher();
 		this.ngmon.start();
-		
+
 		client = (Client) ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE,
 				TIMEOUT_TIME_UNIT);
 		assertNotNull(client);
@@ -53,7 +89,7 @@ public class ClientTest {
 	@After
 	public void tearDown() throws InterruptedException {
 		client.stop();
-		
+
 		this.ngmon.stop();
 	}
 
@@ -149,6 +185,80 @@ public class ClientTest {
 	public void stopAfterStop() throws InterruptedException, ExecutionException {
 		stop();
 		client.stopSending();
+	}
+
+	private void sendEvents(String jsonFileName) throws IOException, InterruptedException {
+		TestSensor sensor = new TestSensor();
+		BufferedReader br = new BufferedReader(new FileReader("src/main/resources/" + jsonFileName));
+		String line;
+		while ((line = br.readLine()) != null) {
+			sensor.sendString(line);
+		}
+		br.close();
+		sensor.close();
+
+		Thread.sleep(EVENT_TIMEOUT_IN_MILLIS);
+	}
+
+	private List<Event> testMessageReceived(Predicate predicate, int expectedEventCount) throws InterruptedException,
+			ExecutionException, IOException {
+		Long subscriptionId = client.subscribe(predicate).get();
+		client.setEventReceivedHandler(testEventHandler);
+		assertTrue(client.ready().get());
+
+		sendEvents(JSON_FILE_NAME);
+
+		assertTrue(client.stopSending().get());
+		client.unsubscribe(subscriptionId);
+
+		assertEquals(expectedEventCount, testEventHandler.getCount().intValue());
+
+		return testEventHandler.getEvents();
+	}
+
+	private List<Event> testMessageReceivedOneConstraint(Constraint constraint, int expectedEventCount)
+			throws InterruptedException, ExecutionException, IOException {
+		Predicate predicate = new Predicate();
+		predicate.addConstraint(constraint);
+		return testMessageReceived(predicate, expectedEventCount);
+	}
+
+	@Test
+	public void testTypeEqualsStarted5() throws InterruptedException, ExecutionException, IOException {
+		List<Event> events = testMessageReceivedOneConstraint(new Constraint("type", Operator.EQUALS,
+				"org.linux.cron.Started5"), 1);
+		assertEquals(1, events.size());
+		Event event = events.get(0);
+		assertEquals("bar", event.getApplication());
+		assertEquals("domain.localhost.cz", event.getHostname());
+		assertEquals(5, event.getLevel());
+		assertEquals(4, event.getPriority());
+		assertEquals("cron", event.getProcess());
+		assertEquals(4219, event.getProcessId());
+		assertEquals("org.linux.cron.Started5", event.getType());
+	}
+
+	@Test
+	public void testProcessIdLessThan5000() throws InterruptedException, ExecutionException, IOException {
+		testMessageReceivedOneConstraint(new Constraint("processId", Operator.LESS_THAN, "5000"), 10);
+	}
+
+	@Test
+	public void testTypePrefix() throws InterruptedException, ExecutionException, IOException {
+		testMessageReceivedOneConstraint(new Constraint("type", Operator.PREFIX, "org.linux.cron.Started"), 10);
+	}
+
+	@Test
+	public void testLevelLessThan5() throws InterruptedException, ExecutionException, IOException {
+		testMessageReceivedOneConstraint(new Constraint("level", Operator.LESS_THAN, "5"), 4);
+	}
+
+	@Test
+	public void testApplicationCronPrefixLevelLessThan4() throws InterruptedException, ExecutionException, IOException {
+		Predicate predicate = new Predicate();
+		predicate.addConstraint(new Constraint("application", Operator.PREFIX, "Cron"));
+		predicate.addConstraint(new Constraint("level", Operator.LESS_THAN, "4"));
+		testMessageReceived(predicate, 3);
 	}
 
 }

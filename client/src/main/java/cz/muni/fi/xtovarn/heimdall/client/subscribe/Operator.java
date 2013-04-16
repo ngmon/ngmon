@@ -2,7 +2,7 @@ package cz.muni.fi.xtovarn.heimdall.client.subscribe;
 
 public enum Operator {
 
-	EQUALS, LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUAL;
+	EQUALS, LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUAL, PREFIX;
 
 	@Override
 	public String toString() {
@@ -17,6 +17,8 @@ public enum Operator {
 			return "#gt";
 		case GREATER_THAN_OR_EQUAL:
 			return "#ge";
+		case PREFIX:
+			return "#pref";
 		default:
 			throw new IllegalArgumentException();
 		}
