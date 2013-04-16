@@ -28,8 +28,11 @@ import cz.muni.fi.xtovarn.heimdall.test.util.TestSensor;
 
 public class EventHandlingTest {
 
+	private static final String JSON_FILE_1 = "events.jsons";
 	private static final String CONNECTION_ID_KEY = "connectionId";
 	private static final String SUBSCRIPTION_ID_KEY_PREFIX = "subscriptionId";
+	private static final boolean INCLUDE_READY_DEFAULT = true;
+	private static final boolean INCLUDE_STOP_DEFAULT = false;
 
 	private static final String VALID_USER_LOGIN = "user0";
 	private static final String VALID_USER_PASSCODE = "password0";
@@ -70,7 +73,7 @@ public class EventHandlingTest {
 	}
 
 	private void testSubscribe(Collection<Map<String, String>> subscriptionMaps, int expectedEventCount,
-			boolean includeReady, boolean includeStop) throws InterruptedException, IOException {
+			String jsonFileName, boolean includeReady, boolean includeStop) throws InterruptedException, IOException {
 		connect();
 
 		int i = 1;
@@ -92,7 +95,7 @@ public class EventHandlingTest {
 		testClient.run(false);
 
 		TestSensor sensor = new TestSensor();
-		BufferedReader br = new BufferedReader(new FileReader("src/main/resources/events.jsons"));
+		BufferedReader br = new BufferedReader(new FileReader("src/main/resources/" + jsonFileName));
 		String line;
 		while ((line = br.readLine()) != null) {
 			sensor.sendString(line);
@@ -105,89 +108,92 @@ public class EventHandlingTest {
 		Assert.assertEquals((!includeReady || includeStop) ? 0 : expectedEventCount, messageHandler.getMessageCount());
 	}
 
-	private void testSubscribe(Collection<Map<String, String>> subscriptionMaps, int expectedEventCount)
-			throws InterruptedException, IOException {
-		testSubscribe(subscriptionMaps, expectedEventCount, true, false);
+	private void testSubscribe(Collection<Map<String, String>> subscriptionMaps, int expectedEventCount,
+			String jsonFileName) throws InterruptedException, IOException {
+		testSubscribe(subscriptionMaps, expectedEventCount, jsonFileName, INCLUDE_READY_DEFAULT, INCLUDE_STOP_DEFAULT);
 	}
 
 	private void testSubscribeOneSubscription(Map<String, String> subscriptionMap, int expectedEventCount,
-			boolean includeReady, boolean includeStop) throws InterruptedException, IOException {
+			String jsonFileName, boolean includeReady, boolean includeStop) throws InterruptedException, IOException {
 		List<Map<String, String>> subscriptionMaps = new ArrayList<>();
 		subscriptionMaps.add(subscriptionMap);
-		testSubscribe(subscriptionMaps, expectedEventCount, includeReady, includeStop);
+		testSubscribe(subscriptionMaps, expectedEventCount, jsonFileName, includeReady, includeStop);
 	}
 
-	private void testSubscribeOneSubscription(Map<String, String> subscriptionMap, int expectedEventCount)
-			throws InterruptedException, IOException {
-		testSubscribeOneSubscription(subscriptionMap, expectedEventCount, true, false);
+	private void testSubscribeOneSubscription(Map<String, String> subscriptionMap, int expectedEventCount,
+			String jsonFileName) throws InterruptedException, IOException {
+		List<Map<String, String>> subscriptionMaps = new ArrayList<>();
+		subscriptionMaps.add(subscriptionMap);
+		testSubscribe(subscriptionMaps, expectedEventCount, jsonFileName, INCLUDE_READY_DEFAULT, INCLUDE_STOP_DEFAULT);
 	}
 
-	private void testSubscribeOnePredicate(String attribute, String operator, String value, int expectedEventCount)
-			throws InterruptedException, IOException {
+	private void testSubscribeOnePredicate(String attribute, String operator, String value, int expectedEventCount,
+			String jsonFileName) throws InterruptedException, IOException {
 		final Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put(attribute, "#" + operator + " " + value);
 
-		testSubscribeOneSubscription(subscriptionMap, expectedEventCount);
+		testSubscribeOneSubscription(subscriptionMap, expectedEventCount, jsonFileName, INCLUDE_READY_DEFAULT,
+				INCLUDE_STOP_DEFAULT);
 	}
 
 	@Test
 	public void testSubscribeOnProcessIdLessThan5000() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("processId", "le", "5000", 10);
+		testSubscribeOnePredicate("processId", "le", "5000", 10, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnProcessIdGreaterThan5000() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("processId", "gt", "5000", 0);
+		testSubscribeOnePredicate("processId", "gt", "5000", 0, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnProcessIdEquals5000() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("processId", "eq", "5000", 0);
+		testSubscribeOnePredicate("processId", "eq", "5000", 0, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnProcessIdEquals4219() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("processId", "eq", "4219", 10);
+		testSubscribeOnePredicate("processId", "eq", "4219", 10, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnTypeEqualsStarted5() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "eq", "'org.linux.cron.Started5'", 1);
+		testSubscribeOnePredicate("type", "eq", "'org.linux.cron.Started5'", 1, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnTypeEqualsStarted20() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "eq", "'org.linux.cron.Started20'", 0);
+		testSubscribeOnePredicate("type", "eq", "'org.linux.cron.Started20'", 0, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnTypePrefixStarted20() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "pref", "'org.linux.cron.Started20'", 0);
+		testSubscribeOnePredicate("type", "pref", "'org.linux.cron.Started20'", 0, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnTypePrefixStarted() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "pref", "'org.linux.cron.Started'", 10);
+		testSubscribeOnePredicate("type", "pref", "'org.linux.cron.Started'", 10, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnTypePrefixStarted1() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "pref", "'org.linux.cron.Started1'", 2);
+		testSubscribeOnePredicate("type", "pref", "'org.linux.cron.Started1'", 2, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnTypePrefixFoo() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("type", "pref", "'foo'", 0);
+		testSubscribeOnePredicate("type", "pref", "'foo'", 0, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnNonexistingAttributeEqualsFoo() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("foo", "eq", "'foo'", 0);
+		testSubscribeOnePredicate("foo", "eq", "'foo'", 0, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeOnNonexistingAttributePrefixFoo() throws InterruptedException, IOException {
-		testSubscribeOnePredicate("foo", "pref", "'foo'", 0);
+		testSubscribeOnePredicate("foo", "pref", "'foo'", 0, JSON_FILE_1);
 	}
 
 	@Test
@@ -195,7 +201,7 @@ public class EventHandlingTest {
 		final Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("type", "#eq 'org.linux.cron.Started8'");
 		subscriptionMap.put("processId", "#eq 5000");
-		testSubscribeOneSubscription(subscriptionMap, 0);
+		testSubscribeOneSubscription(subscriptionMap, 0, JSON_FILE_1);
 	}
 
 	@Test
@@ -203,7 +209,7 @@ public class EventHandlingTest {
 		final Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("type", "#eq 'org.linux.cron.Started20'");
 		subscriptionMap.put("processId", "#eq 5000");
-		testSubscribeOneSubscription(subscriptionMap, 0);
+		testSubscribeOneSubscription(subscriptionMap, 0, JSON_FILE_1);
 	}
 
 	@Test
@@ -211,7 +217,7 @@ public class EventHandlingTest {
 		final Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("type", "#pref 'org.linux.cron.Started5'");
 		subscriptionMap.put("processId", "#eq 5000");
-		testSubscribeOneSubscription(subscriptionMap, 0);
+		testSubscribeOneSubscription(subscriptionMap, 0, JSON_FILE_1);
 	}
 
 	@Test
@@ -219,7 +225,7 @@ public class EventHandlingTest {
 		final Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("type", "#pref 'org.linux.cron.Started1'");
 		subscriptionMap.put("processId", "#eq 5000");
-		testSubscribeOneSubscription(subscriptionMap, 0);
+		testSubscribeOneSubscription(subscriptionMap, 0, JSON_FILE_1);
 	}
 
 	@Test
@@ -227,7 +233,7 @@ public class EventHandlingTest {
 		final Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("type", "#eq 'org.linux.cron.Started20'");
 		subscriptionMap.put("processId", "#eq 4219");
-		testSubscribeOneSubscription(subscriptionMap, 0);
+		testSubscribeOneSubscription(subscriptionMap, 0, JSON_FILE_1);
 	}
 
 	@Test
@@ -235,7 +241,7 @@ public class EventHandlingTest {
 		final Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("type", "#pref 'org.linux.cron.Started'");
 		subscriptionMap.put("processId", "#eq 4219");
-		testSubscribeOneSubscription(subscriptionMap, 10);
+		testSubscribeOneSubscription(subscriptionMap, 10, JSON_FILE_1);
 	}
 
 	@Test
@@ -243,7 +249,7 @@ public class EventHandlingTest {
 		final Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("type", "#pref 'org.linux.cron.Started5'");
 		subscriptionMap.put("processId", "#eq 4219");
-		testSubscribeOneSubscription(subscriptionMap, 1);
+		testSubscribeOneSubscription(subscriptionMap, 1, JSON_FILE_1);
 	}
 
 	@Test
@@ -251,7 +257,7 @@ public class EventHandlingTest {
 		final Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("type", "#pref 'org.linux.cron.Started1'");
 		subscriptionMap.put("processId", "#eq 4219");
-		testSubscribeOneSubscription(subscriptionMap, 2);
+		testSubscribeOneSubscription(subscriptionMap, 2, JSON_FILE_1);
 	}
 
 	private List<Map<String, String>> getSubscriptionMapsForTwoSubscriptions(String attributeTitle1,
@@ -270,55 +276,55 @@ public class EventHandlingTest {
 	public void testTwoSubscriptionsOneMatched() throws InterruptedException, IOException {
 		testSubscribe(
 				getSubscriptionMapsForTwoSubscriptions("type", "#eq 'org.linux.cron.Started8'", "processId", "#eq 5000"),
-				1);
+				1, JSON_FILE_1);
 	}
 
 	@Test
 	public void testTwoSubscriptionsNoneMatched() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#eq 'org.linux.cron.Started20'", "processId", "#eq 5000"),
-				0);
+				getSubscriptionMapsForTwoSubscriptions("type", "#eq 'org.linux.cron.Started20'", "processId",
+						"#eq 5000"), 0, JSON_FILE_1);
 	}
 
 	@Test
 	public void testTwoSubscriptionsOneMatched2() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#pref 'org.linux.cron.Started5'", "processId", "#eq 5000"),
-				1);
+				getSubscriptionMapsForTwoSubscriptions("type", "#pref 'org.linux.cron.Started5'", "processId",
+						"#eq 5000"), 1, JSON_FILE_1);
 	}
 
 	@Test
 	public void testTwoSubscriptionsTwoMatched() throws InterruptedException, IOException {
 		testSubscribe(
 				getSubscriptionMapsForTwoSubscriptions("type", "#pref 'org.linux.cron.Started1'", "processId",
-						"#eq 5000"), 2);
+						"#eq 5000"), 2, JSON_FILE_1);
 	}
 
 	@Test
 	public void testTwoSubscriptionsAllMatched() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#eq 'org.linux.cron.Started20'", "processId", "#eq 4219"),
-				10);
+				getSubscriptionMapsForTwoSubscriptions("type", "#eq 'org.linux.cron.Started20'", "processId",
+						"#eq 4219"), 10, JSON_FILE_1);
 	}
 
 	@Test
 	public void testTwoSubscriptionsAllMatched2() throws InterruptedException, IOException {
 		testSubscribe(
-				getSubscriptionMapsForTwoSubscriptions("type", "#pref 'org.linux.cron.Started'", "processId", "#eq 4219"),
-				10);
+				getSubscriptionMapsForTwoSubscriptions("type", "#pref 'org.linux.cron.Started'", "processId",
+						"#eq 4219"), 10, JSON_FILE_1);
 	}
 
 	@Test
 	public void testSubscribeWithoutReady() throws IOException, InterruptedException {
 		Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("processId", "#eq 4219");
-		testSubscribeOneSubscription(subscriptionMap, 0, false, false);
+		testSubscribeOneSubscription(subscriptionMap, 0, JSON_FILE_1, false, false);
 	}
 
 	@Test
 	public void testSubscribeWithStop() throws IOException, InterruptedException {
 		Map<String, String> subscriptionMap = new HashMap<>();
 		subscriptionMap.put("processId", "#eq 4219");
-		testSubscribeOneSubscription(subscriptionMap, 0, true, true);
+		testSubscribeOneSubscription(subscriptionMap, 0, JSON_FILE_1, true, true);
 	}
 }
