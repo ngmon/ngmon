@@ -26,6 +26,7 @@ public class ClientFSM extends AbstractFiniteStateMachineNoActions<ClientState, 
 		
 		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.RECEIVED_ACK_FOR_READY, ClientState.SENDING);
 
+		this.addTransition(ClientState.CONNECTED, ClientEvent.REQUEST_DISCONNECT, ClientState.DISCONNECTED);
 	}
 
 }

@@ -16,6 +16,7 @@ public interface ClientApi {
 	public void setEventReceivedHandler(EventReceivedHandler handler);
 	public void setServerResponseExceptionHandler(ServerResponseExceptionHandler handler);
 
+	public Future<Boolean> disconnect();
 	public void stop();
 	
 	public void reset();

@@ -19,6 +19,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 	private ClientProtocolContext clientProtocolContext;
 	private EventReceivedHandler eventReceivedHandler = null;
 	private ServerResponseExceptionHandler exceptionHandler = null;
+	private boolean disconnected = false;
 
 	private ResultFuture<Boolean> channelConnectedResult = new ResultFuture<>();
 
@@ -42,9 +43,16 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 			return ClientEvent.RECEIVED_CONNECTED;
 		case ERROR:
 			return ClientEvent.ERROR;
-		case ACK:
-			return lastRequest.equals(ClientEvent.REQUEST_READY) ? ClientEvent.RECEIVED_ACK_FOR_READY
-					: ClientEvent.RECEIVED_ACK;
+		case ACK: {
+			switch (lastRequest) {
+			case REQUEST_READY:
+				return ClientEvent.RECEIVED_ACK_FOR_READY;
+			case REQUEST_DISCONNECT:
+				return ClientEvent.RECEIVED_DISCONNECTED;
+			default:
+				return ClientEvent.RECEIVED_ACK;
+			}
+		}
 		default:
 			return null;
 		}
@@ -52,6 +60,9 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+		if (disconnected)
+			return;
+		
 		SimpleMessage message = (SimpleMessage) e.getMessage();
 		Directive directive = message.getDirective();
 
@@ -63,6 +74,12 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 		}
 
 		ClientEvent clientEvent = directiveToClientEvent(directive, clientProtocolContext.getLastRequest());
+		if (clientEvent != null && clientEvent.equals(ClientEvent.RECEIVED_DISCONNECTED)) {
+			disconnected = true;
+			clientProtocolContext.disconnectResponse();
+			return;
+		}
+		
 		if (clientEvent == null || this.clientStateMachine.isEnded()
 				|| this.clientStateMachine.getNextState(clientEvent) == null) {
 			// TODO - use checked exception?
@@ -92,6 +109,9 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+		if (disconnected)
+			return;
+		
 		if (e.getCause().getClass().equals(java.net.ConnectException.class)) {
 			System.err.println("Connection refused...");
 			System.exit(-1);

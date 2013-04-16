@@ -28,6 +28,7 @@ public class Client implements ClientApi {
 	private DefaultClientHandler clientHandler = null;
 	private ClientProtocolContext clientProtocolContext = null;
 	private ClientFSM clientFSM = null;
+	private boolean disconnected = false;
 
 	public Client(long timeout, TimeUnit unit) throws InterruptedException {
 		factory = new NioClientSocketChannelFactory(Executors.newSingleThreadExecutor(),
@@ -61,6 +62,8 @@ public class Client implements ClientApi {
 		if (!currentState.equals(state))
 			throw new IllegalStateException("This operation requires the state " + state.toString()
 					+ ", but the current state is " + currentState.toString());
+		if (disconnected)
+			throw new IllegalStateException("The client is disconnected");
 	}
 
 	public Future<Boolean> connect(String login, String passcode) throws InterruptedException {
@@ -165,6 +168,16 @@ public class Client implements ClientApi {
 	@Override
 	public void setServerResponseExceptionHandler(ServerResponseExceptionHandler handler) {
 		clientHandler.setServerResponseExceptionHandler(handler);
+	}
+
+	@Override
+	public Future<Boolean> disconnect() {
+		checkFsmState(ClientState.CONNECTED);
+		
+		disconnected = true;
+		
+		clientFSM.readSymbol(ClientEvent.REQUEST_DISCONNECT);
+		return clientProtocolContext.disconnectRequest(channel);
 	}
 
 }

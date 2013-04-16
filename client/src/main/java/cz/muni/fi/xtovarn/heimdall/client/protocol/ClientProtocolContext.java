@@ -30,6 +30,7 @@ public class ClientProtocolContext {
 	private ResultFuture<Boolean> unsubscribeResult = null;
 	private ResultFuture<Boolean> readyRequest = null;
 	private ResultFuture<Boolean> stopRequest = null;
+	private ResultFuture<Boolean> disconnectRequest = null;
 
 	private Long connectionId = null;
 
@@ -210,6 +211,18 @@ public class ClientProtocolContext {
 		channel.write(new SimpleMessage(Directive.STOP, "".getBytes()));
 		
 		return stopRequest;
+	}
+
+	public Future<Boolean> disconnectRequest(Channel channel) {
+		disconnectRequest = new ResultFuture<>();
+		lastRequest = ClientEvent.REQUEST_DISCONNECT;
+		channel.write(new SimpleMessage(Directive.DISCONNECT, "".getBytes()));
+
+		return disconnectRequest;
+	}
+
+	public void disconnectResponse() {
+		disconnectRequest.put(true);
 	}
 
 }
