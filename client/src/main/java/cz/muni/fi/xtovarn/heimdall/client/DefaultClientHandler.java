@@ -9,6 +9,7 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientEvent;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientFSM;
 import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientProtocolContext;
+import cz.muni.fi.xtovarn.heimdall.commons.json.JSONEventMapper;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 
@@ -16,6 +17,8 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 
 	private ClientFSM clientStateMachine = new ClientFSM(null);
 	private ClientProtocolContext clientProtocolContext;
+	private EventReceivedHandler eventReceivedHandler = null;
+	private ServerResponseExceptionHandler exceptionHandler = null;
 
 	private ResultFuture<Boolean> channelConnectedResult = new ResultFuture<>();
 
@@ -50,12 +53,22 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
+		Directive directive = message.getDirective();
 
-		ClientEvent clientEvent = directiveToClientEvent(message.getDirective(), clientProtocolContext.getLastRequest());
+		// sensor event?
+		if (directive.equals(Directive.SEND_SMILE) || directive.equals(Directive.SEND_JSON)) {
+			if (eventReceivedHandler != null)
+				eventReceivedHandler.handleEvent(JSONEventMapper.bytesToEvent(message.getBody()));
+			return;
+		}
+
+		ClientEvent clientEvent = directiveToClientEvent(directive, clientProtocolContext.getLastRequest());
 		if (clientEvent == null || this.clientStateMachine.isEnded()
 				|| this.clientStateMachine.getNextState(clientEvent) == null) {
 			// TODO - use checked exception?
-			throw new IllegalStateException("Unexpected response from server");
+			if (exceptionHandler != null)
+				exceptionHandler.handleException(new IllegalStateException("Unexpected response from server"));
+			return;
 		}
 
 		// it's crucial to change the state before calling ProtocolContext
@@ -64,7 +77,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 		// client method, which requires the new state, causing it to fail
 		clientStateMachine.readSymbol(clientEvent);
 
-		switch (message.getDirective()) {
+		switch (directive) {
 		case CONNECTED:
 			clientProtocolContext.connectResponse(e);
 			break;
@@ -83,7 +96,10 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 			System.err.println("Connection refused...");
 			System.exit(-1);
 		} else {
-			super.exceptionCaught(ctx, e);
+			if (exceptionHandler == null)
+				super.exceptionCaught(ctx, e);
+			else
+				exceptionHandler.handleException(e.getCause());
 		}
 	}
 
@@ -93,6 +109,14 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 
 	public ResultFuture<Boolean> getChannelConnectedResult() {
 		return channelConnectedResult;
+	}
+
+	public void setEventReceivedHandler(EventReceivedHandler handler) {
+		this.eventReceivedHandler = handler;
+	}
+
+	public void setServerResponseExceptionHandler(ServerResponseExceptionHandler handler) {
+		this.exceptionHandler = handler;
 	}
 
 }

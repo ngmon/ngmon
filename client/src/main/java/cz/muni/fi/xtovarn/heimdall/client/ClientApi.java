@@ -12,6 +12,9 @@ public interface ClientApi {
 	
 	public Future<Boolean> ready();
 	public Future<Boolean> stopSending();
+	
+	public void setEventReceivedHandler(EventReceivedHandler handler);
+	public void setServerResponseExceptionHandler(ServerResponseExceptionHandler handler);
 
 	public void stop();
 	

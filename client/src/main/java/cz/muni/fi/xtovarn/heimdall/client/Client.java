@@ -157,4 +157,14 @@ public class Client implements ClientApi {
 		clientFSM.rollback();
 	}
 
+	@Override
+	public void setEventReceivedHandler(EventReceivedHandler handler) {
+		clientHandler.setEventReceivedHandler(handler);
+	}
+
+	@Override
+	public void setServerResponseExceptionHandler(ServerResponseExceptionHandler handler) {
+		clientHandler.setServerResponseExceptionHandler(handler);
+	}
+
 }
