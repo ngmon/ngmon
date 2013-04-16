@@ -6,12 +6,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sleepycat.je.DatabaseException;
 
 import cz.muni.fi.xtovarn.heimdall.client.Client;
 import cz.muni.fi.xtovarn.heimdall.client.ClientApi;
@@ -20,6 +23,7 @@ import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory.ConnectionExce
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Constraint;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Operator;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
+import cz.muni.fi.xtovarn.heimdall.client.test.util.NgmonLauncher;
 
 public class ClientTest {
 
@@ -30,11 +34,16 @@ public class ClientTest {
 
 	private static final int TIMEOUT_VALUE = 5;
 	private static final TimeUnit TIMEOUT_TIME_UNIT = TimeUnit.SECONDS;
+	
+	private NgmonLauncher ngmon = null;
 
 	private Client client = null;
 
 	@Before
-	public void before() throws ConnectionException {
+	public void setUp() throws ConnectionException, DatabaseException, IOException, InterruptedException {
+		this.ngmon = new NgmonLauncher();
+		this.ngmon.start();
+		
 		client = (Client) ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE,
 				TIMEOUT_TIME_UNIT);
 		assertNotNull(client);
@@ -42,8 +51,10 @@ public class ClientTest {
 	}
 
 	@After
-	public void after() throws InterruptedException {
+	public void tearDown() throws InterruptedException {
 		client.stop();
+		
+		this.ngmon.stop();
 	}
 
 	@Test
