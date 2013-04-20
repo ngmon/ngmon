@@ -21,6 +21,7 @@ import com.sleepycat.je.DatabaseException;
 
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.commons.json.JSONEventMapper;
+import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestSensor;
 import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Message;
@@ -30,7 +31,6 @@ import cz.muni.fi.xtovarn.heimdall.test.util.ObjectMapperWrapper;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestMessageHandler;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestResponseHandlers;
-import cz.muni.fi.xtovarn.heimdall.test.util.TestSensor;
 
 public class EventHandlingTest {
 

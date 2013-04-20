@@ -1,6 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.collector;
 
 import cz.muni.fi.xtovarn.heimdall.pipeline.PipelineFactory;
+import cz.muni.fi.xtovarn.heimdall.commons.Constants;
 import cz.muni.fi.xtovarn.heimdall.commons.Startable;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class SocketCollector implements Startable {
 	@Override
 	public void start() {
 		try {
-			serverSocket = new ServerSocket(5000, 50);
+			serverSocket = new ServerSocket(Constants.SENSOR_PORT, 50);
 
 			while (true) {
 				Socket socket = serverSocket.accept();

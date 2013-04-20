@@ -30,8 +30,8 @@ import cz.muni.fi.xtovarn.heimdall.client.subscribe.Constraint;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Operator;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
 import cz.muni.fi.xtovarn.heimdall.client.test.util.NgmonLauncher;
-import cz.muni.fi.xtovarn.heimdall.client.test.util.TestSensor;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestSensor;
 
 public class ClientTest {
 
