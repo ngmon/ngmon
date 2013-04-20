@@ -17,7 +17,7 @@ public class ClientFSM extends AbstractFiniteStateMachineNoActions<ClientState, 
 		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.RECEIVED_CONNECTED, ClientState.CONNECTED);
 		this.addTransition(ClientState.CONNECTED, ClientEvent.REQUEST_SUBSCRIBE, ClientState.WAITING_FOR_ACK);
 		this.addTransition(ClientState.CONNECTED, ClientEvent.REQUEST_UNSUBSCRIBE, ClientState.WAITING_FOR_ACK);
-		this.addTransition(ClientState.SENDING, ClientEvent.REQUEST_STOP, ClientState.WAITING_FOR_ACK);
+		this.addTransition(ClientState.RECEIVING, ClientEvent.REQUEST_STOP, ClientState.WAITING_FOR_ACK);
 		this.addTransition(ClientState.CONNECTED, ClientEvent.REQUEST_READY, ClientState.WAITING_FOR_ACK);
 		this.addTransition(ClientState.CONNECTED, ClientEvent.REQUEST_GET, ClientState.WAITING_FOR_ACK);
 		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.RECEIVED_ACK, ClientState.CONNECTED);
@@ -25,7 +25,7 @@ public class ClientFSM extends AbstractFiniteStateMachineNoActions<ClientState, 
 		this.addTransition(ClientState.PRE_CONNECTED, ClientEvent.ERROR, ClientState.PRE_CONNECTED);
 		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.ERROR, ClientState.CONNECTED);
 		
-		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.RECEIVED_ACK_FOR_READY, ClientState.SENDING);
+		this.addTransition(ClientState.WAITING_FOR_ACK, ClientEvent.RECEIVED_ACK_FOR_READY, ClientState.RECEIVING);
 
 		this.addTransition(ClientState.CONNECTED, ClientEvent.REQUEST_DISCONNECT, ClientState.DISCONNECTED);
 	}

@@ -147,7 +147,7 @@ public class Client implements ClientApi {
 	
 	@Override
 	public Future<Boolean> stopSending() {
-		checkFsmState(ClientState.SENDING);
+		checkFsmState(ClientState.RECEIVING);
 		
 		clientFSM.readSymbol(ClientEvent.REQUEST_STOP);
 		return clientProtocolContext.stopRequest(channel);
