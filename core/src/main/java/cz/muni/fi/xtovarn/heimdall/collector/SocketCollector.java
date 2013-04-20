@@ -15,9 +15,24 @@ public class SocketCollector implements Startable {
 	private final PipelineFactory pipelineFactory;
 	private ServerSocket serverSocket;
 
-//	@Inject
+	// @Inject
 	public SocketCollector(PipelineFactory pipelineFactory) {
 		this.pipelineFactory = pipelineFactory;
+	}
+
+	private void closeServerSocket(boolean setToNull) {
+		if (serverSocket != null) {
+			if (!serverSocket.isClosed()) {
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			if (setToNull)
+				serverSocket = null;
+		}
 	}
 
 	@Override
@@ -31,11 +46,11 @@ public class SocketCollector implements Startable {
 			}
 		} catch (IOException e) {
 			if (serverSocket != null && serverSocket.isClosed())
-				; //Ignore if closed by stopServer() call
+				; // Ignore if closed by stopServer() call
 			else
 				e.printStackTrace();
 		} finally {
-			serverSocket = null;
+			closeServerSocket(true);
 		}
 	}
 
@@ -43,11 +58,7 @@ public class SocketCollector implements Startable {
 	public void stop() {
 		System.out.println("Closing " + this.getClass() + "...");
 
-		try {
-			serverSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		closeServerSocket(false);
 
 		System.out.println(this.getClass() + " closed!");
 	}
