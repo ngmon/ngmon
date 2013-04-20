@@ -31,6 +31,7 @@ public class ClientProtocolContext {
 	private ResultFuture<Boolean> readyRequest = null;
 	private ResultFuture<Boolean> stopRequest = null;
 	private ResultFuture<Boolean> disconnectRequest = null;
+	private ResultFuture<Boolean> getRequest = null;
 
 	private Long connectionId = null;
 
@@ -171,6 +172,9 @@ public class ClientProtocolContext {
 		case REQUEST_STOP:
 			stopRequest.put(true);
 			break;
+		case REQUEST_GET:
+			getRequest.put(true);
+			break;
 		default:
 			throw new IllegalArgumentException();
 		}
@@ -193,6 +197,9 @@ public class ClientProtocolContext {
 			break;
 		case REQUEST_STOP:
 			stopRequest.put(false);
+			break;
+		case REQUEST_GET:
+			getRequest.put(false);
 			break;
 		}
 	}
@@ -223,6 +230,14 @@ public class ClientProtocolContext {
 
 	public void disconnectResponse() {
 		disconnectRequest.put(true);
+	}
+
+	public Future<Boolean> getRequest(Channel channel) {
+		getRequest = new ResultFuture<>();
+		lastRequest = ClientEvent.REQUEST_GET;
+		channel.write(new SimpleMessage(Directive.GET, "".getBytes()));
+		
+		return getRequest;
 	}
 
 }

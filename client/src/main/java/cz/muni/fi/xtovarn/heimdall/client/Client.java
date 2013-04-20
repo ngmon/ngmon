@@ -180,4 +180,12 @@ public class Client implements ClientApi {
 		return clientProtocolContext.disconnectRequest(channel);
 	}
 
+	@Override
+	public Future<Boolean> get() {
+		checkFsmState(ClientState.CONNECTED);
+		
+		clientFSM.readSymbol(ClientEvent.REQUEST_GET);
+		return clientProtocolContext.getRequest(channel);
+	}
+
 }
