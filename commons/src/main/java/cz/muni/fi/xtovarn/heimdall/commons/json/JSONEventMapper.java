@@ -7,6 +7,9 @@ import  com.fasterxml.jackson.dataformat.smile.SmileFactory;
 import java.io.IOException;
 
 // TODO add to pico
+/**
+ * Converts Event to byte array and vice versa
+ */
 public class JSONEventMapper {
 
 	private static final ObjectMapper mapper = new ObjectMapper(new SmileFactory());

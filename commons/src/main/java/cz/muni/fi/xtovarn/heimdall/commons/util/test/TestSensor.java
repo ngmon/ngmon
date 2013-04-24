@@ -7,6 +7,10 @@ import java.net.Socket;
 
 import cz.muni.fi.xtovarn.heimdall.commons.Constants;
 
+/**
+ * A simple sensor designed to be used in tests (for sending events to the
+ * server)
+ */
 public class TestSensor {
 
 	private static final String HOST_NAME = "localhost";

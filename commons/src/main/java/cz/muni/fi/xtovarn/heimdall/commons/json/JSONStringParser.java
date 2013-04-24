@@ -5,6 +5,9 @@ import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 
 import java.io.IOException;
 
+/**
+ * Converts Event to String and vice versa
+ */
 public class JSONStringParser {
 
 	private static final ObjectMapper mapper = new ObjectMapper();
