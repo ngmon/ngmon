@@ -1,5 +1,10 @@
 package cz.muni.fi.xtovarn.heimdall.client.subscribe;
 
+/**
+ * A constraint (for filtering sensor events)
+ * 
+ * @see Predicate
+ */
 public class Constraint {
 
 	private String attributeName;

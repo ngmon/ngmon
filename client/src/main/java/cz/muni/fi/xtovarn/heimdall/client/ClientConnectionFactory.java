@@ -4,6 +4,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * The class for retrieving ClientApi object
+ */
 public class ClientConnectionFactory {
 
 	public static class ConnectionException extends Exception {
@@ -32,6 +35,10 @@ public class ClientConnectionFactory {
 
 	}
 
+	/**
+	 * Retrieves the ClientApi object - connects to the Ngmon server (with
+	 * authentication)
+	 */
 	public static ClientApi getClient(String login, String passcode, long timeout, TimeUnit unit)
 			throws ConnectionException {
 		Client client;
@@ -39,7 +46,8 @@ public class ClientConnectionFactory {
 		boolean connected;
 		try {
 			client = new Client(timeout, unit);
-			// wait for the channel to connect (waiting in the constructor is not
+			// wait for the channel to connect (waiting in the constructor is
+			// not
 			// enough)
 			client.getChannelConnectedResult().get();
 			connected = client.connect(login, passcode).get(timeout, unit);

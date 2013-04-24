@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
+ * Implementation of the Future interface
  * 
  * @author Klaus Brunner (https://gist.github.com/KlausBrunner/4110226),
  *         modifications by Svata Novak

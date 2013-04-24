@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A predicate for filtering sensor events; To be used in SUBSCRIBE messages
+ * sent to the server (for subscribing to specific sensor events)
+ */
 public class Predicate {
 
 	private List<Constraint> constraints = new ArrayList<>();

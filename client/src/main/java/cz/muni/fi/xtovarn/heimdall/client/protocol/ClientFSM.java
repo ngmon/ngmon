@@ -3,6 +3,9 @@ package cz.muni.fi.xtovarn.heimdall.client.protocol;
 import cz.muni.fi.xtovarn.fsm.AbstractFiniteStateMachineNoActions;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 
+/**
+ * State machine which manages client state
+ */
 public class ClientFSM extends AbstractFiniteStateMachineNoActions<ClientState, ClientEvent> {
 
 	public ClientFSM(final SecureChannelGroup secureChannelGroup) {

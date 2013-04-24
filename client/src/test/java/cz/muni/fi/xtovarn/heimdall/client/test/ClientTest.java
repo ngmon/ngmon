@@ -33,8 +33,14 @@ import cz.muni.fi.xtovarn.heimdall.client.test.util.NgmonLauncher;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestSensor;
 
+/**
+ * Various client tests
+ */
 public class ClientTest {
 
+	/**
+	 * Simple EventReceivedHandler which counts and saves received sensor events
+	 */
 	private static class TestEventHandler implements EventReceivedHandler {
 		private AtomicInteger count = new AtomicInteger(0);
 		private List<Event> events = new ArrayList<>();
@@ -65,8 +71,14 @@ public class ClientTest {
 	private static final String INVALID_USER_PASSWORD = "passwordFoo";
 	private static final String JSON_FILE_NAME = "events2.jsons";
 
+	/**
+	 * How long to wait for server response
+	 */
 	private static final int TIMEOUT_VALUE = 5;
 	private static final TimeUnit TIMEOUT_TIME_UNIT = TimeUnit.SECONDS;
+	/**
+	 * The amount of time to wait for all sensor events
+	 */
 	private static final long EVENT_TIMEOUT_IN_MILLIS = 1000;
 
 	private TestEventHandler testEventHandler = new TestEventHandler();
@@ -75,6 +87,9 @@ public class ClientTest {
 
 	private Client client = null;
 
+	/**
+	 * Starts Ngmon server and connects to it
+	 */
 	@Before
 	public void setUp() throws ConnectionException, DatabaseException, IOException, InterruptedException {
 		this.ngmon = new NgmonLauncher();
@@ -93,6 +108,9 @@ public class ClientTest {
 		this.ngmon.stop();
 	}
 
+	/**
+	 * Empty since the actual test is done in setUp
+	 */
 	@Test
 	public void connect() throws InterruptedException, ExecutionException {
 	}
@@ -187,6 +205,9 @@ public class ClientTest {
 		client.stopSending();
 	}
 
+	/**
+	 * Sends the events from the specified file (JSON format)
+	 */
 	private void sendEvents(String jsonFileName) throws IOException, InterruptedException {
 		TestSensor sensor = new TestSensor();
 		BufferedReader br = new BufferedReader(new FileReader("src/main/resources/" + jsonFileName));
@@ -200,6 +221,11 @@ public class ClientTest {
 		Thread.sleep(EVENT_TIMEOUT_IN_MILLIS);
 	}
 
+	/**
+	 * Subscribes to sensor events using the specified Predicate, then sends the
+	 * events using a test sensor, and finally checks the number of received
+	 * events is what we expected
+	 */
 	private List<Event> testMessageReceived(Predicate predicate, int expectedEventCount) throws InterruptedException,
 			ExecutionException, IOException {
 		Long subscriptionId = client.subscribe(predicate).get();
@@ -223,6 +249,9 @@ public class ClientTest {
 		return testMessageReceived(predicate, expectedEventCount);
 	}
 
+	/**
+	 * Checks the content of the forwarded event is correct too
+	 */
 	@Test
 	public void testTypeEqualsStarted5() throws InterruptedException, ExecutionException, IOException {
 		List<Event> events = testMessageReceivedOneConstraint(new Constraint("type", Operator.EQUALS,

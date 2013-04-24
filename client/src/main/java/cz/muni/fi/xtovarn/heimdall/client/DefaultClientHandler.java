@@ -13,6 +13,9 @@ import cz.muni.fi.xtovarn.heimdall.commons.json.JSONEventMapper;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 
+/**
+ * Used to receive and process messages coming by Ngmon server
+ */
 public class DefaultClientHandler extends SimpleChannelHandler {
 
 	private ClientFSM clientStateMachine = new ClientFSM(null);
@@ -74,12 +77,14 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 		}
 
 		ClientEvent clientEvent = directiveToClientEvent(directive, clientProtocolContext.getLastRequest());
+		// handle disconnect message
 		if (clientEvent != null && clientEvent.equals(ClientEvent.RECEIVED_DISCONNECTED)) {
 			disconnected = true;
 			clientProtocolContext.disconnectResponse();
 			return;
 		}
 		
+		// unexpected message
 		if (clientEvent == null || this.clientStateMachine.isEnded()
 				|| this.clientStateMachine.getNextState(clientEvent) == null) {
 			// TODO - use checked exception?

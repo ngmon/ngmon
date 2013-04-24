@@ -21,10 +21,17 @@ import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.Constants;
 
+/**
+ * The "executive" part of the client - sends messages to server and processes
+ * received messages (after they are preprocessed by DefaultClientHandler)
+ */
 public class ClientProtocolContext {
 
 	private ObjectMapper mapper = new ObjectMapper();
 
+	/**
+	 * The objects of type Future which hold the results of the operations
+	 */
 	private ResultFuture<Boolean> connectResult = null;
 	private ResultFuture<Long> subscribeResult = null;
 	private ResultFuture<Boolean> unsubscribeResult = null;
@@ -40,6 +47,16 @@ public class ClientProtocolContext {
 
 	private ClientEvent lastRequest = null;
 
+	/**
+	 * Sends the CONNECT message to the server (with authentication data)
+	 * 
+	 * @param channel
+	 *            Netty connection channel
+	 * @param user
+	 *            Stores authentication data
+	 * @return True if the connection (authentication) was successful, false
+	 *         otherwise
+	 */
 	public Future<Boolean> connectRequest(Channel channel, User user) {
 		try {
 			connectResult = new ResultFuture<>();
@@ -60,8 +77,12 @@ public class ClientProtocolContext {
 		return connectResult;
 	}
 
+	/**
+	 * Processes the server response to CONNECT
+	 */
 	public void connectResponse(MessageEvent e) {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
+		// authentication failed
 		if (message.getDirective().equals(Directive.ERROR)) {
 			connectResult.put(false);
 			return;
@@ -71,9 +92,8 @@ public class ClientProtocolContext {
 			@SuppressWarnings("unchecked")
 			Map<String, Number> connectionIdMap = (Map<String, Number>) mapper.readValue(message.getBody(), Map.class);
 			connectionId = connectionIdMap.get(Constants.CONNECTION_ID_TITLE).longValue();
-			// TODO - might be null if getNewConnectResult()
-			// wasn't called
 			connectResult.put(true);
+			// retrieving of the response failed
 		} catch (IOException ex) {
 			connectResult.put(false);
 			throw new RuntimeException("Invalid response from server");
@@ -110,6 +130,8 @@ public class ClientProtocolContext {
 					.readValue(message.getBody(), Map.class);
 			subscriptionId = subscriptionIdMap.get(Constants.SUBSCRIPTION_ID_TITLE).longValue();
 			if (subscriptionId != null) {
+				// this is for testing purposes only (client user should
+				// keep track of subscription IDs)
 				subscriptionIds.add(subscriptionId);
 			}
 		} catch (IOException ex) {
@@ -158,6 +180,9 @@ public class ClientProtocolContext {
 		return lastRequest;
 	}
 
+	/**
+	 * Handle ACK server response
+	 */
 	public void ackResponse(MessageEvent e) {
 		switch (getLastRequest()) {
 		case REQUEST_SUBSCRIBE:
@@ -180,6 +205,9 @@ public class ClientProtocolContext {
 		}
 	}
 
+	/**
+	 * Handle ERROR server response
+	 */
 	public void errorResponse(MessageEvent e) {
 		// TODO - what if lastRequest == null?
 		switch (getLastRequest()) {
@@ -204,22 +232,31 @@ public class ClientProtocolContext {
 		}
 	}
 
+	/**
+	 * Sends READY (ready to start receiving sensor events) to server
+	 */
 	public Future<Boolean> readyRequest(Channel channel) {
 		readyRequest = new ResultFuture<>();
 		lastRequest = ClientEvent.REQUEST_READY;
 		channel.write(new SimpleMessage(Directive.READY, "".getBytes()));
-		
+
 		return readyRequest;
 	}
-	
+
+	/**
+	 * Sends STOP (stop sending sensor events) to server
+	 */
 	public Future<Boolean> stopRequest(Channel channel) {
 		stopRequest = new ResultFuture<>();
 		lastRequest = ClientEvent.REQUEST_STOP;
 		channel.write(new SimpleMessage(Directive.STOP, "".getBytes()));
-		
+
 		return stopRequest;
 	}
 
+	/**
+	 * Sends DISCONNECT request to server
+	 */
 	public Future<Boolean> disconnectRequest(Channel channel) {
 		disconnectRequest = new ResultFuture<>();
 		lastRequest = ClientEvent.REQUEST_DISCONNECT;
@@ -232,11 +269,14 @@ public class ClientProtocolContext {
 		disconnectRequest.put(true);
 	}
 
+	/**
+	 * Sends GET to server (NOT YET IMPLEMENTED!)
+	 */
 	public Future<Boolean> getRequest(Channel channel) {
 		getRequest = new ResultFuture<>();
 		lastRequest = ClientEvent.REQUEST_GET;
 		channel.write(new SimpleMessage(Directive.GET, "".getBytes()));
-		
+
 		return getRequest;
 	}
 

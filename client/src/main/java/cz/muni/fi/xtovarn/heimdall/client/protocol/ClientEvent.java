@@ -1,5 +1,9 @@
 package cz.muni.fi.xtovarn.heimdall.client.protocol;
 
+/**
+ * Event causing the client to change state; Usually fired by Client method call
+ * (subscribe, ready...) or as a response to a (received) server message
+ */
 public enum ClientEvent {
 	NETTY_TCP_CONNECTED,
 	ERROR,

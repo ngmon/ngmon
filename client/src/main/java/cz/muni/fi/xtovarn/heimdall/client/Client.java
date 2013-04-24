@@ -20,6 +20,9 @@ import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientState;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
 import cz.muni.fi.xtovarn.heimdall.entities.User;
 
+/**
+ * Ngmon client implementation
+ */
 public class Client implements ClientApi {
 
 	private ChannelFactory factory;
@@ -27,9 +30,18 @@ public class Client implements ClientApi {
 	private Channel channel = null;
 	private DefaultClientHandler clientHandler = null;
 	private ClientProtocolContext clientProtocolContext = null;
+	/**
+	 * Manages client state
+	 */
 	private ClientFSM clientFSM = null;
+	/**
+	 * True if disconnect() has been called
+	 */
 	private boolean disconnected = false;
 
+	/**
+	 * Connects to the Ngmon server
+	 */
 	public Client(long timeout, TimeUnit unit) throws InterruptedException {
 		factory = new NioClientSocketChannelFactory(Executors.newSingleThreadExecutor(),
 				Executors.newSingleThreadExecutor());
@@ -53,10 +65,22 @@ public class Client implements ClientApi {
 		clientFSM = clientHandler.getClientStateMachine();
 	}
 
+	/**
+	 * Used in ConnectionFactory when connecting to the server, this is true as
+	 * soon as the connection has been established and client state has been
+	 * changed accordingly (this is very important)
+	 */
 	public Future<Boolean> getChannelConnectedResult() {
 		return clientHandler.getChannelConnectedResult();
 	}
 
+	/**
+	 * Helper method for checking if the client is in a desired state; if not,
+	 * exception is thrown
+	 * 
+	 * @param state
+	 *            The required state
+	 */
 	private void checkFsmState(ClientState state) {
 		ClientState currentState = clientFSM.getCurrentState();
 		if (!currentState.equals(state))
@@ -66,6 +90,9 @@ public class Client implements ClientApi {
 			throw new IllegalStateException("The client is disconnected");
 	}
 
+	/**
+	 * Authenticates against the Ngmon server, finishing the connection phase
+	 */
 	public Future<Boolean> connect(String login, String passcode) throws InterruptedException {
 		if (login == null || passcode == null || login.isEmpty() || passcode.isEmpty())
 			throw new IllegalArgumentException("connect()");
@@ -74,6 +101,7 @@ public class Client implements ClientApi {
 
 		User user = new User(login, passcode);
 
+		// set waiting state, then send the request to server
 		clientFSM.readSymbol(ClientEvent.REQUEST_CONNECT);
 		return clientProtocolContext.connectRequest(channel, user);
 	}
@@ -86,8 +114,12 @@ public class Client implements ClientApi {
 		return clientProtocolContext.isConnected();
 	}
 
-	/* (non-Javadoc)
-	 * @see cz.muni.fi.xtovarn.heimdall.client.ClientApi#subscribe(cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * cz.muni.fi.xtovarn.heimdall.client.ClientApi#subscribe(cz.muni.fi.xtovarn
+	 * .heimdall.client.subscribe.Predicate)
 	 */
 	@Override
 	public Future<Long> subscribe(Predicate predicate) throws InterruptedException, ExecutionException {
@@ -96,6 +128,7 @@ public class Client implements ClientApi {
 		if (predicate == null || predicate.isEmpty())
 			throw new IllegalArgumentException("subscribe()");
 
+		// set waiting state, then send the request to server
 		clientFSM.readSymbol(ClientEvent.REQUEST_SUBSCRIBE);
 		return clientProtocolContext.subscribeRequest(channel, predicate);
 	}
@@ -112,8 +145,11 @@ public class Client implements ClientApi {
 		return clientProtocolContext.wasLastSubscriptionSuccessful();
 	}
 
-	/* (non-Javadoc)
-	 * @see cz.muni.fi.xtovarn.heimdall.client.ClientApi#unsubscribe(java.lang.Long)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * cz.muni.fi.xtovarn.heimdall.client.ClientApi#unsubscribe(java.lang.Long)
 	 */
 	@Override
 	public Future<Boolean> unsubscribe(Long subscriptionId) throws InterruptedException, ExecutionException {
@@ -126,7 +162,9 @@ public class Client implements ClientApi {
 		return clientProtocolContext.unsubscribeRequest(channel, subscriptionId);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see cz.muni.fi.xtovarn.heimdall.client.ClientApi#stop()
 	 */
 	@Override
@@ -140,15 +178,15 @@ public class Client implements ClientApi {
 	@Override
 	public Future<Boolean> ready() {
 		checkFsmState(ClientState.CONNECTED);
-		
+
 		clientFSM.readSymbol(ClientEvent.REQUEST_READY);
 		return clientProtocolContext.readyRequest(channel);
 	}
-	
+
 	@Override
 	public Future<Boolean> stopSending() {
 		checkFsmState(ClientState.RECEIVING);
-		
+
 		clientFSM.readSymbol(ClientEvent.REQUEST_STOP);
 		return clientProtocolContext.stopRequest(channel);
 	}
@@ -156,7 +194,7 @@ public class Client implements ClientApi {
 	@Override
 	public void reset() {
 		checkFsmState(ClientState.WAITING_FOR_ACK);
-		
+
 		clientFSM.rollback();
 	}
 
@@ -173,9 +211,9 @@ public class Client implements ClientApi {
 	@Override
 	public Future<Boolean> disconnect() {
 		checkFsmState(ClientState.CONNECTED);
-		
+
 		disconnected = true;
-		
+
 		clientFSM.readSymbol(ClientEvent.REQUEST_DISCONNECT);
 		return clientProtocolContext.disconnectRequest(channel);
 	}
@@ -183,7 +221,7 @@ public class Client implements ClientApi {
 	@Override
 	public Future<Boolean> get() {
 		checkFsmState(ClientState.CONNECTED);
-		
+
 		clientFSM.readSymbol(ClientEvent.REQUEST_GET);
 		return clientProtocolContext.getRequest(channel);
 	}
