@@ -8,6 +8,10 @@ import org.jboss.netty.channel.MessageEvent;
 
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.MessageHandler;
 
+/**
+ * A simple handler which saves and counts the received messages (sent by the
+ * server)
+ */
 public class TestMessageHandler implements MessageHandler {
 
 	private int messageCount = 0;

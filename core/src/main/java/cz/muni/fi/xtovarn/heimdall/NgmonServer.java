@@ -13,6 +13,9 @@ import cz.muni.fi.xtovarn.heimdall.storage.dpl.EventDataAccessor;
 
 import java.io.File;
 
+/**
+ * The Ngmon server itself
+ */
 public class NgmonServer {
 
 	private final DefaultDatabaseEnvironment defaultDatabaseEnvironment;
@@ -26,16 +29,20 @@ public class NgmonServer {
 		this.nettyServer = new NettyServer(scg, subscriptionManager);
 		Dispatcher dispatcher = new Dispatcher(scg);
 
+		// initialize event store
 		this.defaultDatabaseEnvironment = new DefaultDatabaseEnvironment();
 		EventStore eventStore = new EventDataAccessor(defaultDatabaseEnvironment.setup(baseDirectory));
 
+		// create pipeline factory for sensor events
 		PipelineFactory pipelineFactory = new DefaultPipelineFactory(eventStore, dispatcher, scg, subscriptionManager);
 		this.socketCollector = new SocketCollector(pipelineFactory);
 	}
 
 	public void start() {
 
+		// start the server itself
 		this.nettyServer.start();
+		// start collecting sensor events
 		this.socketCollector.start();
 	}
 

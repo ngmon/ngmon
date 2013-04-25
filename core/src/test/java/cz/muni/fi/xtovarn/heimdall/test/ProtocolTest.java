@@ -24,6 +24,9 @@ import cz.muni.fi.xtovarn.heimdall.test.util.TestResponseHandlers;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.ResponseHandler;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.TestMessage;
 
+/**
+ * Various server tests - Client sends requests and checks the responses
+ */
 public class ProtocolTest {
 
 	private static final String VALID_USER_LOGIN = "user0";
@@ -35,61 +38,88 @@ public class ProtocolTest {
 	private static final String SUBSCRIPTION_ID_KEY = "subscriptionId";
 
 	private static ObjectMapperWrapper mapper = new ObjectMapperWrapper();
-	
+
 	private NgmonLauncher ngmon = null;
 	private TestClient testClient = null;
 
+	/**
+	 * Launches the Ngmon server and initializes the test client
+	 */
 	@Before
 	public void setUp() throws DatabaseException, IOException, InterruptedException {
 		this.ngmon = new NgmonLauncher();
 		this.ngmon.start();
-		
+
 		testClient = new TestClient();
 	}
 
 	@After
 	public void tearDown() {
 		testClient.stop();
-		
+
 		this.ngmon.stop();
 	}
 
+	/**
+	 * Connects (with authentication) to the Ngmon server
+	 */
 	private void connect() {
 		testClient.addMessage(
 				new SimpleMessage(Directive.CONNECT, mapper.writeValueAsBytesNoExceptions(new User(VALID_USER_LOGIN,
 						VALID_USER_PASSCODE))), CONNECTION_ID_KEY, TestResponseHandlers.CONNECT_RESPONSE_HANDLER);
 	}
 
+	/**
+	 * Sends DISCONNECT request to the server
+	 */
 	private void disconnect() {
 		testClient.addMessage(new SimpleMessage(Directive.DISCONNECT, "".getBytes()), null,
 				TestResponseHandlers.ACK_RESPONSE_HANDLER);
 	}
-	
+
+	/**
+	 * Sends READY request, checks the response is ACK
+	 */
 	private void ready() {
 		testClient.addMessage(new SimpleMessage(Directive.READY, "".getBytes()), null,
 				TestResponseHandlers.ACK_RESPONSE_HANDLER);
 	}
-	
+
+	/**
+	 * Sends READY request, checks the response is ERROR
+	 */
 	private void readyWithError() {
 		testClient.addMessage(new SimpleMessage(Directive.READY, "".getBytes()), null,
 				TestResponseHandlers.ERROR_RESPONSE_HANDLER);
 	}
-	
+
+	/**
+	 * Sends STOP request, checks the response is ACK
+	 */
 	private void stop() {
 		testClient.addMessage(new SimpleMessage(Directive.STOP, "".getBytes()), null,
 				TestResponseHandlers.ACK_RESPONSE_HANDLER);
 	}
-	
+
+	/**
+	 * Sends STOP request, checks the response is ERROR
+	 */
 	private void stopWithError() {
 		testClient.addMessage(new SimpleMessage(Directive.STOP, "".getBytes()), null,
 				TestResponseHandlers.ERROR_RESPONSE_HANDLER);
 	}
-	
+
+	/**
+	 * Sends GET request, checks the response is ACK
+	 */
 	private void get() {
 		testClient.addMessage(new SimpleMessage(Directive.GET, "".getBytes()), null,
 				TestResponseHandlers.ACK_RESPONSE_HANDLER);
 	}
-	
+
+	/**
+	 * Sends GET request, checks the response is ERROR
+	 */
 	private void getWithError() {
 		testClient.addMessage(new SimpleMessage(Directive.GET, "".getBytes()), null,
 				TestResponseHandlers.ERROR_RESPONSE_HANDLER);
@@ -290,14 +320,14 @@ public class ProtocolTest {
 		ready();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testReadyWithoutConnect() throws InterruptedException {
 		testClient.addMessage(new SimpleMessage(Directive.READY, "".getBytes()), null,
 				TestResponseHandlers.ERROR_RESPONSE_HANDLER);
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testReadyAfterDisconnect() throws InterruptedException {
 		connect();
@@ -306,7 +336,7 @@ public class ProtocolTest {
 				TestResponseHandlers.ERROR_RESPONSE_HANDLER);
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testStop() throws InterruptedException {
 		connect();
@@ -314,20 +344,20 @@ public class ProtocolTest {
 		stop();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testStopWithoutReady() throws InterruptedException {
 		connect();
 		stopWithError();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testStopWithoutConnect() throws InterruptedException {
 		stopWithError();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testStopAfterDisconnect() throws InterruptedException {
 		connect();
@@ -335,14 +365,14 @@ public class ProtocolTest {
 		stopWithError();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testGet() throws InterruptedException {
 		connect();
 		get();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testGetWhenSending() throws InterruptedException {
 		connect();
@@ -350,13 +380,13 @@ public class ProtocolTest {
 		getWithError();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testGetWithoutConnect() throws InterruptedException {
 		getWithError();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testGetAfterDisconnect() throws InterruptedException {
 		connect();
@@ -364,7 +394,7 @@ public class ProtocolTest {
 		getWithError();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testReadyAfterReady() throws InterruptedException {
 		connect();
@@ -372,7 +402,7 @@ public class ProtocolTest {
 		readyWithError();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testStopAfterStop() throws InterruptedException {
 		connect();
@@ -381,7 +411,7 @@ public class ProtocolTest {
 		stopWithError();
 		testClient.run();
 	}
-	
+
 	@Test
 	public void testSubscribeAfterReady() throws InterruptedException {
 		connect();

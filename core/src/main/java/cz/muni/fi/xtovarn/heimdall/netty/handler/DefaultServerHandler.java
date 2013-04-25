@@ -15,6 +15,9 @@ import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerFSM;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.ServerProtocolContext;
 import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
 
+/**
+ * Handles client requests (CONNECT, SUBSCRIBE, READY...)
+ */
 public class DefaultServerHandler extends SimpleChannelHandler {
 
 	private final SecureChannelGroup secureChannelGroup;
@@ -40,12 +43,14 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 		// TODO - add description to the error message (based on current state
 		// and received message)
 		ServerEvent serverEvent = HandlerUtils.directiveToServerEvent(message.getDirective());
+		// invalid client message -> send error
 		if (serverEvent == null || this.serverStateMachine.isEnded()
 				|| this.serverStateMachine.getNextState(serverEvent) == null) {
 			sendError(channel);
 			return;
 		}
 
+		// react to the message - change state and do the appropriate action
 		ServerContext actionContext = new ServerContext(ctx, e, null);
 		switch (message.getDirective()) {
 		case CONNECT:

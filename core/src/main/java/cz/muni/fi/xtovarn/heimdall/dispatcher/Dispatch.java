@@ -10,6 +10,9 @@ import org.jboss.netty.channel.ChannelFuture;
 
 import java.io.IOException;
 
+/**
+ * Sends an Event using the specified (Netty) Channel
+ */
 public class Dispatch implements Runnable {
 
 	private final Event event;

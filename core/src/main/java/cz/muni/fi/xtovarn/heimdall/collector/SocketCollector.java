@@ -10,6 +10,9 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * The service for processing sensor events
+ */
 public class SocketCollector implements Startable {
 
 	private final ExecutorService service = Executors.newCachedThreadPool();
@@ -36,6 +39,9 @@ public class SocketCollector implements Startable {
 		}
 	}
 
+	/**
+	 * Opens the server socket and processes incoming sensor data
+	 */
 	@Override
 	public void start() {
 		try {

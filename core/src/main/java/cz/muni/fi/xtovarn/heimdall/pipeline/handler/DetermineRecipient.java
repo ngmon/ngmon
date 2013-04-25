@@ -10,6 +10,10 @@ import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 import cz.muni.fi.xtovarn.heimdall.pipeline.handler.utils.EventConverter;
 import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
 
+/**
+ * This handler appends to the sensor event the appropriate recipients (clients)
+ * which subscribed to this event before
+ */
 public class DetermineRecipient implements Handler {
 
 	private final SubscriptionManager subscriptionManager;
@@ -34,8 +38,11 @@ public class DetermineRecipient implements Handler {
 			throw new RuntimeException(e);
 		}
 
+		// keep only recipients which are connected and receiving (are in the
+		// RECEIVING state, i.e. sent READY)
 		recipients.retainAll(secureChannelGroup.getReceivingUsers());
 
+		// append the recipients
 		return new Subscription(recipients, event);
 	}
 }

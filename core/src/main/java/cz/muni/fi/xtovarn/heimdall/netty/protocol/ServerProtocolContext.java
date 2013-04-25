@@ -20,8 +20,15 @@ import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
 import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionParser;
 
+/**
+ * The "executive" part of the server - processes client requests (after they
+ * are preprocessed by DefaultServerHandler) and sends results to the client
+ */
 public class ServerProtocolContext {
 
+	/**
+	 * Simple static user store
+	 */
 	private static class UserStore {
 
 		private Map<String, String> userMap = new HashMap<>();
@@ -49,6 +56,9 @@ public class ServerProtocolContext {
 		this.subscriptionManager = subscriptionManager;
 	}
 
+	/**
+	 * Processes CONNECT request
+	 */
 	public boolean connect(ServerContext actionContext) {
 		MessageEvent messageEvent = actionContext.getMessageEvent();
 		SimpleMessage message = (SimpleMessage) messageEvent.getMessage();
@@ -77,6 +87,9 @@ public class ServerProtocolContext {
 		return verified;
 	}
 
+	/**
+	 * Processes DISCONNECT request
+	 */
 	public void disconnect(ServerContext actionContext) {
 		Channel channel = actionContext.getMessageEvent().getChannel();
 
@@ -86,6 +99,9 @@ public class ServerProtocolContext {
 		disconnect(channel);
 	}
 
+	/**
+	 * Removes the client from the collection of connected clients
+	 */
 	public void disconnect(Channel channel) {
 		secureChannelGroup.remove(channel);
 	}
@@ -94,16 +110,22 @@ public class ServerProtocolContext {
 		channel.write(new SimpleMessage(Directive.ERROR, "".getBytes()));
 	}
 
+	/**
+	 * Subscribes the client for sensor events specified by the Predicate
+	 */
 	public void processSubscription(ServerContext actionContext) {
 		MessageEvent messageEvent = actionContext.getMessageEvent();
 		Channel channel = messageEvent.getChannel();
 		boolean success = false;
 		try {
+			// parse the predicate and subscribe the client
 			@SuppressWarnings("unchecked")
 			Predicate predicate = SubscriptionParser.parseSubscription(mapper.readValue(
 					((SimpleMessage) messageEvent.getMessage()).getBody(), Map.class));
 			Long subscriptionId = this.subscriptionManager.addSubscription(secureChannelGroup.getUsername(channel),
 					predicate);
+			
+			// send the subscription ID to the client
 			Map<String, Long> subscriptionIdMap = new HashMap<>();
 			subscriptionIdMap.put(Constants.SUBSCRIPTION_ID_TITLE, subscriptionId);
 			channel.write(new SimpleMessage(Directive.ACK, mapper.writeValueAsBytes(subscriptionIdMap)));
@@ -115,10 +137,14 @@ public class ServerProtocolContext {
 			sendError(channel);
 	}
 
+	/**
+	 * Cancels the specified subscription
+	 */
 	public void processUnsubscribe(ServerContext actionContext) {
 		Channel channel = actionContext.getMessageEvent().getChannel();
 		boolean success = false;
 		try {
+			// retrieve the subscription ID, then unsubscribe
 			@SuppressWarnings("unchecked")
 			Map<String, Number> unsubscribeMap = mapper.readValue(((SimpleMessage) actionContext.getMessageEvent()
 					.getMessage()).getBody(), Map.class);
@@ -141,18 +167,27 @@ public class ServerProtocolContext {
 		channel.write(new SimpleMessage(Directive.ACK, "".getBytes()));
 	}
 
+	/**
+	 * Starts forwarding sensor events to the client
+	 */
 	public void processReady(ServerContext actionContext) {
 		Channel channel = actionContext.getMessageEvent().getChannel();
 		secureChannelGroup.setReceiving(channel, true);
 		sendAck(channel);
 	}
 
+	/**
+	 * Stops forwarding sensor events to the client
+	 */
 	public void processStop(ServerContext actionContext) {
 		Channel channel = actionContext.getMessageEvent().getChannel();
 		secureChannelGroup.setReceiving(channel, false);
 		sendAck(channel);
 	}
 
+	/**
+	 * Retrieves the "missed" sensor events - NOT YET IMPLEMENTED
+	 */
 	public void processGet(ServerContext actionContext) {
 		// TODO - implement
 		sendAck(actionContext.getMessageEvent().getChannel());

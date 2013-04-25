@@ -11,6 +11,9 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The network component of the Ngmon server, implemented using Netty framework
+ */
 public class NettyServer implements Startable {
 
 	private final SecureChannelGroup secureChannelGroup;

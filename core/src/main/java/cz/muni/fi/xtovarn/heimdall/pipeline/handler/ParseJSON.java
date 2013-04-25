@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import java.io.IOException;
 
+/**
+ * Converts the event string to the Event object
+ */
 public class ParseJSON implements Handler {
 
 	@Override

@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+/**
+ * Receives sensor events and sends them through the pipeline for processing
+ */
 public class SensorConnectionHandler implements Runnable {
 
 //	private final ExecutorService childExecutor = Executors.newFixedThreadPool(10);
@@ -24,6 +27,7 @@ public class SensorConnectionHandler implements Runnable {
 
 			String string;
 
+			// receive and process the sensor events in a loop
 			while ((string = in.readLine()) != null) {
 				pipeline(string);
 			}

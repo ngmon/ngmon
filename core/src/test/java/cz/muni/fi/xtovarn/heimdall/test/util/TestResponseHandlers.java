@@ -10,6 +10,9 @@ import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
 import cz.muni.fi.xtovarn.heimdall.netty.protocol.Constants;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.ResponseHandler;
 
+/**
+ * Some response handler which are reused several times in the tests
+ */
 public class TestResponseHandlers {
 
 	public static ObjectMapperWrapper mapper = new ObjectMapperWrapper();

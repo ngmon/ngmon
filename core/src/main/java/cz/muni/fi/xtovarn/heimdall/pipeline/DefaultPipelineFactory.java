@@ -6,6 +6,9 @@ import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
 import cz.muni.fi.xtovarn.heimdall.storage.EventStore;
 import cz.muni.fi.xtovarn.heimdall.dispatcher.Dispatcher;
 
+/**
+ * Pipeline factory for processing sensor events
+ */
 public class DefaultPipelineFactory implements PipelineFactory {
 
 	private final EventStore eventStore;
@@ -25,6 +28,7 @@ public class DefaultPipelineFactory implements PipelineFactory {
 	public Pipeline getPipeline(Object o) {
 		Pipeline pipeline = new Pipeline(o);
 
+		// the individual phases of the sensor event processing
 		pipeline.addHandler(new ParseJSON());
 		pipeline.addHandler(new SetDetectionTime());
 		pipeline.addHandler(new Store(eventStore));

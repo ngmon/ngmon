@@ -24,6 +24,9 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 
+/**
+ * Manages connected users
+ */
 public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGroup {
 
 	private ConcurrentMap<String, Integer> usernameToId = new ConcurrentHashMap<String, Integer>();
@@ -98,6 +101,10 @@ public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGr
 		return true;
 	}
 
+	/**
+	 * Sets whether the user associated with the specified Channel wants to
+	 * receive sensor events or not
+	 */
 	public boolean setReceiving(Channel channel, boolean receiving) {
 		String username = getUsername(channel);
 		if (username == null)
@@ -107,10 +114,13 @@ public class SecureChannelGroup extends DefaultChannelGroup implements ChannelGr
 			receivingUsers.put(username, receiving);
 		else
 			receivingUsers.remove(username);
-			
+
 		return true;
 	}
 
+	/**
+	 * Returns the users who are receiving sensor events
+	 */
 	public Set<String> getReceivingUsers() {
 		return Collections.unmodifiableSet(receivingUsers.keySet());
 	}

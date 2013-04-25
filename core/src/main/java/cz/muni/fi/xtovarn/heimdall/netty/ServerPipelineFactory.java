@@ -12,6 +12,9 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
+/**
+ * Pipeline factory for processing client requests
+ */
 public class ServerPipelineFactory implements ChannelPipelineFactory {
 
 	private final SecureChannelGroup secureChannelGroup;

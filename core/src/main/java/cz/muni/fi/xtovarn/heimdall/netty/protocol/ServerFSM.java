@@ -3,6 +3,9 @@ package cz.muni.fi.xtovarn.heimdall.netty.protocol;
 import cz.muni.fi.xtovarn.fsm.AbstractFiniteStateMachineNoActions;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 
+/**
+ * State machine which manages server state
+ */
 public class ServerFSM extends AbstractFiniteStateMachineNoActions<ServerState, ServerEvent> {
 
 	public ServerFSM(final SecureChannelGroup secureChannelGroup) {

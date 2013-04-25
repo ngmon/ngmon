@@ -6,6 +6,9 @@ import cz.muni.fi.xtovarn.heimdall.storage.EventStore;
 
 import java.io.IOException;
 
+/**
+ * Saves the event to a (persistent) storage
+ */
 public class Store implements Handler {
 
 	private final EventStore store;

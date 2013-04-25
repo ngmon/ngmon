@@ -12,6 +12,10 @@ import cz.muni.fi.publishsubscribe.countingtree.AttributeValue;
 import cz.muni.fi.publishsubscribe.countingtree.Event;
 import cz.muni.fi.publishsubscribe.countingtree.EventImpl;
 
+/**
+ * Converts the event from the Ngmon format to the format which can be used in
+ * the publish-subscribe matching algorithm
+ */
 public class EventConverter {
 
 	private enum TYPE {
@@ -32,14 +36,17 @@ public class EventConverter {
 				continue;
 
 			String methodName = method.getName();
+			// filtering based on the payload (additional data) is not possible
 			if (methodName.equals("getPayload"))
 				continue;
 
 			Class<?> resultClass = method.getReturnType();
+			// call the get method - get the attribute value
 			Object result = method.invoke(ngmonEvent);
 			// remove if null is a valid attribute value
 			if (result == null)
 				continue;
+			// removing "get" to keep only the attribute name
 			String attributeName = methodName.substring(3);
 			if (attributeName.isEmpty())
 				continue;

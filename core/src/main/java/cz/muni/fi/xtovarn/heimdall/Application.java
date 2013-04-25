@@ -5,6 +5,9 @@ import com.sleepycat.je.DatabaseException;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Used to start the server directly (from the command line)
+ */
 public class Application {
 
 	public static final String DATABASE_PATH = "./database/events";

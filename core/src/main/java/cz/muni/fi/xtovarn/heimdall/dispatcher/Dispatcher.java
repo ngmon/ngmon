@@ -7,6 +7,9 @@ import cz.muni.fi.xtovarn.heimdall.commons.Startable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Sends events to the specified recipients which are connected
+ */
 public class Dispatcher implements Startable {
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 	private final SecureChannelGroup secureChannelGroup;

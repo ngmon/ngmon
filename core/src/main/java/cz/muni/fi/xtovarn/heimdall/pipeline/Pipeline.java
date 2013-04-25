@@ -5,6 +5,9 @@ import cz.muni.fi.xtovarn.heimdall.pipeline.handler.Handler;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Pipeline with handlers (Pipes and Filters pattern)
+ */
 public class Pipeline implements Runnable {
 
 	private List<Handler> handlers = new ArrayList<Handler>(5);

@@ -5,6 +5,10 @@ import java.io.IOException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Helper class which catches checked exceptions making the test code a little
+ * cleaner
+ */
 public class ObjectMapperWrapper extends ObjectMapper {
 
 	private static final long serialVersionUID = 1L;
