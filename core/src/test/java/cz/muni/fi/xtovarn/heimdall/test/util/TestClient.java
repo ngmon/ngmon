@@ -11,6 +11,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
@@ -70,6 +72,8 @@ public class TestClient {
 	private ObjectMapper mapper = new ObjectMapper();
 
 	private boolean isRunning = false;
+	
+	private static Logger logger = LogManager.getLogger(TestClient.class);
 
 	public void run(boolean close) throws InterruptedException {
 		factory = new NioClientSocketChannelFactory(Executors.newSingleThreadExecutor(),
@@ -145,14 +149,14 @@ public class TestClient {
 
 		channelHandler.setUnsolicitedMessageHandler(unsubscribeHandler);
 		for (Long subscriptionId : this.subscriptionIds) {
-			System.out.println("Unsubscribing " + subscriptionId);
+			logger.debug("Unsubscribing " + subscriptionId);
 			latch = channelHandler.getNewMessageReceivedLatch();
 			Map<String, Long> unsubscribeMap = new HashMap<>();
 			unsubscribeMap.put(Constants.SUBSCRIPTION_ID_TITLE, subscriptionId);
 			try {
 				channel.write(new SimpleMessage(Directive.UNSUBSCRIBE, mapper.writeValueAsBytes(unsubscribeMap)));
 				latch.await(TIMEOUT, TIMEOUT_UNIT);
-				System.out.println("Unsubscribed");
+				logger.debug("Unsubscribed");
 			} catch (JsonProcessingException | InterruptedException e) {
 				throw new RuntimeException("Error when unsubscribing. It's recommended to restart the server.", e);
 			}

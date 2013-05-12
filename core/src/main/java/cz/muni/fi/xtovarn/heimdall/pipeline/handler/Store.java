@@ -1,14 +1,20 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline.handler;
 
+import java.io.IOException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.sleepycat.je.DatabaseException;
+
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.storage.EventStore;
-
-import java.io.IOException;
 
 public class Store implements Handler {
 
 	private final EventStore store;
+	
+	private static Logger logger = LogManager.getLogger(Store.class);
 
 	public Store(EventStore store) {
 		this.store = store;
@@ -19,13 +25,13 @@ public class Store implements Handler {
 		try {
 			store.put((Event) o);
 		} catch (DatabaseException e) {
-			System.err.println("DatabaseException " + e.getMessage());
+			logger.error("DatabaseException " + e.getMessage());
 			e.printStackTrace();
 		} catch (IOException e) {
-			System.err.println("IOException " + e.getMessage());
+			logger.error("IOException " + e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
-			System.err.println("Exception " + e.getMessage());
+			logger.error("Exception " + e.getMessage());
 			e.printStackTrace();
 		}
 

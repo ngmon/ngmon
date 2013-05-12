@@ -3,6 +3,9 @@ package cz.muni.fi.xtovarn.heimdall.test.util;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.sleepycat.je.DatabaseException;
 
 import cz.muni.fi.xtovarn.heimdall.NgmonServer;
@@ -13,6 +16,8 @@ public class NgmonLauncher {
 	public static NgmonServer ngmonServer;
 	
 	private static long WAIT_IN_MILLIS = 1000;
+	
+	private static Logger logger = LogManager.getLogger(NgmonLauncher.class);
 
 	private static class NgmonStarter implements Runnable {
 
@@ -32,14 +37,14 @@ public class NgmonLauncher {
 		ngmonServer = new NgmonServer(new File(DATABASE_PATH));
 		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler(ngmonServer)));
 		
-		System.out.println("Heimdall is starting...");
+		logger.info("Heimdall is starting...");
 		(new Thread(new NgmonStarter(ngmonServer))).start();
 		
 		Thread.sleep(WAIT_IN_MILLIS);
 	}
 
 	public void stop() {
-		System.out.println("Shutting down...");
+		logger.info("Shutting down...");
 		ngmonServer.stop();
 	}
 

@@ -1,15 +1,20 @@
 package cz.muni.fi.xtovarn.heimdall.dispatcher;
 
-import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
-import cz.muni.fi.xtovarn.heimdall.commons.Startable;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import cz.muni.fi.xtovarn.heimdall.commons.Startable;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
 
 public class Dispatcher implements Startable {
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 	private final SecureChannelGroup secureChannelGroup;
+	
+	private static Logger logger = LogManager.getLogger(Dispatcher.class);
 
 //	@Inject
 	public Dispatcher(SecureChannelGroup secureChannelGroup) {
@@ -40,7 +45,7 @@ public class Dispatcher implements Startable {
 
 	@Override
 	public void stop() {
-		System.out.println("Closing " + this.getClass() + "...");
+		logger.info("Closing " + this.getClass() + "...");
 
 		executor.shutdown();
 	}

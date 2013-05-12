@@ -1,13 +1,19 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline.handler;
 
-import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.commons.json.JSONStringParser;
+import java.io.IOException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import java.io.IOException;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.json.JSONStringParser;
 
 public class ParseJSON implements Handler {
+	
+	private static Logger logger = LogManager.getLogger(ParseJSON.class);
 
 	@Override
 	public Object handle(Object o) {
@@ -18,15 +24,15 @@ public class ParseJSON implements Handler {
 
 		} catch (JsonParseException e) {
 
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 
 		} catch (JsonMappingException e) {
 
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 
 		} catch (IOException e) {
 
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 		}
 
 		return event;
