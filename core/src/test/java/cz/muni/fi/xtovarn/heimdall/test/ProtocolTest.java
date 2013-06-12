@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jboss.netty.channel.MessageEvent;
 import org.junit.After;
 import org.junit.Assert;
@@ -20,9 +22,9 @@ import cz.muni.fi.xtovarn.heimdall.netty.protocol.Constants;
 import cz.muni.fi.xtovarn.heimdall.test.util.NgmonLauncher;
 import cz.muni.fi.xtovarn.heimdall.test.util.ObjectMapperWrapper;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient;
-import cz.muni.fi.xtovarn.heimdall.test.util.TestResponseHandlers;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.ResponseHandler;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.TestMessage;
+import cz.muni.fi.xtovarn.heimdall.test.util.TestResponseHandlers;
 
 /**
  * Various server tests - Client sends requests and checks the responses
@@ -41,6 +43,8 @@ public class ProtocolTest {
 
 	private NgmonLauncher ngmon = null;
 	private TestClient testClient = null;
+	
+	private static Logger logger = LogManager.getLogger(ProtocolTest.class);
 
 	/**
 	 * Launches the Ngmon server and initializes the test client
@@ -140,7 +144,7 @@ public class ProtocolTest {
 								message.getBody(), Map.class);
 						Long connectionId = connectionIdMap.get(Constants.CONNECTION_ID_TITLE).longValue();
 						Assert.assertNotNull(connectionId);
-						System.out.println("Connection ID: " + connectionId);
+						logger.debug("Connection ID: " + connectionId);
 						return connectionId;
 					}
 				});

@@ -10,6 +10,9 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * The service for processing sensor events
  */
@@ -18,6 +21,8 @@ public class SocketCollector implements Startable {
 	private final ExecutorService service = Executors.newCachedThreadPool();
 	private final PipelineFactory pipelineFactory;
 	private ServerSocket serverSocket;
+	
+	private static Logger logger = LogManager.getLogger(SocketCollector.class);
 
 	// @Inject
 	public SocketCollector(PipelineFactory pipelineFactory) {
@@ -63,10 +68,10 @@ public class SocketCollector implements Startable {
 
 	@Override
 	public void stop() {
-		System.out.println("Closing " + this.getClass() + "...");
+		logger.info("Closing " + this.getClass() + "...");
 
 		closeServerSocket(false);
 
-		System.out.println(this.getClass() + " closed!");
+		logger.info(this.getClass() + " closed!");
 	}
 }

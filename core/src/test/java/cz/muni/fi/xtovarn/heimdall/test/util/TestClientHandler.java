@@ -3,6 +3,8 @@ package cz.muni.fi.xtovarn.heimdall.test.util;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
@@ -45,6 +47,8 @@ public class TestClientHandler extends SimpleChannelHandler {
 	 * handler)
 	 */
 	private MessageHandler unsolicitedMessageHandler;
+	
+	private static Logger logger = LogManager.getLogger(TestClientHandler.class);
 
 	public TestClientHandler(List<ResponseHandler> responseHandlers, MessageHandler unsolicitedMessageHandler) {
 		this.responseHandlers = responseHandlers;
@@ -54,10 +58,10 @@ public class TestClientHandler extends SimpleChannelHandler {
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		SimpleMessage message = (SimpleMessage) e.getMessage();
-		System.out.println("Message number: " + messageCount);
-		System.out.println("Directive: " + message.getDirective().toString());
+		logger.debug("Message number: " + messageCount);
+		logger.debug("Directive: " + message.getDirective().toString());
 		// System.out.println("Body1: " + Arrays.toString(message.getBody()));
-		System.out.println("Body: " + new String(message.getBody()));
+		logger.debug("Body: " + new String(message.getBody()));
 
 		// send the message to the appropriate handler
 		if (messageCount < responseHandlers.size()) {

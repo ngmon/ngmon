@@ -1,8 +1,13 @@
 package cz.muni.fi.xtovarn.heimdall.client.test.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cz.muni.fi.xtovarn.heimdall.NgmonServer;
 
 public class ShutdownHandler implements Runnable {
+	
+	private static Logger logger = LogManager.getLogger(ShutdownHandler.class);
 	
 	private NgmonServer ngmonServer;
 	
@@ -12,7 +17,7 @@ public class ShutdownHandler implements Runnable {
 	
 	@Override
 	public void run() {
-		System.out.println("Shutting down...");
+		logger.info("Shutting down...");
 		ngmonServer.stop();
 	}
 }

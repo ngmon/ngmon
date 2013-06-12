@@ -1,15 +1,18 @@
 package cz.muni.fi.xtovarn.heimdall.netty;
 
-import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
-import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
-import cz.muni.fi.xtovarn.heimdall.commons.Startable;
+import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import cz.muni.fi.xtovarn.heimdall.commons.Startable;
+import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
+import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
 
 /**
  * The network component of the Ngmon server, implemented using Netty framework
@@ -21,6 +24,8 @@ public class NettyServer implements Startable {
 	public final static int SERVER_PORT = 6000;
 
 	private ServerBootstrap bootstrap;
+	
+	private static Logger logger = LogManager.getLogger(NettyServer.class);
 
 //	@Inject
 	public NettyServer(SecureChannelGroup secureChannelGroup, SubscriptionManager subscriptionManager) {
@@ -41,12 +46,12 @@ public class NettyServer implements Startable {
 
 		bootstrap.bind(new InetSocketAddress(SERVER_PORT));
 
-		System.out.println(getClass().getCanonicalName() + "started");
+		logger.info(getClass().getCanonicalName() + "started");
 	}
 
 	@Override
 	public void stop() {
-		System.out.println("Closing " + this.getClass() + "...");
+		logger.info("Closing " + this.getClass() + "...");
 
 		try {
 			secureChannelGroup.close().await(5, TimeUnit.SECONDS);
@@ -55,6 +60,6 @@ public class NettyServer implements Startable {
 		}
 		bootstrap.releaseExternalResources();
 
-		System.out.println(this.getClass() + " closed!");
+		logger.info(this.getClass() + " closed!");
 	}
 }

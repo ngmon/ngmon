@@ -1,5 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.netty.handler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
@@ -24,6 +26,8 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 
 	private final ServerFSM serverStateMachine;
 	private ServerProtocolContext serverProtocolContext;
+	
+	private static Logger logger = LogManager.getLogger(DefaultServerHandler.class);
 
 	public DefaultServerHandler(SecureChannelGroup secureChannelGroup, SubscriptionManager subscriptionManager) {
 		this.secureChannelGroup = secureChannelGroup;
@@ -103,6 +107,6 @@ public class DefaultServerHandler extends SimpleChannelHandler {
 		// removed from the ChannelGroup automatically
 		this.serverProtocolContext.disconnect(e.getChannel());
 		// TODO - set the machine state to DISCONNECTED?
-		System.out.println("Channel disconnected...");
+		logger.info("Channel disconnected...");
 	}
 }

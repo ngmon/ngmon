@@ -1,5 +1,7 @@
 package cz.muni.fi.xtovarn.heimdall.client;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -23,6 +25,8 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 	private EventReceivedHandler eventReceivedHandler = null;
 	private ServerResponseExceptionHandler exceptionHandler = null;
 	private boolean disconnected = false;
+	
+	private static Logger logger = LogManager.getLogger(DefaultClientHandler.class);
 
 	private ResultFuture<Boolean> channelConnectedResult = new ResultFuture<>();
 
@@ -118,7 +122,7 @@ public class DefaultClientHandler extends SimpleChannelHandler {
 			return;
 		
 		if (e.getCause().getClass().equals(java.net.ConnectException.class)) {
-			System.err.println("Connection refused...");
+			logger.error("Connection refused...");
 			System.exit(-1);
 		} else {
 			if (exceptionHandler == null)

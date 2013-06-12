@@ -1,13 +1,15 @@
 package cz.muni.fi.xtovarn.heimdall.storage.dpl;
 
+import java.io.File;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.StoreConfig;
-import cz.muni.fi.xtovarn.heimdall.commons.Startable;
-
-import java.io.File;
 
 public class DefaultDatabaseEnvironment {
 	private static Environment environment = null;
@@ -16,6 +18,7 @@ public class DefaultDatabaseEnvironment {
 	private final EnvironmentConfig environmentConfig;
 	private final StoreConfig storeConfig;
 
+	private static Logger logger = LogManager.getLogger(DefaultDatabaseEnvironment.class);
 
 	public DefaultDatabaseEnvironment() {
 
@@ -40,7 +43,7 @@ public class DefaultDatabaseEnvironment {
 	}
 
 	public void close() {
-		System.out.println("Closing " + this.getClass() + "...");
+		logger.info("Closing " + this.getClass() + "...");
 
 		try {
 			if (entityStore != null) {
@@ -54,6 +57,6 @@ public class DefaultDatabaseEnvironment {
 			e.printStackTrace();
 		}
 
-		System.out.println(this.getClass() + " closed!");
+		logger.info(this.getClass() + " closed!");
 	}
 }

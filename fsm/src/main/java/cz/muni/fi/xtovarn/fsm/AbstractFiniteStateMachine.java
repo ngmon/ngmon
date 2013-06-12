@@ -1,9 +1,18 @@
 package cz.muni.fi.xtovarn.fsm;
 
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cz.muni.fi.xtovarn.fsm.action.Action;
 import cz.muni.fi.xtovarn.heimdall.commons.util.Pair;
-
-import java.util.*;
 
 /**
  *
@@ -23,6 +32,8 @@ public abstract class AbstractFiniteStateMachine<T1 extends Enum<T1>, T2, T3> {
 	private Queue<T1> history;
 
 	private final boolean DEBUG;
+	
+	private static Logger logger = LogManager.getLogger(AbstractFiniteStateMachine.class);
 
 	public AbstractFiniteStateMachine(T1 startState, T1[] endStates, Class<T1> statesEnumClass, boolean debug) { // Generics Workaround (Class<T1> statesEnumClass)
 		this.statesEnumClass = statesEnumClass;
@@ -82,7 +93,7 @@ public abstract class AbstractFiniteStateMachine<T1 extends Enum<T1>, T2, T3> {
 		}
 
 		if (DEBUG) {
-			System.out.println(String.format("[%s] %s: %s -> %s", this.toString(), symbol, currentState, nextState));
+			logger.debug(String.format("[%s] %s: %s -> %s", this.toString(), symbol, currentState, nextState));
 		}
 
 		this.history.add(currentState);
