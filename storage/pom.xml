@@ -36,6 +36,7 @@
 			<groupId>cz.muni.fi.xtovarn</groupId>
 			<artifactId>commons</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.util.ISO8601Utils;
 import com.sleepycat.persist.EntityStore;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.commons.json.JSONStringParser;
+import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestUtil;
 import cz.muni.fi.xtovarn.heimdall.storage.dpl.DefaultDatabaseEnvironment;
 import cz.muni.fi.xtovarn.heimdall.storage.dpl.EventDataAccessor;
 import org.junit.After;
@@ -39,7 +40,7 @@ public class DPLTest {
 		eventDataAccessor = new EventDataAccessor(entityStore);
 
 		// Read JSON from File
-		JSON_STRING = this.readInputStream(JSON_FILE_INPUT_STREAM);
+		JSON_STRING = TestUtil.readInputStreamToString(JSON_FILE_INPUT_STREAM);
 	}
 
 	@Test
@@ -56,27 +57,6 @@ public class DPLTest {
 	@After
 	public void tearDown() throws Exception {
 		myEnvironment.close();
-		this.recursiveDelete(BASE_DIRECTORY);
-	}
-
-	private String readInputStream(InputStream inputStream) throws IOException {
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-		StringBuilder stringBuilder = new StringBuilder();
-
-		String line;
-		while ((line = bufferedReader.readLine()) != null) {
-			stringBuilder.append(line);
-		}
-
-		bufferedReader.close();
-		return stringBuilder.toString();
-	}
-
-	private void recursiveDelete(File file) {
-		File[] files = file.listFiles();
-		if (files != null)
-			for (File each : files)
-				recursiveDelete(each);
-		file.delete();
+		TestUtil.recursiveDelete(BASE_DIRECTORY);
 	}
 }
