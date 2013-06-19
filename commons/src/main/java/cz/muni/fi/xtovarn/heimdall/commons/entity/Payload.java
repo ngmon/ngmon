@@ -10,7 +10,6 @@ import java.util.Map;
 public class Payload {
 
 	private String schema;
-	private String schemaVersion;
 
 	private Map<String, Object> properties = new LinkedHashMap<>(1);
 
@@ -22,14 +21,6 @@ public class Payload {
 	@JsonAnyGetter
 	public Map<String, Object> properties() {
 		return properties;
-	}
-
-	public String getSchemaVersion() {
-		return schemaVersion;
-	}
-
-	public void setSchemaVersion(String schemaVersion) {
-		this.schemaVersion = schemaVersion;
 	}
 
 	public String getSchema() {
@@ -48,7 +39,6 @@ public class Payload {
 	public String toString() {
 		return "Payload{" +
 			  "schema='" + schema + '\'' +
-			  ", schemaVersion='" + schemaVersion + '\'' +
 			  ", properties=" + properties +
 			  '}';
 	}
