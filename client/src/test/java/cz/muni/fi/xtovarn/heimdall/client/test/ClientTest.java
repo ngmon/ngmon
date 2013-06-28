@@ -1,35 +1,32 @@
 package cz.muni.fi.xtovarn.heimdall.client.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import com.sleepycat.je.DatabaseException;
+import cz.muni.fi.xtovarn.heimdall.client.Client;
+import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory;
+import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory.ConnectionException;
+import cz.muni.fi.xtovarn.heimdall.client.ClientImpl;
+import cz.muni.fi.xtovarn.heimdall.client.EventReceivedHandler;
+import cz.muni.fi.xtovarn.heimdall.client.subscribe.Constraint;
+import cz.muni.fi.xtovarn.heimdall.client.subscribe.Operator;
+import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
+import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestSensor;
+import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestUtil;
+import cz.muni.fi.xtovarn.heimdall.util.NgmonLauncher;
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestUtil;
-import org.junit.*;
-
-import com.sleepycat.je.DatabaseException;
-
-import cz.muni.fi.xtovarn.heimdall.client.Client;
-import cz.muni.fi.xtovarn.heimdall.client.ClientApi;
-import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory;
-import cz.muni.fi.xtovarn.heimdall.client.ClientConnectionFactory.ConnectionException;
-import cz.muni.fi.xtovarn.heimdall.client.EventReceivedHandler;
-import cz.muni.fi.xtovarn.heimdall.client.subscribe.Constraint;
-import cz.muni.fi.xtovarn.heimdall.client.subscribe.Operator;
-import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
-import cz.muni.fi.xtovarn.heimdall.util.NgmonLauncher;
-import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
-import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestSensor;
-import org.junit.rules.TemporaryFolder;
+import static org.junit.Assert.*;
 
 /**
  * Various client tests
@@ -87,7 +84,7 @@ public class ClientTest {
 
 	private NgmonLauncher ngmon = null;
 
-	private Client client = null;
+	private ClientImpl client = null;
 
 	/**
 	 * Starts Ngmon server and connects to it
@@ -97,7 +94,7 @@ public class ClientTest {
 		this.ngmon = new NgmonLauncher(BASE_DIRECTORY);
 		this.ngmon.start();
 
-		client = (Client) ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE,
+		client = (ClientImpl) ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE,
 				TIMEOUT_TIME_UNIT);
 		assertNotNull(client);
 		assertTrue(client.isConnected());
@@ -124,14 +121,14 @@ public class ClientTest {
 
 	@Test
 	public void connectInvalidUser() throws ConnectionException {
-		ClientApi client2 = ClientConnectionFactory.getClient(INVALID_USER_NAME, INVALID_USER_PASSWORD, TIMEOUT_VALUE,
+		Client client2 = ClientConnectionFactory.getClient(INVALID_USER_NAME, INVALID_USER_PASSWORD, TIMEOUT_VALUE,
 				TIMEOUT_TIME_UNIT);
 		assertNull(client2);
 	}
 
 	@Test
 	public void connectInvalidPassword() throws ConnectionException {
-		ClientApi client2 = ClientConnectionFactory.getClient(INVALID_USER_NAME, INVALID_USER_PASSWORD, TIMEOUT_VALUE,
+		Client client2 = ClientConnectionFactory.getClient(INVALID_USER_NAME, INVALID_USER_PASSWORD, TIMEOUT_VALUE,
 				TIMEOUT_TIME_UNIT);
 		assertNull(client2);
 	}

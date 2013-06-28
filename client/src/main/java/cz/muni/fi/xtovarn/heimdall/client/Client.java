@@ -1,229 +1,91 @@
 package cz.muni.fi.xtovarn.heimdall.client;
 
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-
-import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientEvent;
-import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientFSM;
-import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientProtocolContext;
-import cz.muni.fi.xtovarn.heimdall.client.protocol.ClientState;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
-import cz.muni.fi.xtovarn.heimdall.entities.User;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
- * Ngmon client implementation
+ * Client interface; Object of this class is retrieved by using
+ * ClientConnectionFactory
+ * 
+ * @see ClientConnectionFactory
  */
-public class Client implements ClientApi {
-
-	private ChannelFactory factory;
-	private ClientBootstrap bootstrap;
-	private Channel channel = null;
-	private DefaultClientHandler clientHandler = null;
-	private ClientProtocolContext clientProtocolContext = null;
-	/**
-	 * Manages client state
-	 */
-	private ClientFSM clientFSM = null;
-	/**
-	 * True if disconnect() has been called
-	 */
-	private boolean disconnected = false;
+public interface Client {
 
 	/**
-	 * Connects to the Ngmon server
-	 */
-	public Client(long timeout, TimeUnit unit) throws InterruptedException {
-		factory = new NioClientSocketChannelFactory(Executors.newSingleThreadExecutor(),
-				Executors.newSingleThreadExecutor());
-
-		bootstrap = new ClientBootstrap(factory);
-
-		bootstrap.setPipelineFactory(new ClientPipelineFactory());
-
-		bootstrap.setOption("child.tcpNoDelay", true);
-		bootstrap.setOption("child.keepAlive", true);
-
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(6000));
-		// maybe not needed
-		future.await(timeout, unit);
-
-		channel = future.getChannel();
-
-		clientHandler = (DefaultClientHandler) channel.getPipeline().getContext(Constants.DEFAULT_CLIENT_HANDLER_TITLE)
-				.getHandler();
-		clientProtocolContext = clientHandler.getClientProtocolContext();
-		clientFSM = clientHandler.getClientStateMachine();
-	}
-
-	/**
-	 * Used in ConnectionFactory when connecting to the server, this is true as
-	 * soon as the connection has been established and client state has been
-	 * changed accordingly (this is very important)
-	 */
-	public Future<Boolean> getChannelConnectedResult() {
-		return clientHandler.getChannelConnectedResult();
-	}
-
-	/**
-	 * Helper method for checking if the client is in a desired state; if not,
-	 * exception is thrown
+	 * Subscribes for sensor events specified by the predicate
 	 * 
-	 * @param state
-	 *            The required state
+	 * @param predicate
+	 *            Predicate specifying which sensor events to receive
+	 * @return Subscription ID
 	 */
-	private void checkFsmState(ClientState state) {
-		ClientState currentState = clientFSM.getCurrentState();
-		if (!currentState.equals(state))
-			throw new IllegalStateException("This operation requires the state " + state.toString()
-					+ ", but the current state is " + currentState.toString());
-		if (disconnected)
-			throw new IllegalStateException("The client is disconnected");
-	}
+	public Future<Long> subscribe(Predicate predicate) throws InterruptedException, ExecutionException;
 
 	/**
-	 * Authenticates against the Ngmon server, finishing the connection phase
-	 */
-	public Future<Boolean> connect(String login, String passcode) throws InterruptedException {
-		if (login == null || passcode == null || login.isEmpty() || passcode.isEmpty())
-			throw new IllegalArgumentException("connect()");
-
-		checkFsmState(ClientState.PRE_CONNECTED);
-
-		User user = new User(login, passcode);
-
-		// set waiting state, then send the request to server
-		clientFSM.readSymbol(ClientEvent.REQUEST_CONNECT);
-		return clientProtocolContext.connectRequest(channel, user);
-	}
-
-	public Long getConnectionId() {
-		return clientProtocolContext.getConnectionId();
-	}
-
-	public boolean isConnected() {
-		return clientProtocolContext.isConnected();
-	}
-
-	/*
-	 * (non-Javadoc)
+	 * Reverts effect of a previous subscribe() call
 	 * 
-	 * @see
-	 * cz.muni.fi.xtovarn.heimdall.client.ClientApi#subscribe(cz.muni.fi.xtovarn
-	 * .heimdall.client.subscribe.Predicate)
+	 * @param subscriptionId
+	 *            ID of the subscription to cancel
+	 * @return True if the operation was successful, false otherwise (for
+	 *         example because of invalid server state or incorrect subscription
+	 *         ID)
 	 */
-	@Override
-	public Future<Long> subscribe(Predicate predicate) throws InterruptedException, ExecutionException {
-		checkFsmState(ClientState.CONNECTED);
+	public Future<Boolean> unsubscribe(Long subscriptionId) throws InterruptedException, ExecutionException;
 
-		if (predicate == null || predicate.isEmpty())
-			throw new IllegalArgumentException("subscribe()");
-
-		// set waiting state, then send the request to server
-		clientFSM.readSymbol(ClientEvent.REQUEST_SUBSCRIBE);
-		return clientProtocolContext.subscribeRequest(channel, predicate);
-	}
-
-	public List<Long> getSubscriptionIds() {
-		return clientProtocolContext.getSubscriptionIds();
-	}
-
-	public Long getLastSubscriptionId() {
-		return clientProtocolContext.getLastSubscriptionId();
-	}
-
-	public boolean wasLastSubscriptionSuccessful() {
-		return clientProtocolContext.wasLastSubscriptionSuccessful();
-	}
-
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Starts receiving sensor events; These are processed using an object set
+	 * by setEventReceivedHandler
 	 * 
-	 * @see
-	 * cz.muni.fi.xtovarn.heimdall.client.ClientApi#unsubscribe(java.lang.Long)
-	 */
-	@Override
-	public Future<Boolean> unsubscribe(Long subscriptionId) throws InterruptedException, ExecutionException {
-		checkFsmState(ClientState.CONNECTED);
-
-		if (subscriptionId == null)
-			throw new IllegalArgumentException("unsubscribe()");
-
-		clientFSM.readSymbol(ClientEvent.REQUEST_UNSUBSCRIBE);
-		return clientProtocolContext.unsubscribeRequest(channel, subscriptionId);
-	}
-
-	/*
-	 * (non-Javadoc)
+	 * @return True if the operation was successful, false otherwise (usually
+	 *         because of invalid server state)
 	 * 
-	 * @see cz.muni.fi.xtovarn.heimdall.client.ClientApi#stop()
+	 * @see Client#setEventReceivedHandler(EventReceivedHandler)
 	 */
-	@Override
-	public void stop() {
-		ChannelFuture future = channel.close();
-		future.awaitUninterruptibly();
-		// channel.getCloseFuture().awaitUninterruptibly();
-		factory.releaseExternalResources();
-	}
+	public Future<Boolean> ready();
 
-	@Override
-	public Future<Boolean> ready() {
-		checkFsmState(ClientState.CONNECTED);
+	/**
+	 * Stops the server from sending sensor events
+	 * 
+	 * @return True if the operation was successful, false otherwise (usually
+	 *         because of invalid server state)
+	 */
+	public Future<Boolean> stopSending();
 
-		clientFSM.readSymbol(ClientEvent.REQUEST_READY);
-		return clientProtocolContext.readyRequest(channel);
-	}
+	/**
+	 * Retrieves the sensor events which have not been received before (usually
+	 * because the client was disconnected) NOT YET IMPLEMENTED!
+	 */
+	public Future<Boolean> get();
 
-	@Override
-	public Future<Boolean> stopSending() {
-		checkFsmState(ClientState.RECEIVING);
+	/**
+	 * Sets the object for processing sensor events
+	 */
+	public void setEventReceivedHandler(EventReceivedHandler handler);
 
-		clientFSM.readSymbol(ClientEvent.REQUEST_STOP);
-		return clientProtocolContext.stopRequest(channel);
-	}
+	/**
+	 * Sets the object for processing exceptions which occurred as a reaction on
+	 * a server message
+	 */
+	public void setServerResponseExceptionHandler(ServerResponseExceptionHandler handler);
 
-	@Override
-	public void reset() {
-		checkFsmState(ClientState.WAITING_FOR_ACK);
+	/**
+	 * Sends DISCONNECT message to server, letting him know we are going to
+	 * disconnect
+	 */
+	public Future<Boolean> disconnect();
 
-		clientFSM.rollback();
-	}
+	/**
+	 * Disconnects - closes the network channel
+	 */
+	public void stop();
 
-	@Override
-	public void setEventReceivedHandler(EventReceivedHandler handler) {
-		clientHandler.setEventReceivedHandler(handler);
-	}
-
-	@Override
-	public void setServerResponseExceptionHandler(ServerResponseExceptionHandler handler) {
-		clientHandler.setServerResponseExceptionHandler(handler);
-	}
-
-	@Override
-	public Future<Boolean> disconnect() {
-		checkFsmState(ClientState.CONNECTED);
-
-		disconnected = true;
-
-		clientFSM.readSymbol(ClientEvent.REQUEST_DISCONNECT);
-		return clientProtocolContext.disconnectRequest(channel);
-	}
-
-	@Override
-	public Future<Boolean> get() {
-		checkFsmState(ClientState.CONNECTED);
-
-		clientFSM.readSymbol(ClientEvent.REQUEST_GET);
-		return clientProtocolContext.getRequest(channel);
-	}
+	/**
+	 * Returns to the previous state. For example when subscribe is called, but
+	 * a confirmation from server is never sent, the client is "stuck" in a
+	 * waiting state (so the other methods would fail). This can be used in
+	 * these situations if we don't want to terminate the connection.
+	 */
+	public void reset();
 
 }
