@@ -3,19 +3,16 @@ package cz.muni.fi.xtovarn.heimdall.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestUtil;
 import org.jboss.netty.channel.MessageEvent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -31,11 +28,16 @@ import cz.muni.fi.xtovarn.heimdall.test.util.ObjectMapperWrapper;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestMessageHandler;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestResponseHandlers;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Tests sensor events forwarding (sensor -> server -> clients)
  */
 public class EventHandlingTest {
+
+	@Rule
+	public static final TemporaryFolder JUNIT_TEMPORARY_DIRECTORY = new TemporaryFolder();
+	private static final File BASE_DIRECTORY = JUNIT_TEMPORARY_DIRECTORY.newFolder("junit_testdatabase1");
 
 	private static final String JSON_FILE_1 = "events.jsons";
 	private static final String JSON_FILE_2 = "events2.jsons";
@@ -56,17 +58,21 @@ public class EventHandlingTest {
 	 */
 	@Before
 	public void setUp() throws DatabaseException, IOException, InterruptedException {
-		this.ngmon = new NgmonLauncher();
+		this.ngmon = new NgmonLauncher(BASE_DIRECTORY);
 		this.ngmon.start();
 
-		testClient = new TestClient();
+		this.testClient = new TestClient();
 	}
 
 	@After
 	public void tearDown() {
-		testClient.stop();
-
+		this.testClient.stop();
 		this.ngmon.stop();
+	}
+
+	@AfterClass
+	public static void tearDownClass() {
+		TestUtil.recursiveDelete(BASE_DIRECTORY);
 	}
 
 	/**
@@ -145,7 +151,7 @@ public class EventHandlingTest {
 
 		// send the test events using a simple sensor
 		TestSensor sensor = new TestSensor();
-		BufferedReader br = new BufferedReader(new FileReader("src/main/resources/" + jsonFileName));
+		BufferedReader br = new BufferedReader(new InputStreamReader(EventHandlingTest.class.getResourceAsStream(jsonFileName)));
 		String line;
 		while ((line = br.readLine()) != null) {
 			sensor.sendString(line);

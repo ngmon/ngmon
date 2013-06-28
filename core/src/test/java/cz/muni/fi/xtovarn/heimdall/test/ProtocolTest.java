@@ -1,16 +1,15 @@
 package cz.muni.fi.xtovarn.heimdall.test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jboss.netty.channel.MessageEvent;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -25,11 +24,16 @@ import cz.muni.fi.xtovarn.heimdall.test.util.TestClient;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.ResponseHandler;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient.TestMessage;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestResponseHandlers;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Various server tests - Client sends requests and checks the responses
  */
 public class ProtocolTest {
+
+	@Rule
+	public static final TemporaryFolder JUNIT_TEMPORARY_DIRECTORY = new TemporaryFolder();
+	private static final File BASE_DIRECTORY = JUNIT_TEMPORARY_DIRECTORY.newFolder("junit_testdatabase2");
 
 	private static final String VALID_USER_LOGIN = "user0";
 	private static final String VALID_USER_PASSCODE = "password0";
@@ -51,7 +55,7 @@ public class ProtocolTest {
 	 */
 	@Before
 	public void setUp() throws DatabaseException, IOException, InterruptedException {
-		this.ngmon = new NgmonLauncher();
+		this.ngmon = new NgmonLauncher(BASE_DIRECTORY);
 		this.ngmon.start();
 
 		testClient = new TestClient();
@@ -62,6 +66,11 @@ public class ProtocolTest {
 		testClient.stop();
 
 		this.ngmon.stop();
+	}
+
+	@AfterClass
+	public static void tearDownClass() {
+		TestUtil.recursiveDelete(BASE_DIRECTORY);
 	}
 
 	/**

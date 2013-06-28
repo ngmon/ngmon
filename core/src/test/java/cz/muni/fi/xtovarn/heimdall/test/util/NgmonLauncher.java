@@ -12,12 +12,16 @@ import cz.muni.fi.xtovarn.heimdall.NgmonServer;
 
 public class NgmonLauncher {
 
-	public static final String DATABASE_PATH = "./database/events";
+	public File DATABASE_PATH;
 	public static NgmonServer ngmonServer;
 	
 	private static long WAIT_IN_MILLIS = 1000;
 	
 	private static Logger logger = LogManager.getLogger(NgmonLauncher.class);
+
+	public NgmonLauncher(File baseDirectory) {
+		this.DATABASE_PATH = baseDirectory;
+	}
 
 	private static class NgmonStarter implements Runnable {
 
@@ -34,7 +38,7 @@ public class NgmonLauncher {
 	}
 
 	public void start() throws IOException, DatabaseException, InterruptedException {
-		ngmonServer = new NgmonServer(new File(DATABASE_PATH));
+		ngmonServer = new NgmonServer(DATABASE_PATH);
 		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler(ngmonServer)));
 		
 		logger.info("Heimdall is starting...");

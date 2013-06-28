@@ -6,18 +6,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestUtil;
+import org.junit.*;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -32,11 +29,16 @@ import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
 import cz.muni.fi.xtovarn.heimdall.client.test.util.NgmonLauncher;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestSensor;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Various client tests
  */
 public class ClientTest {
+
+	@Rule
+	public static final TemporaryFolder JUNIT_TEMPORARY_DIRECTORY = new TemporaryFolder();
+	private static final File BASE_DIRECTORY = JUNIT_TEMPORARY_DIRECTORY.newFolder("junit_testdatabase1");
 
 	/**
 	 * Simple EventReceivedHandler which counts and saves received sensor events
@@ -92,7 +94,7 @@ public class ClientTest {
 	 */
 	@Before
 	public void setUp() throws ConnectionException, DatabaseException, IOException, InterruptedException {
-		this.ngmon = new NgmonLauncher();
+		this.ngmon = new NgmonLauncher(BASE_DIRECTORY);
 		this.ngmon.start();
 
 		client = (Client) ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE,
@@ -106,6 +108,11 @@ public class ClientTest {
 		client.stop();
 
 		this.ngmon.stop();
+	}
+
+	@AfterClass
+	public static void tearDownClass() {
+		TestUtil.recursiveDelete(BASE_DIRECTORY);
 	}
 
 	/**
@@ -210,7 +217,7 @@ public class ClientTest {
 	 */
 	private void sendEvents(String jsonFileName) throws IOException, InterruptedException {
 		TestSensor sensor = new TestSensor();
-		BufferedReader br = new BufferedReader(new FileReader("src/main/resources/" + jsonFileName));
+		BufferedReader br = new BufferedReader(new InputStreamReader(ClientTest.class.getResourceAsStream(jsonFileName)));
 		String line;
 		while ((line = br.readLine()) != null) {
 			sensor.sendString(line);
