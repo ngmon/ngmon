@@ -52,7 +52,7 @@ public class ClientImpl implements Client {
 		bootstrap.setOption("child.tcpNoDelay", true);
 		bootstrap.setOption("child.keepAlive", true);
 
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(6000));
+		ChannelFuture future = bootstrap.connect(new InetSocketAddress(11000));
 		// maybe not needed
 		future.await(timeout, unit);
 
