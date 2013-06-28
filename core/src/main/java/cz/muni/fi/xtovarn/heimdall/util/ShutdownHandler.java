@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.test.util;
+package cz.muni.fi.xtovarn.heimdall.util;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

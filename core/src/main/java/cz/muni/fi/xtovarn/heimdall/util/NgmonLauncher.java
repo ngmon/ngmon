@@ -1,4 +1,4 @@
-package cz.muni.fi.xtovarn.heimdall.client.test.util;
+package cz.muni.fi.xtovarn.heimdall.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class NgmonLauncher {
 
 	public File DATABASE_PATH;
 	public static NgmonServer ngmonServer;
-
+	
 	private static long WAIT_IN_MILLIS = 1000;
 	
 	private static Logger logger = LogManager.getLogger(NgmonLauncher.class);
@@ -40,10 +40,10 @@ public class NgmonLauncher {
 	public void start() throws IOException, DatabaseException, InterruptedException {
 		ngmonServer = new NgmonServer(DATABASE_PATH);
 		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler(ngmonServer)));
-
+		
 		logger.info("Heimdall is starting...");
 		(new Thread(new NgmonStarter(ngmonServer))).start();
-
+		
 		Thread.sleep(WAIT_IN_MILLIS);
 	}
 

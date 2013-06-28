@@ -26,7 +26,7 @@ import cz.muni.fi.xtovarn.heimdall.client.EventReceivedHandler;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Constraint;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Operator;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
-import cz.muni.fi.xtovarn.heimdall.client.test.util.NgmonLauncher;
+import cz.muni.fi.xtovarn.heimdall.util.NgmonLauncher;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.commons.util.test.TestSensor;
 import org.junit.rules.TemporaryFolder;

@@ -23,7 +23,7 @@ import cz.muni.fi.xtovarn.heimdall.entities.User;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Directive;
 import cz.muni.fi.xtovarn.heimdall.netty.message.Message;
 import cz.muni.fi.xtovarn.heimdall.netty.message.SimpleMessage;
-import cz.muni.fi.xtovarn.heimdall.test.util.NgmonLauncher;
+import cz.muni.fi.xtovarn.heimdall.util.NgmonLauncher;
 import cz.muni.fi.xtovarn.heimdall.test.util.ObjectMapperWrapper;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestClient;
 import cz.muni.fi.xtovarn.heimdall.test.util.TestMessageHandler;
