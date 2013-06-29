@@ -1,5 +1,10 @@
 package cz.muni.fi.xtovarn.heimdall.pipeline.handler.utils;
 
+import cz.muni.fi.publishsubscribe.countingtree.Attribute;
+import cz.muni.fi.publishsubscribe.countingtree.AttributeValue;
+import cz.muni.fi.publishsubscribe.countingtree.Event;
+import cz.muni.fi.publishsubscribe.countingtree.EventImpl;
+
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -7,16 +12,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
 
-import cz.muni.fi.publishsubscribe.countingtree.Attribute;
-import cz.muni.fi.publishsubscribe.countingtree.AttributeValue;
-import cz.muni.fi.publishsubscribe.countingtree.Event;
-import cz.muni.fi.publishsubscribe.countingtree.EventImpl;
-
 /**
  * Converts the event from the Ngmon format to the format which can be used in
  * the publish-subscribe matching algorithm
  */
-public class EventConverter {
+public class SuperSlowEventConverter {
 
 	private enum TYPE {
 		INTEGER, STRING, DATE
