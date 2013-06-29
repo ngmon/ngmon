@@ -3,11 +3,9 @@ package cz.muni.fi.xtovarn.heimdall.pipeline.handler;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
 import cz.muni.fi.xtovarn.heimdall.dispatcher.Subscription;
 import cz.muni.fi.xtovarn.heimdall.netty.group.SecureChannelGroup;
-import cz.muni.fi.xtovarn.heimdall.pipeline.handler.utils.SuperSlowEventConverter;
+import cz.muni.fi.xtovarn.heimdall.pipeline.handler.utils.FastEventConverter;
 import cz.muni.fi.xtovarn.heimdall.pubsub.SubscriptionManager;
 
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 /**
@@ -18,7 +16,7 @@ public class DetermineRecipient implements Handler {
 
 	private final SubscriptionManager subscriptionManager;
 	private SecureChannelGroup secureChannelGroup;
-	private SuperSlowEventConverter eventConverter = new SuperSlowEventConverter();
+	private FastEventConverter eventConverter = new FastEventConverter();
 
 	public DetermineRecipient(SecureChannelGroup secureChannelGroup, SubscriptionManager subscriptionManager) {
 		this.secureChannelGroup = secureChannelGroup;
@@ -34,7 +32,7 @@ public class DetermineRecipient implements Handler {
 		try {
 			// get matching recipients
 			recipients = subscriptionManager.getRecipients(eventConverter.ngmonEventToPubsubEvent(event));
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | IntrospectionException e) {
+		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		}
 
