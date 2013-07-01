@@ -17,6 +17,7 @@ public class DetermineRecipient implements Handler {
 	private final SubscriptionManager subscriptionManager;
 	private SecureChannelGroup secureChannelGroup;
 	private FastEventConverter eventConverter = new FastEventConverter();
+	// TODO - The tests wont work without @cz.muni.fi.xtovarn.heimdall.pipeline.handler.utils.SuperSlowEventConverter
 
 	public DetermineRecipient(SecureChannelGroup secureChannelGroup, SubscriptionManager subscriptionManager) {
 		this.secureChannelGroup = secureChannelGroup;
