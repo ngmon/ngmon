@@ -89,14 +89,14 @@ public class ClientPeek {
 	private static Predicate getPredicate() {
 		Predicate predicate = new Predicate();
 		predicate.addConstraint(new Constraint("level", Operator.GREATER_THAN, "5"));
-		predicate.addConstraint(new Constraint("type", Operator.PREFIX, "log"));
+		predicate.addConstraint(new Constraint("type", Operator.EQUALS, "login"));
 		return predicate;
 	}
 
     private static Predicate getPredicate(int pre) {
         Predicate predicate = new Predicate();
         predicate.addConstraint(new Constraint("level", Operator.GREATER_THAN, "5"));
-        predicate.addConstraint(new Constraint("type", Operator.PREFIX, "log"+pre));
+        predicate.addConstraint(new Constraint("type", Operator.EQUALS, "log"+pre));
         return predicate;
     }
 
