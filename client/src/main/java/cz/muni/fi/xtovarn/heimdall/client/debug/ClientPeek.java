@@ -14,6 +14,7 @@ import cz.muni.fi.xtovarn.heimdall.util.NgmonLauncher;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,10 +58,23 @@ public class ClientPeek {
 
 	private ClientImpl client = null;
 
-    public static void main(String[] args) throws ConnectionException, ExecutionException, InterruptedException {
-        Client client = ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE, TIMEOUT_TIME_UNIT);
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        Client client = null;
+        try {
+            client = ClientConnectionFactory.getClient(VALID_USER_NAME, VALID_USER_PASSWORD, TIMEOUT_VALUE, TIMEOUT_TIME_UNIT);
+        } catch (ConnectionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        System.out.println("Connected");
 
         Long subscriptionId = client.subscribe(getPredicate()).get();
+
+        for (int i = 0; i < 1000; i++) {
+            Future f = client.subscribe(getPredicate(i));
+            f.get();
+        }
+
 
         TestEventHandler testEventHandler = new TestEventHandler();
 
@@ -68,13 +82,23 @@ public class ClientPeek {
 
         client.ready();
 
+        System.out.println("Ready");
+
     }
 
 	private static Predicate getPredicate() {
 		Predicate predicate = new Predicate();
 		predicate.addConstraint(new Constraint("level", Operator.GREATER_THAN, "5"));
+		predicate.addConstraint(new Constraint("type", Operator.PREFIX, "log"));
 		return predicate;
 	}
+
+    private static Predicate getPredicate(int pre) {
+        Predicate predicate = new Predicate();
+        predicate.addConstraint(new Constraint("level", Operator.GREATER_THAN, "5"));
+        predicate.addConstraint(new Constraint("type", Operator.PREFIX, "log"+pre));
+        return predicate;
+    }
 
 
 }
