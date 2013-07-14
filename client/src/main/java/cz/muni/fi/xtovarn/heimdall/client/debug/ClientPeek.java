@@ -9,13 +9,12 @@ import cz.muni.fi.xtovarn.heimdall.client.subscribe.Constraint;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Operator;
 import cz.muni.fi.xtovarn.heimdall.client.subscribe.Predicate;
 import cz.muni.fi.xtovarn.heimdall.commons.entity.Event;
+import cz.muni.fi.xtovarn.heimdall.commons.json.JSONStringParser;
 import cz.muni.fi.xtovarn.heimdall.util.NgmonLauncher;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Various client tests
@@ -25,27 +24,17 @@ public class ClientPeek {
 	 * Simple EventReceivedHandler which counts and saves received sensor events
 	 */
 	private static class TestEventHandler implements EventReceivedHandler {
-		private AtomicInteger count = new AtomicInteger(0);
-		private List<Event> events = new ArrayList<>();
+
+        private SimpleFileWriter output = new SimpleFileWriter("clientpeek.log");
 
 		@Override
 		public void handleEvent(Event event) {
-			count.incrementAndGet();
-			addEventToList(event);
-            System.out.println(event);
+            try {
+                output.write(JSONStringParser.eventToString(event));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
-		private synchronized void addEventToList(Event event) {
-			events.add(event);
-		}
-
-		public AtomicInteger getCount() {
-			return count;
-		}
-
-		public List<Event> getEvents() {
-			return events;
-		}
 
 	}
 
