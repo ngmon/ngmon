@@ -12,6 +12,8 @@ public class FastEventConverter {
 		EventImpl pubSubEvent = new EventImpl();
         pubSubEvent.addAttribute(new Attribute<>("level", new AttributeValue<>((long) ngmonEvent.getLevel(), Long.class)));
         pubSubEvent.addAttribute(new Attribute<>("type", new AttributeValue<>(ngmonEvent.getType(), String.class)));
+        pubSubEvent.addAttribute(new Attribute<>("processId", new AttributeValue<>((long) ngmonEvent.getProcessId(), Long.class)));
+        pubSubEvent.addAttribute(new Attribute<>("application", new AttributeValue<>(ngmonEvent.getApplication(), String.class)));
 
 		return pubSubEvent;
 	}
