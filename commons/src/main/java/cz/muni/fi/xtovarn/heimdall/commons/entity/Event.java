@@ -1,5 +1,6 @@
 package cz.muni.fi.xtovarn.heimdall.commons.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -9,10 +10,12 @@ import com.sleepycat.persist.model.Relationship;
 import com.sleepycat.persist.model.SecondaryKey;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @JsonRootName("Event")
 @JsonPropertyOrder({"occurrenceTime", "type", "_"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Event {
 
 	@PrimaryKey(sequence = "event_long_sequence")
@@ -44,6 +47,9 @@ public class Event {
 
 	@SecondaryKey(name = "priority", relate = Relationship.MANY_TO_ONE)
 	private int priority;
+
+    @SecondaryKey(name = "tags", relate = Relationship.MANY_TO_MANY)
+    private Set<String> tags;
 
 	@JsonProperty("_")
 	private Payload payload;
@@ -154,6 +160,7 @@ public class Event {
 				", level=" + level +
 				", priority=" + priority +
 				", payload=" + payload +
+				", tags=" + tags +
 				'}';
 	}
 
@@ -173,4 +180,12 @@ public class Event {
 	public int hashCode() {
 		return (int) (id ^ (id >>> 32));
 	}
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
+    }
 }

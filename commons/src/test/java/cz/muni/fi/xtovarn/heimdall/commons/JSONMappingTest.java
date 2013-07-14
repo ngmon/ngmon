@@ -8,8 +8,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 
 
 public class JSONMappingTest {
@@ -45,7 +44,8 @@ public class JSONMappingTest {
 			"\"process\":" + "\"" + process + "\"," +
 			"\"processId\":" + processId + "," +
 			"\"level\":" + level + "," +
-			"\"priority\":" + priority +
+			"\"priority\":" + priority + "," +
+            "\"tags\":[\"tag0\",\"tag1\"]" +
 			"}}";
 
 
@@ -61,6 +61,11 @@ public class JSONMappingTest {
 		event.setProcessId(processId);
 		event.setLevel(level);
 		event.setPriority(priority);
+
+        Set<String> tags = new HashSet<>();
+        tags.add("tag1");
+        tags.add("tag0");
+        event.setTags(tags);
 
 		Payload payload = new Payload();
 

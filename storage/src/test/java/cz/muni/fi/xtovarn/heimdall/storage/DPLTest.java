@@ -14,6 +14,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -48,6 +50,13 @@ public class DPLTest {
 
 		Event expected = JSONStringParser.stringToEvent(JSON_STRING);
 		expected.setDetectionTime(ISO8601Utils.parse(DETECTION_TIME));
+
+        Set<String> tags = new HashSet<>();
+        tags.add("tag1");
+        tags.add("tag2");
+        tags.add("tag3");
+        expected.setTags(tags);
+
 		eventDataAccessor.put(expected);
 		Event actual = eventDataAccessor.getEventById(1L);
 

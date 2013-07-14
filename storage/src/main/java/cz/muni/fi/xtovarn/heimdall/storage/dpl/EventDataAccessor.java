@@ -23,6 +23,7 @@ public class EventDataAccessor implements EventStore {
 	SecondaryIndex<String, Long, Event> processIdIndex;
 	SecondaryIndex<Integer, Long, Event> levelIndex;
 	SecondaryIndex<Integer, Long, Event> priorityIndex;
+	SecondaryIndex<String, Long, Event> tagsIndex;
 
 	public EventDataAccessor(EntityStore store) {
 		primaryIndex = store.getPrimaryIndex(Long.class, Event.class);
@@ -36,6 +37,7 @@ public class EventDataAccessor implements EventStore {
 		processIdIndex = store.getSecondaryIndex(primaryIndex, String.class, "processId");
 		levelIndex = store.getSecondaryIndex(primaryIndex, Integer.class, "level");
 		priorityIndex = store.getSecondaryIndex(primaryIndex, Integer.class, "priority");
+		tagsIndex = store.getSecondaryIndex(primaryIndex, String.class, "tags");
 	}
 
 	@Override
