@@ -31,7 +31,7 @@ public class DefaultPipelineFactory implements PipelineFactory {
 		// the individual phases of the sensor event processing
 		pipeline.addHandler(new ParseJSON());
 		pipeline.addHandler(new SetDetectionTime());
-		pipeline.addHandler(new Store(eventStore));
+//		pipeline.addHandler(new Store(eventStore)); TODO -- parametrize!
 		pipeline.addHandler(new DetermineRecipient(secureChannelGroup, subscriptionManager));
 		pipeline.addHandler(new SubmitToDispatcher(dispatcher));
 

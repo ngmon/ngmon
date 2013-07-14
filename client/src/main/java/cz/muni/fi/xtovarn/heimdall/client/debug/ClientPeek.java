@@ -83,7 +83,7 @@ public class ClientPeek {
 
 	private static Predicate getPredicate() {
 		Predicate predicate = new Predicate();
-		predicate.addConstraint(new Constraint("level", Operator.LESS_THAN, "5"));
+		predicate.addConstraint(new Constraint("level", Operator.GREATER_THAN, "5"));
 		return predicate;
 	}
 
